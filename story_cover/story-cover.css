@@ -125,6 +125,7 @@ h1.title-area__title {
 .comment-area > .comment {
     border-left: solid 2px;
     padding-left: 10px;
+    margin-bottom: .5em;
 }
 
 .comment > .source {
