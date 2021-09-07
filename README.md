@@ -1,6 +1,8 @@
 # tl-utils
 Utilities for EnStars TLs (?)
 
+[On jsDelivr](https://cdn.jsdelivr.net/gh/enstars/tl-utils/)
+
 ## Story Cover
 **LIVE PREVIEW:** [TL archive](https://watatomo.github.io/tl/post/phantom_thieves_vs_detectives/)
 
@@ -8,6 +10,7 @@ Utilities for EnStars TLs (?)
 - [ ] Add featured cards
 - [ ] Add story CGs
 - [ ] Add associated event/gacha
+- [ ] Collapsibles
 - [x] Mobile view
 - [x] Use chibi heads for characters
 - [ ] Make Hexo plugin (?)

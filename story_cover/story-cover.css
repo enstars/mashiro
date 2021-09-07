@@ -1,6 +1,5 @@
 :root {
-    --darkTransform: 20%;
-    --storyColor-dark-l: calc(var(--storyColor-l) - var(--darkTransform));
+    --storyColor-dark-l: calc(var(--storyColor-l) - 20%);
     --storyColor-dark: hsl(var(--storyColor-h), var(--storyColor-s), var(--storyColor-dark-l));
 }
 .story-wrapper {
@@ -8,6 +7,9 @@
     flex-direction: column;
     width: 100%;
     font-size: .92em;
+}
+.story-wrapper img {
+    margin-bottom: 0;
 }
 .grid-wrapper {
     display: grid;
@@ -49,7 +51,6 @@
     object-fit: cover;
     border-radius: 3px;
     box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.5);
-    margin: 0;
     transform: translate(0, -100%);
 }
 .info-area {
@@ -99,17 +100,46 @@ h1.title-area__title {
 .info-area a:hover {
     color: var(--storyColor-dark);
 }
+.info{
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 2fr;
+    gap: 5px;
+}
 .info-item {
-    display: flex;
-    flex-direction: row;
-    font-size: .9em;
+    border-radius: 5px;
+    padding: 5px 10px;
+    border: solid 2px rgba(35, 193, 219, .2);
+}
+.info-item.season {
+    grid-column: 1/2;
+    grid-row: 1/2;
+}
+.info-item.chapters {
+    grid-column: 2/4;
+    grid-row: 1/2;
+}
+.info-item.writer {
+    grid-column: 4/5;
+    grid-row: 1/2;
+}
+.info-item.characters {
+    grid-column: 1/5;
+    padding: 5px 10px 0px;
+}
+.info-item.tl {
+    grid-column: 1/3;
+}
+.info-item.pr {
+    grid-column: 3/5;
 }
 .info-item>.label {
+    padding: 0px;
     font-weight: 700;
-    flex-basis: 140px;
+    font-size: .82em;
 }
 .info-item>.value {
     flex-grow: 1;
+    font-size: .9em;
 }
 .comment-area>.comment {
     border-left: solid 2px;
@@ -149,9 +179,6 @@ h1.title-area__title {
     grid-row: 1;
     grid-column: 1/5;
 }
-.info-item.characters {
-
-}
 .characters>.value a {
     display: inline-block;
     height: 40px;
@@ -183,12 +210,6 @@ h1.title-area__title {
         grid-column: 1/3;
         grid-row: 3;
         font-size: .9em;
-    }
-    .info-item.characters {
-        flex-direction: column;
-    }
-    .info-item.characters>.label {
-        flex-basis: 0;
     }
     .characters>.value a {
         height: 35px;
