@@ -7,6 +7,8 @@ Utilities for EnStars TLs (?)
 ### To-do
 - [ ] Add featured cards
 - [ ] Add story CGs
+- [ ] Add associated event/gacha
 - [x] Mobile view
-- [ ] Use chibi heads for characters
+- [x] Use chibi heads for characters
 - [ ] Make Hexo plugin (?)
+- [ ] How to add a preview on the main page that disappears in the full post...
