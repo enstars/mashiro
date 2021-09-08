@@ -9,8 +9,8 @@ Utilities for EnStars TLs (?)
 ### To-do
 - [ ] Add featured cards
 - [ ] Add story CGs
-- [ ] Add associated event/gacha
-- [ ] Collapsibles
+- [x] Add associated event/gacha
+- [x] Collapsibles
 - [x] Mobile view
 - [x] Use chibi heads for characters
 - [ ] Make Hexo plugin (?)
