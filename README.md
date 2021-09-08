@@ -8,7 +8,7 @@ Utilities for EnStars TLs (?)
 
 ### To-do
 - [ ] Add featured cards
-- [ ] Add story CGs
+- [x] Add story CGs
 - [x] Add associated event/gacha
 - [x] Collapsibles
 - [x] Mobile view

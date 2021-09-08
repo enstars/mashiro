@@ -11,6 +11,7 @@
 }
 .story-wrapper img {
     margin-bottom: 0;
+    border-radius: 0;
 }
 .grid-wrapper {
     display: grid;
@@ -142,9 +143,6 @@ h1.title-area__title {
     flex-grow: 1;
     font-size: .9em;
 }
-.comment-area>.comment {
-    margin-bottom: .5em;
-}
 .comment>.source {
     text-align: right;
     font-size: .9em;
@@ -222,6 +220,37 @@ h1.title-area__title {
 }
 .tab-content>.tab-item:last-child {
     padding: 8px 0 0 0;
+}
+.cg-gallery>.tab-content>.gallery {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(auto, 2fr));
+        gap: 8px;
+    }
+.gallery-item {
+    overflow: hidden;
+    border-radius: 5px;
+    position: relative;
+}
+.gallery-item>.image {
+    width: 100%;
+    height: auto;
+    transition: 0.2s ease;
+}
+.gallery-item>.image:hover {
+    transform: scale(1.02);
+}
+.gallery-item>.caption {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    color: #fff;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.0), rgba(0,0,0,0.7));
+    padding: 7px 7px 3px;
+    transition: 0.2s ease;
+    transform: translateY(100%);
+}
+.gallery-item:hover>.caption {
+    transform: translateY(0%);
 }
 @media only screen and (max-width: 812px) {
     .story-box {
