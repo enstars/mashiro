@@ -1,5 +1,5 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/enstars/tl-utils@1.0.4/story_cover/story-cover.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/enstars/tl-utils@1.0.6/story_cover/story-cover.css">
 
 <style>
     :root {
@@ -224,7 +224,35 @@
                         <h3 class="tab-header__name">Associated Cards</h3>
                     </div>
                     <div class="tab-content">
-                        test
+                        <div class="cards">
+                            <div>
+                                <img src="/tl/img/enst/phantom_thieves_vs_detectives/assets/cd_468_normal.png">
+                            </div>
+                            <div>
+                                <img src="/tl/img/enst/phantom_thieves_vs_detectives/assets/cd_469_normal.png">
+                            </div>
+                            <div>
+                                <img src="/tl/img/enst/phantom_thieves_vs_detectives/assets/cd_470_normal.png">
+                            </div>
+                            <div>
+                                <img src="/tl/img/enst/phantom_thieves_vs_detectives/assets/cd_471_normal.png">
+                            </div>
+                            <div>
+                                <img src="/tl/img/enst/phantom_thieves_vs_detectives/assets/cd_472_normal.png">
+                            </div>
+                            <div>
+                                <img src="/tl/img/enst/phantom_thieves_vs_detectives/assets/cd_473_normal.png">
+                            </div>
+                            <div>
+                                <img src="/tl/img/enst/phantom_thieves_vs_detectives/assets/cd_474_normal.png">
+                            </div>
+                            <div>
+                                <img src="/tl/img/enst/phantom_thieves_vs_detectives/assets/cd_475_normal.png">
+                            </div>
+                            <div>
+                                <img src="/tl/img/enst/phantom_thieves_vs_detectives/assets/cd_476_normal.png">
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="comment-area">
@@ -239,44 +267,44 @@
             <div class="chapter-area">
                 <ul>
                     <li>
-                        <a href="1">Prologue</a>
+                        <a href="1" id="none">Prologue</a>
                     </li>
                     <li>
                         <span>Case Discovery</span>
-                        <a href="2">1</a>
-                        <a href="3">2</a>
-                        <a href="4">3</a>
-                        <a href="5">4</a>
-                        <a href="6">5</a>
-                        <a href="7">6</a>
+                        <a href="2" id="none">1</a>
+                        <a href="3" id="none">2</a>
+                        <a href="4" id="none">3</a>
+                        <a href="5" id="none">4</a>
+                        <a href="6" id="none">5</a>
+                        <a href="7" id="none">6</a>
                     </li>
                     <li>
                         <span>Investigation Start</span>
-                        <a href="8">1</a>
-                        <a href="9">2</a>
-                        <a href="10">3</a>
-                        <a href="11">4</a>
+                        <a href="8" id="none">1</a>
+                        <a href="9" id="none">2</a>
+                        <a href="10" id="none">3</a>
+                        <a href="11" id="none">4</a>
                     </li>
                     <li>
                         <span>Criminal Pursuit</span>
-                        <a href="12">1</a>
-                        <a href="13">2</a>
-                        <a href="14">3</a>
-                        <a href="15">4</a>
+                        <a href="12" id="none">1</a>
+                        <a href="13" id="none">2</a>
+                        <a href="14" id="none">3</a>
+                        <a href="15" id="none">4</a>
                     </li>
                     <li>
                         <span>Revelations</span>
-                        <a href="16">1</a>
-                        <a href="17">2</a>
-                        <a href="18">3</a>
-                        <a href="19">4</a>
+                        <a href="16" id="none">1</a>
+                        <a href="17" id="none">2</a>
+                        <a href="18" id="none">3</a>
+                        <a href="19" id="none">4</a>
                     </li>
                     <li>
                         <span>Epilogue</span>
-                        <a href="20">1</a>
-                        <a href="21">2</a>
-                        <a href="22">3</a>
-                        <a href="23">4</a>
+                        <a href="20" id="none">1</a>
+                        <a href="21" id="none">2</a>
+                        <a href="22" id="none">3</a>
+                        <a href="23" id="none">4</a>
                     </li>
                 </ul>
             </div>
@@ -288,7 +316,7 @@
 $(document).ready(function() {
   $('.tab-header').click(function(){
     $(this).next().slideToggle();
-    $('.tab-header__name').toggleClass(open, add);
+    $(this).toggleClass('tab-header__open');
   })
 });
 </script>

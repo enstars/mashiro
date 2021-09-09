@@ -5,6 +5,6 @@ document.head.appendChild(jQ);
 $(document).ready(function() {
   $('.tab-header').click(function(){
     $(this).next().slideToggle();
-    $('.tab-header__name').toggleClass(open, add);
+    $(this).toggleClass('tab-header__open');
   })
 });

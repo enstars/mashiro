@@ -4,8 +4,8 @@
     --storyColor-dark: hsl(var(--storyColor-h), var(--storyColor-s), var(--storyColor-dark-l));
 }
 .story-wrapper {
-    display: flex;
-    flex-direction: column;
+    /* display: flex; */
+    /* flex-direction: column; */
     width: 100%;
     font-size: .92em;
 }
@@ -102,6 +102,9 @@ h1.title-area__title {
 .info-area a:hover {
     color: var(--storyColor-dark);
 }
+.info-area .synopsis {
+    margin-bottom: 5px;
+}
 .info{
     display: grid;
     grid-template-columns: 2fr 1fr 1fr 2fr;
@@ -172,6 +175,12 @@ h1.title-area__title {
 .chapter-area a:hover {
     background: rgba(var(--storyColor-rgb), .11);
 }
+#none {
+    background: rgba(239, 240, 244, .7);
+}
+#none:hover {
+    background: rgba(239, 240, 244, 1);
+}
 .chapter-area span {
     grid-row: 1;
     grid-column: 1/5;
@@ -200,13 +209,14 @@ h1.title-area__title {
 }
 .tab-header:first-child:after {
     content: '\e5cf';
+    display: inline-block;
     font-family: 'Material Icons Round';
     font-size: 1.5em;
     line-height: 1;
-    transition: transform 0.2s ease;
+    transition: transform 0.4s ease;
 }
-.tab-header:first-child:after {
-    /* transform: rotate(180deg); */
+.tab-header__open:first-child:after {
+    transform: rotate(180deg);
 }
 .tab-item>.label {
     font-weight: 700;
@@ -246,7 +256,7 @@ h1.title-area__title {
 .gallery-item .caption {
     position: absolute;
     bottom: 0;
-    width: 100%;
+    width: calc(100% - 16px);
     color: #fff;
     background: linear-gradient(to bottom, rgba(0,0,0,0.0), rgba(0,0,0,0.7));
     padding: 20px 8px 4px;
@@ -255,6 +265,11 @@ h1.title-area__title {
 }
 .gallery-item:hover .caption {
     transform: translateY(0%);
+}
+.story-cards>.tab-content>.cards {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(auto, 1fr));
+    gap: 8px;
 }
 @media only screen and (max-width: 812px) {
     .story-box {

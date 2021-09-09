@@ -7,7 +7,7 @@ Utilities for EnStars TLs (?)
 **LIVE PREVIEW:** [TL archive](https://watatomo.github.io/tl/post/phantom_thieves_vs_detectives/)
 
 ### To-do
-- [ ] Add featured cards
+- [x] Add featured cards
 - [x] Add story CGs
 - [x] Add associated event/gacha
 - [x] Collapsibles
