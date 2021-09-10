@@ -1,16 +1,15 @@
-var jQ = document.createElement('script');
-jQ.src = 'https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js';
-document.head.appendChild(jQ);
-
 function cardLightboxInitialize(){
     $('body').append(`<div class="lightbox__dim" style="display: none;">
         <div class="lightbox-content"></div>
     </div>`);
 }
-
 $(document).ready(function() {
     cardLightboxInitialize();
     $('.tab-header').click(function(){
+        $(this).next().slideToggle();
+        $(this).toggleClass('tab-header__open');
+    })
+    $('.mt-header').click(function(){
         $(this).next().slideToggle();
         $(this).toggleClass('tab-header__open');
     })
@@ -23,5 +22,8 @@ $(document).ready(function() {
         $('.lightbox-content').parent().fadeOut(200);
     }).children().click(function(e) {
         return false;
+    });
+    $('.card-pair-wrapper').click(function(){
+        $('.card-pair-wrapper').toggleClass('bloomed');
     });
 });

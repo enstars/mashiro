@@ -1,5 +1,6 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/enstars/tl-utils@1.0.7/story_cover/story-cover.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/enstars/tl-utils@1.0.8/story_cover/story-cover.css">
+<script src="https://cdn.jsdelivr.net/gh/enstars/tl-utils@1.0.8/story_cover/story-cover.js"></script>
 
 <style>
     :root {
@@ -8,24 +9,12 @@
         --storyColor-h: 188;
         --storyColor-s: 72%;
         --storyColor-l: 50%;
-        --background: url("/gh/watatomo/tl/img/enst/phantom_thieves_vs_detectives/assets/still_469_normal.png");
+        --background: url('/gh/watatomo/tl/img/enst/phantom_thieves_vs_detectives/assets/still_469_normal.png');
     }
     @media (max-width: 567px) {
         .post-block {
             padding: 5px 10px 8px !important;
         }
-    }
-    .cards-item .lightbox {
-        display: none;
-    }
-</style>
-
-<style>
-    .mini-talks li {
-        grid-column: 1/3;
-    }
-    .mini-talks a {
-        display: none;
     }
 </style>
 
@@ -247,7 +236,6 @@
                                     </div>
                                 </div>
                                 <div class="lightbox">
-                                    <!-- card image -->
                                     [Genius and Ordinary] Tomoya Mashiro<br>
                                     [天才と普通] 真白 友也<br>
                                     Skills: Genius of Diligence, Until I Run Out of Energy<br>
@@ -264,7 +252,6 @@
                                     </div>
                                 </div>
                                 <div class="lightbox">
-                                    <!-- card image -->
                                     [Under the Mask] Wataru Hibiki<br>
                                     [仮面の下] 日々樹 渉<br>
                                     Skills: Zero Gravity Show, Balloon Advertising<br>
@@ -281,7 +268,6 @@
                                     </div>
                                 </div>
                                 <div class="lightbox">
-                                    <!-- card image -->
                                     [Positive Detective] Mitsuru Tenma<br>
                                     [前向き探偵] 天満 光<br>
                                     Skills: Spinning Jump, Race<br>
@@ -298,7 +284,6 @@
                                     </div>
                                 </div>
                                 <div class="lightbox">
-                                    <!-- card image -->
                                     [Meddling Phantom Thief] Arashi Narukami<br>
                                     [翻弄する怪盗] 鳴上 嵐<br>
                                     Skills: Jewels in Hand, Hospitality with Pleasure<br>
@@ -315,7 +300,6 @@
                                     </div>
                                 </div>
                                 <div class="lightbox">
-                                    <!-- card image -->
                                     [Watchful Detective] Nazuna Nito<br>
                                     [見守り探偵] 仁兎 なずな<br>
                                     Skills: Mystery Solving Glasses, Contemplative Pipe<br>
@@ -332,7 +316,6 @@
                                     </div>
                                 </div>
                                 <div class="lightbox">
-                                    <!-- card image -->
                                     [Sadistic Phantom Thief] Izumi Sena<br>
                                     [いじわる怪盗] 瀬名 泉<br>
                                     Skills: Song of Clues, Puzzling Problem<br>
@@ -349,7 +332,6 @@
                                     </div>
                                 </div>
                                 <div class="lightbox">
-                                    <!-- card image -->
                                     [Black Tea Detective] Hajime Shino<br>
                                     [紅茶探偵] 紫之 創<br>
                                     Skills: Relaxing Tea, Heart-Pounding Crime Scene<br>
@@ -366,7 +348,6 @@
                                     </div>
                                 </div>
                                 <div class="lightbox">
-                                    <!-- card image -->
                                     [Sleepy Phantom Thief] Ritsu Sakuma<br>
                                     [眠たげ怪盗] 朔間 凛月<br>
                                     Skills: Evening Public Performance, Tired Yawn<br>
@@ -383,7 +364,6 @@
                                     </div>
                                 </div>
                                 <div class="lightbox">
-                                    <!-- card image -->
                                     [Sincere Phantom Thief] Tsukasa Suou<br>
                                     [真摯な怪盗] 朱桜 司<br>
                                     Skills: Fluttering Cloak, New Repertoire<br>
@@ -447,59 +427,45 @@
                         </li>
                     </ul>
                 </div>
-                <!-- <div class="mini-talks">
-                    <ul>
-                        <li>
-                            <span class="mini-talk">Mitsuru Tenma</span>
+                <div class="mini-talks">
+                    <div class="mini-talk">
+                        <div class="mt-header">Mitsuru Tenma</div>
+                        <div class="mt-content">
+                        <div class="item">
                             <a href="mini_talk/mitsuru/1" id="none">1</a>
                             <a href="mini_talk/mitsuru/2" id="none">2</a>
-                        </li>
-                        <li>
-                            <span class="mini-talk">Arashi Narukami</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mini-talk">
+                        <div class="mt-header">Arashi Narukami</div>
+                        <div class="mt-content">
+                        <div class="item">
                             <a href="mini_talk/arashi/1" id="none">1</a>
                             <a href="mini_talk/arashi/2" id="none">2</a>
-                        </li>
-                        <li>
-                            <span class="mini-talk">Tomoya Mashiro</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mini-talk">
+                        <div class="mt-header">Tomoya Mashiro</div>
+                        <div class="mt-content">
+                            <div class="item">
                             <a href="mini_talk/tomoya/1" id="none">1</a>
                             <a href="mini_talk/tomoya/2" id="none">2</a>
-                        </li>
-                        <li>
-                            <span class="mini-talk">Wataru Hibiki</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mini-talk">
+                        <div class="mt-header">Wataru Hibiki</div>
+                        <div class="mt-content">
+                            <div class="item">
                             <a href="mini_talk/wataru/1" id="none">1</a>
                             <a href="mini_talk/wataru/2" id="none">2</a>
-                        </li>
-                    </ul>
-                </div> -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
-
-<script>
-function cardLightboxInitialize(){
-    $('body').append(`<div class="lightbox__dim" style="display: none;">
-        <div class="lightbox-content"></div>
-    </div>`);
-}
-$(document).ready(function() {
-    cardLightboxInitialize();
-    $('.tab-header').click(function(){
-        $(this).next().slideToggle();
-        $(this).toggleClass('tab-header__open');
-    })
-    $('.cards-item').click(function() {
-        $('body').addClass('lightbox-visible');
-        $('.lightbox-content').html( $(this).html() ).parent().fadeToggle(200);
-    });
-    $('.lightbox__dim').click(function() {
-        $('body').removeClass('lightbox-visible');
-        $('.lightbox-content').parent().fadeOut(200);
-    }).children().click(function(e) {
-        return false;
-    });
-    $('.card-pair-wrapper').click(function(){
-        $('.card-pair-wrapper').toggleClass('bloomed');
-    });
-});
-</script>
