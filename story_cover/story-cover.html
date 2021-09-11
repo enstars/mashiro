@@ -1,6 +1,82 @@
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/gh/enstars/tl-utils@1.0.9/story_cover/story-cover.css">
-<script type="text/javascript" src="https://cdn.jsdelivr.net/gh/enstars/tl-utils@1.0.9/story_cover/story-cover.js"></script>
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/gh/enstars/tl-utils@1.0.91/story_cover/story-cover.css">
+
+<div class="preview-wrapper" style="--storyColor: #23c1db; --storyColor-rgb: 35,193,219;--storyColor-h: 188;--storyColor-s: 72%; --storyColor-l: 50%;">
+    <div class="grid-wrapper">
+        <div class="preview-background" style="background-image: url('/tl/img/enst/phantom_thieves_vs_detectives/assets/cs_468_evolution.webp')"></div>
+        <div class="preview-box">
+            <div class="title-area">
+                <div class="title-area__title">Phantom Thieves vs. Detectives</div>
+                <div class="title-area__subtitle">怪盗VS探偵団</div>
+                <div class="title-area__start"><a href="1">Start Reading</a></div>
+            </div>
+            <div class="info-area">
+                <div class="synopsis">
+                    Knights and Ra*bits will have an eight-day concert for the new S3 tier. They're split into two groups: phantom thieves and detectives. But just when the curtains rise, something happened to Tomoya...?! <a href="https://twitter.com/ensemble_stars/status/681716281414815744">➹</a>
+                </div>
+                <div class="info">
+                    <div class="info-item season">
+                        <div class="label">
+                            Season
+                        </div>
+                        <div class="value">
+                            Winter
+                        </div>
+                    </div>
+                    <div class="info-item chapters">
+                        <div class="label">
+                            Chapters
+                        </div>
+                        <div class="value">
+                            23
+                        </div>
+                    </div>
+                    <div class="info-item writer">
+                        <div class="label">
+                            Writer
+                        </div>
+                        <div class="value">
+                            Akira
+                        </div>
+                    </div>
+                    <div class="info-item characters">
+                        <div class="label">
+                            Characters
+                        </div>
+                        <div class="value">
+                            <a href="/tl/categories/Ensemble-Stars/Hajime-Shino/" id="hajime"></a>
+                            <a href="/tl/categories/Ensemble-Stars/Tomoya-Mashiro/" id="tomoya"></a>
+                            <a href="/tl/categories/Ensemble-Stars/Mitsuru-Tenma/" id="mitsuru"></a>
+                            <a href="/tl/categories/Ensemble-Stars/Tsukasa-Suou/" id="tsukasa"></a>
+                            <a href="/tl/categories/Ensemble-Stars/Ritsu-Sakuma/" id="ritsu"></a>
+                            <a href="/tl/categories/Ensemble-Stars/Arashi-Narukami/" id="arashi"></a>
+                            <a href="/tl/categories/Ensemble-Stars/Izumi-Sena/" id="izumi"></a>
+                            <a href="/tl/categories/Ensemble-Stars/Wataru-Hibiki/" id="wataru"></a>
+                            <a href="/tl/categories/Ensemble-Stars/Nazuna-Nito/" id="nazuna"></a>
+                        </div>
+                    </div>
+                    <div class="info-item tl">
+                        <div class="label">
+                            Translator
+                        </div>
+                        <div class="value">
+                            <a href="/tl/about">Ren</a>
+                        </div>
+                    </div>
+                    <div class="info-item pr">
+                        <div class="label">
+                            Proofreaders
+                        </div>
+                        <div class="value">
+                            TBA
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- more -->
 
 <style>
     :root {
@@ -9,7 +85,10 @@
         --storyColor-h: 188;
         --storyColor-s: 72%;
         --storyColor-l: 50%;
-        --background: url('/gh/watatomo/tl/img/enst/phantom_thieves_vs_detectives/assets/still_469_normal.png');
+        --background: url('/gh/watatomo/tl/img/enst/phantom_thieves_vs_detectives/assets/still_469_normal.webp');
+    }
+    .preview-wrapper {
+        display: none;
     }
     @media (max-width: 567px) {
         .post-block {
@@ -18,16 +97,19 @@
     }
 </style>
 
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/enstars/tl-utils@1.0.91/story_cover/story-cover.js"></script>
+
 <div class="story-wrapper">
     <div class="grid-wrapper">
         <div class="story-background"></div>
         <div class="story-box">
             <div class="story-cover">
-                <div><img src="/tl/img/enst/phantom_thieves_vs_detectives/assets/cs_469_evolution.png"></div>
+                <div><img src="/tl/img/enst/phantom_thieves_vs_detectives/assets/cs_469_evolution.webp"></div>
             </div>
             <div class="title-area">
-                <h1 class="title-area__title">Phantom Thieves vs. Detectives</h1>
-                <h2 class="title-area__subtitle">怪盗VS探偵団</h2>
+                <div class="title-area__title">Phantom Thieves vs. Detectives</div>
+                <div class="title-area__subtitle">怪盗VS探偵団</div>
                 <div class="title-area__start">
                     <a href="1">Start Reading</a>
                 </div>
@@ -96,7 +178,7 @@
                 </div>
                 <div class="extra-area">
                     <div class="tab-header">
-                        <h3 class="tab-header__name">Extra Information</h3>
+                        <div class="tab-header__name">Extra Information</div>
                     </div>
                     <div class="tab-content">
                         <div class="tab-item">
@@ -112,7 +194,7 @@
                                 Event
                             </div>
                             <div class="value">
-                                Showdown! The Great Phantom Thief vs. the Detective Brigade <!-- <img src="/tl/img/enst/phantom_thieves_vs_detectives/assets/chapter_banner_2000016.png"> -->
+                                Showdown! The Great Phantom Thief vs. the Detective Brigade
                             </div>
                         </div>
                         <div class="tab-item">
@@ -127,7 +209,7 @@
                 </div>
                 <div class="comment-area">
                     <div class="tab-header">
-                        <h3 class="tab-header__name">Writer's Comment</h3>
+                        <div class="tab-header__name">Writer's Comment</div>
                     </div>
                     <div class="comment tab-content">
                         I'm the writer for <em>Phantom Thieves vs. Detectives.</em> Just like Tomoya, I got sick and collapsed while writing this. I apologize for the inconvenience to those involved. (Starting 2016 with an apology)
@@ -138,7 +220,7 @@
                 </div>
                 <div class="comment-area">
                     <div class="tab-header">
-                        <h3 class="tab-header__name">Voice Actor's Comment</h3>
+                        <div class="tab-header__name">Voice Actor's Comment</div>
                     </div>
                     <div class="comment tab-content">
                         The event's hereee!! Tomo-chin finally got his long-awaited [ranking] event 5*!! And he's not cross-dressing!!
@@ -149,13 +231,13 @@
                 </div>
                 <div class="cg-gallery">
                     <div class="tab-header">
-                        <h3 class="tab-header__name">CG Gallery</h3>
+                        <div class="tab-header__name">CG Gallery</div>
                     </div>
                     <div class="tab-content">
                         <div class="gallery">
                             <div class="gallery-item">
                                 <div class="image">
-                                    <img src="/tl/img/enst/phantom_thieves_vs_detectives/assets/still_468_normal.png">
+                                    <img src="/tl/img/enst/phantom_thieves_vs_detectives/assets/still_468_normal.webp">
                                 </div>
                                 <div class="caption">
                                     Case Discovery (3)
@@ -163,7 +245,7 @@
                             </div>
                             <div class="gallery-item">
                                 <div class="image">
-                                    <img src="/tl/img/enst/phantom_thieves_vs_detectives/assets/still_468_evolution.png">
+                                    <img src="/tl/img/enst/phantom_thieves_vs_detectives/assets/still_468_evolution.webp">
                                 </div>
                                 <div class="caption">
                                     Revelations (3)
@@ -171,7 +253,7 @@
                             </div>
                             <div class="gallery-item">
                                 <div class="image">
-                                    <img src="/tl/img/enst/phantom_thieves_vs_detectives/assets/still_469_normal.png">
+                                    <img src="/tl/img/enst/phantom_thieves_vs_detectives/assets/still_469_normal.webp">
                                 </div>
                                 <div class="caption">
                                     Investigation Start (3)
@@ -179,7 +261,7 @@
                             </div>
                             <div class="gallery-item">
                                 <div class="image">
-                                    <img src="/tl/img/enst/phantom_thieves_vs_detectives/assets/still_469_evolution.png">
+                                    <img src="/tl/img/enst/phantom_thieves_vs_detectives/assets/still_469_evolution.webp">
                                 </div>
                                 <div class="caption">
                                     Epilogue (2)
@@ -187,7 +269,7 @@
                             </div>
                             <div class="gallery-item">
                                 <div class="image">
-                                    <img src="/tl/img/enst/phantom_thieves_vs_detectives/assets/still_470_normal.png">
+                                    <img src="/tl/img/enst/phantom_thieves_vs_detectives/assets/still_470_normal.webp">
                                 </div>
                                 <div class="caption">
                                     Criminal Pursuit (2)
@@ -195,7 +277,7 @@
                             </div>
                             <div class="gallery-item">
                                 <div class="image">
-                                    <img src="/tl/img/enst/phantom_thieves_vs_detectives/assets/still_470_evolution.png">
+                                    <img src="/tl/img/enst/phantom_thieves_vs_detectives/assets/still_470_evolution.webp">
                                 </div>
                                 <div class="caption">
                                     Revelations (4)
@@ -203,7 +285,7 @@
                             </div>
                             <div class="gallery-item">
                                 <div class="image">
-                                    <img src="/tl/img/enst/phantom_thieves_vs_detectives/assets/still_471_normal.png">
+                                    <img src="/tl/img/enst/phantom_thieves_vs_detectives/assets/still_471_normal.webp">
                                 </div>
                                 <div class="caption">
                                     Criminal Pursuit (4)
@@ -211,7 +293,7 @@
                             </div>
                             <div class="gallery-item">
                                 <div class="image">
-                                    <img src="/tl/img/enst/phantom_thieves_vs_detectives/assets/still_471_evolution.png">
+                                    <img src="/tl/img/enst/phantom_thieves_vs_detectives/assets/still_471_evolution.webp">
                                 </div>
                                 <div class="caption">
                                     Case Discovery (5)
@@ -222,17 +304,17 @@
                 </div>
                 <div class="story-cards">
                     <div class="tab-header">
-                        <h3 class="tab-header__name">Associated Cards</h3>
+                        <div class="tab-header__name">Associated Cards</div>
                     </div>
                     <div class="tab-content">
                         <div class="cards">
                             <div class="cards-item">
                                 <div class="image">
                                     <div class="single unbloomed">
-                                        <img src="/tl/img/enst/phantom_thieves_vs_detectives/assets/cd_468_normal.png">
+                                        <img src="/tl/img/enst/phantom_thieves_vs_detectives/assets/cd_468_normal.webp">
                                     </div>
                                     <div class="single bloomed">
-                                        <img src="/tl/img/enst/phantom_thieves_vs_detectives/assets/cd_468_evolution.png">
+                                        <img src="/tl/img/enst/phantom_thieves_vs_detectives/assets/cd_468_evolution.webp">
                                     </div>
                                 </div>
                                 <div class="lightbox">
@@ -255,10 +337,10 @@
                             <div class="cards-item">
                                 <div class="image">
                                     <div class="single unbloomed">
-                                        <img src="/tl/img/enst/phantom_thieves_vs_detectives/assets/cd_469_normal.png">
+                                        <img src="/tl/img/enst/phantom_thieves_vs_detectives/assets/cd_469_normal.webp">
                                     </div>
                                     <div class="single bloomed">
-                                        <img src="/tl/img/enst/phantom_thieves_vs_detectives/assets/cd_469_evolution.png">
+                                        <img src="/tl/img/enst/phantom_thieves_vs_detectives/assets/cd_469_evolution.webp">
                                     </div>
                                 </div>
                                 <div class="lightbox">
@@ -281,10 +363,10 @@
                             <div class="cards-item">
                                 <div class="image">
                                     <div class="single unbloomed">
-                                        <img src="/tl/img/enst/phantom_thieves_vs_detectives/assets/cd_470_normal.png">
+                                        <img src="/tl/img/enst/phantom_thieves_vs_detectives/assets/cd_470_normal.webp">
                                     </div>
                                     <div class="single bloomed">
-                                        <img src="/tl/img/enst/phantom_thieves_vs_detectives/assets/cd_470_evolution.png">
+                                        <img src="/tl/img/enst/phantom_thieves_vs_detectives/assets/cd_470_evolution.webp">
                                     </div>
                                 </div>
                                 <div class="lightbox">
@@ -307,10 +389,10 @@
                             <div class="cards-item">
                                 <div class="image">
                                     <div class="single unbloomed">
-                                        <img src="/tl/img/enst/phantom_thieves_vs_detectives/assets/cd_471_normal.png">
+                                        <img src="/tl/img/enst/phantom_thieves_vs_detectives/assets/cd_471_normal.webp">
                                     </div>
                                     <div class="single bloomed">
-                                        <img src="/tl/img/enst/phantom_thieves_vs_detectives/assets/cd_471_evolution.png">
+                                        <img src="/tl/img/enst/phantom_thieves_vs_detectives/assets/cd_471_evolution.webp">
                                     </div>
                                 </div>
                                 <div class="lightbox">
@@ -333,10 +415,10 @@
                             <div class="cards-item">
                                 <div class="image">
                                     <div class="single unbloomed">
-                                        <img src="/tl/img/enst/phantom_thieves_vs_detectives/assets/cd_472_normal.png">
+                                        <img src="/tl/img/enst/phantom_thieves_vs_detectives/assets/cd_472_normal.webp">
                                     </div>
                                     <div class="single bloomed">
-                                        <img src="/tl/img/enst/phantom_thieves_vs_detectives/assets/cd_472_evolution.png">
+                                        <img src="/tl/img/enst/phantom_thieves_vs_detectives/assets/cd_472_evolution.webp">
                                     </div>
                                 </div>
                                 <div class="lightbox">
@@ -359,10 +441,10 @@
                             <div class="cards-item">
                                 <div class="image">
                                     <div class="single unbloomed">
-                                        <img src="/tl/img/enst/phantom_thieves_vs_detectives/assets/cd_473_normal.png">
+                                        <img src="/tl/img/enst/phantom_thieves_vs_detectives/assets/cd_473_normal.webp">
                                     </div>
                                     <div class="single bloomed">
-                                        <img src="/tl/img/enst/phantom_thieves_vs_detectives/assets/cd_473_evolution.png">
+                                        <img src="/tl/img/enst/phantom_thieves_vs_detectives/assets/cd_473_evolution.webp">
                                     </div>
                                 </div>
                                 <div class="lightbox">
@@ -385,10 +467,10 @@
                             <div class="cards-item">
                                 <div class="image">
                                     <div class="single unbloomed">
-                                        <img src="/tl/img/enst/phantom_thieves_vs_detectives/assets/cd_474_normal.png">
+                                        <img src="/tl/img/enst/phantom_thieves_vs_detectives/assets/cd_474_normal.webp">
                                     </div>
                                     <div class="single bloomed">
-                                        <img src="/tl/img/enst/phantom_thieves_vs_detectives/assets/cd_474_evolution.png">
+                                        <img src="/tl/img/enst/phantom_thieves_vs_detectives/assets/cd_474_evolution.webp">
                                     </div>
                                 </div>
                                 <div class="lightbox">
@@ -411,10 +493,10 @@
                             <div class="cards-item">
                                 <div class="image">
                                     <div class="single unbloomed">
-                                        <img src="/tl/img/enst/phantom_thieves_vs_detectives/assets/cd_475_normal.png">
+                                        <img src="/tl/img/enst/phantom_thieves_vs_detectives/assets/cd_475_normal.webp">
                                     </div>
                                     <div class="single bloomed">
-                                        <img src="/tl/img/enst/phantom_thieves_vs_detectives/assets/cd_475_evolution.png">
+                                        <img src="/tl/img/enst/phantom_thieves_vs_detectives/assets/cd_475_evolution.webp">
                                     </div>
                                 </div>
                                 <div class="lightbox">
@@ -437,10 +519,10 @@
                             <div class="cards-item">
                                 <div class="image">
                                     <div class="single unbloomed">
-                                        <img src="/tl/img/enst/phantom_thieves_vs_detectives/assets/cd_476_normal.png">
+                                        <img src="/tl/img/enst/phantom_thieves_vs_detectives/assets/cd_476_normal.webp">
                                     </div>
                                     <div class="single bloomed">
-                                        <img src="/tl/img/enst/phantom_thieves_vs_detectives/assets/cd_476_evolution.png">
+                                        <img src="/tl/img/enst/phantom_thieves_vs_detectives/assets/cd_476_evolution.webp">
                                     </div>
                                 </div>
                                 <div class="lightbox">
@@ -465,7 +547,7 @@
                 </div>
                 <div class="comment-area">
                     <div class="tab-header">
-                        <h3 class="tab-header__name">Translator's Comment</h3>
+                        <div class="tab-header__name">Translator's Comment</div>
                     </div>
                     <div class="comment tab-content">
                         I fucking hate it here.

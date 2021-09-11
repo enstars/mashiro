@@ -13,8 +13,7 @@ Utilities for EnStars TLs (?)
 - [x] Collapsibles
 - [x] Mobile view
 - [x] Use chibi heads for characters
-- [ ] Make Hexo plugin (?)
-- [ ] How to add a preview on the main page that disappears in the full post...
+- [ ] Make this work with pjax
 
 ## Story Preview
-Coming soon...
+Included in `story-cover.css`, but separate code is in `story-preview.css`.

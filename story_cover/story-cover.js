@@ -4,6 +4,7 @@ function cardLightboxInitialize(){
     </div>`);
 }
 $(document).ready(function() {
+    $('.preview-wrapper').remove();
     cardLightboxInitialize();
     $('.tab-header').click(function(){
         $(this).next().slideToggle();
