@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/icon?family=Material+Icons+Round');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;700&display=swap&subset=japanese');
 :root {
     --storyColor-dark-l: calc(var(--storyColor-l) - 20%);
     --storyColor-dark: hsl(var(--storyColor-h), var(--storyColor-s), var(--storyColor-dark-l))
@@ -83,10 +84,17 @@
 
 h1.title-area__title,
 h2.title-area__subtitle,
-h3.tab-header__name {
+h3.tab-header__name,
+h4.card__name,
+h5.card__jp {
     font: inherit;
     margin: 0;
-    border: 0
+    border: 0;
+}
+
+h2.title-area__subtitle,
+h5.card__jp {
+    font-family: 'Noto Sans JP';
 }
 
 h1.title-area__title {
@@ -183,7 +191,7 @@ h1.title-area__title {
     font-weight: 700
 }
 
-.chapter-area ul {
+.chapter-area ul, .lightbox ul {
     list-style: none;
     padding: 0;
     margin: 0
@@ -242,6 +250,7 @@ h1.title-area__title {
 
 .chapter-area > .mini-talks .mt-header {
     margin: 5px 0;
+    cursor: pointer;
 }
 
 .chapter-area > .mini-talks .mt-header:after {
@@ -361,6 +370,11 @@ h1.title-area__title {
     gap: 8px
 }
 
+h4.card__name {
+    font-weight: 700;
+    font-size: 1.1em;
+}
+
 .single {
     transition: transform .2s ease;
     position: relative;
@@ -373,7 +387,9 @@ h1.title-area__title {
     position: relative;
 }
 
-.single {}
+.cards-item>.image {
+    cursor: zoom-in;
+}
 
 .single img {
     object-fit: contain;
@@ -443,6 +459,55 @@ h1.title-area__title {
 
 body.lightbox-visible {
     overflow: hidden
+}
+
+.skills {
+}
+
+.skills li {
+    display: grid;
+    grid-template-columns: 63px 1fr;
+    gap: 0 5px;
+    margin: 10px 0;
+}
+
+li#live {
+    grid-row-start: 1;
+}
+
+li#live:before, li#lesson:before {
+    color: #fff;
+    background-color: #0C195C;
+    padding: 2px 6px;
+    grid-row-start: 1;
+    grid-column-start: 1;
+    grid-column-end: 2;
+    text-align: center;
+    font-weight: 700;
+    font-size: .8em;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+li#live:before {
+    content: 'LIVE';
+}
+
+li#lesson:before {
+    content: 'LESSON';
+}
+
+li#support:before {
+    content: 'SUPPORT';
+}
+
+.skills .name {
+    font-weight: 700;
+}
+
+.skills .desc {
+    grid-column-start: 2;
 }
 
 @media only screen and (max-width: 812px) {
