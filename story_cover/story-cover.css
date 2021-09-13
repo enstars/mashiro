@@ -12,6 +12,13 @@
     margin-bottom: 0;
     border-radius: 0;
 }
+.info-area ol, .info-area li {
+    margin-block-start: 0;
+	margin-block-end: 0;
+	margin-inline-start: 0;
+	margin-inline-end: 0;
+	padding-inline-start: 0;
+}
 .grid-wrapper {
     display: grid;
 }
@@ -152,9 +159,6 @@
 .tab-content .source {
     text-align: right;
     font-size: .9em;
-}
-.comment-area span {
-    font-weight: 700;
 }
 .chapter-area ul, .lightbox ul {
     list-style: none;
@@ -446,20 +450,32 @@ li#center:before {
     width: 100%;
     grid-template-columns: 22% 10% 2fr 1fr;
 }
+.reverse .grid-wrapper {
+    grid-template-columns: 2fr 1fr 10% 22%;
+}
 .preview-background, .preview-box {
     grid-row-start: 1;
     grid-column-end: span 3;
+}
+.reverse .preview-background, .reverse .preview-box {
+    grid-column-end: 3 span;
 }
 .preview-background {
     width: 100%;
     background-repeat: no-repeat;
     background-size: cover;
-    grid-column-start: 1;
-    grid-column-end: 3;
+    grid-column: 1/3;
     border-radius: 5px 0 0 5px;
     mask-image: linear-gradient(to right, #000 70%, transparent 100%);
     -webkit-mask-image: linear-gradient(to right, #000 70%, transparent 100%);
     background-position: top 35% right 50%;
+}
+.reverse .preview-background {
+    grid-column: 3/5;
+    border-radius: 0 5px 5px 0;
+    mask-image: linear-gradient(to left, #000 70%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to left, #000 70%, transparent 100%);
+    background-position: top 35% left 50%;
 }
 .preview-box {
     border-radius: 15px 5px;
@@ -469,6 +485,9 @@ li#center:before {
     grid-column-start: 2;
     z-index: 1;
     margin: 10px;
+}
+.reverse .preview-box {
+    grid-column: 1/4;
 }
 .preview-wrapper .title-area {
     line-height: 1.25;
@@ -538,17 +557,21 @@ li#center:before {
     li#live:before, li#lesson:before, li#support:before, li#center:before {
         font-size: .7em;
     }
-    .skills .name, .skills .desc, .quotes {
+    .skills .name, .skills .desc {
         font-size: .88em;
+    }
+    .quotes {
+        font-size: .83em;
     }
 }
 @media only screen and (max-width: 567px) {
     .preview-background {
         display: none;
     }
+    .preview-wrapper .grid-wrapper {
+        grid-template-columns: unset;
+    }
     .preview-box {
-        grid-column-start: 1;
-        grid-column-end: 5;
         padding: 0;
         margin: 0;
         background: none;
