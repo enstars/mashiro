@@ -93,7 +93,7 @@
     transition: all .2s ease;
     border: none;
 }
-.title-area__start a:hover {
+.title-area__start a:hover, .preview-wrapper .title-area__start a:hover {
     background: rgba(var(--storyColor-rgb), 1);
     color: #fff;
 }
@@ -116,7 +116,7 @@
 .info-item {
     border-radius: 5px;
     padding: 5px 10px;
-    border: solid 2px rgba(35, 193, 219, .2)
+    border: solid 2px rgba(var(--storyColor-rgb), .2)
 }
 .info-item.season {
     grid-column: 1/2;
@@ -206,9 +206,9 @@
     font-family: 'Material Icons Round';
     font-size: 1.1em;
     transition: transform .4s ease;
-    margin-left: 3px;
     position: relative;
-    top: 2px;
+    top: 1px;
+    left: 3px;
 }
 .characters > .value a {
     display: inline-block;
@@ -455,13 +455,6 @@ li#support:before {
     line-height: 0;
 }
 .preview-wrapper .title-area__start a {
-    background: rgba(var(--storyColor-rgb), .1);
-    color: rgba(var(--storyColor-rgb), 1);
-    padding: 5px 10px;
-    display: inline-block;
-    border-radius: 5px;
-    transition: all .2s ease;
-    border: none;
     font-size: .88em;
 }
 @media only screen and (max-width: 812px) {
