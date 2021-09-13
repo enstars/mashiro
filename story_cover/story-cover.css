@@ -4,7 +4,7 @@
     --storyColor-dark-l: calc(var(--storyColor-l) - 20%);
     --storyColor-dark: hsl(var(--storyColor-h), var(--storyColor-s), var(--storyColor-dark-l))
 }
-.story-wrapper, .preview-wrapper {
+.story-wrapper, .preview-wrapper, .lightbox__dim {
     width: 100%;
     font-size: .92em;
 }
@@ -188,6 +188,13 @@
 .chapter-area > .mini-talks {
     border-top: solid 1px #eff0f4;
 }
+.chapter-area > .mini-talks:before {
+    content: 'Mini Talks';
+    display: flex;
+    align-items: center;
+    font-weight: 700;
+    margin-top: 5px;
+}
 .chapter-area > .mini-talks .mt-content {
     display: none;
 }
@@ -197,7 +204,7 @@
     gap: 5px;
 }
 .chapter-area > .mini-talks .mt-header {
-    margin: 5px 0;
+    margin-bottom: 5px;
     cursor: pointer;
 }
 .chapter-area > .mini-talks .mt-header:after {
@@ -531,7 +538,7 @@ li#center:before {
     li#live:before, li#lesson:before, li#support:before, li#center:before {
         font-size: .7em;
     }
-    .skills .name, .skills .desc {
+    .skills .name, .skills .desc, .quotes {
         font-size: .88em;
     }
 }
