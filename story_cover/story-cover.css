@@ -315,12 +315,12 @@
     object-fit: contain;
     width: 100%;
 }
-.image .unbloomed {
+.image .single.unbloomed {
     z-index: 2;
     transform: scale(1);
     filter: brightness(100%);
 }
-.image .bloomed {
+.image .single.bloomed {
     z-index: 1;
     top: 0;
     left: 0;
@@ -330,15 +330,39 @@
     width: 100%;
     height: 100%;
 }
-.image:hover .bloomed {
+.image:hover .single.bloomed {
     z-index: 2;
     transform: translateX(0%) scale(1) rotate(0deg);
     filter: brightness(100%);
 }
-.image:hover .unbloomed {
+.image:hover .single.unbloomed {
     z-index: 1;
     transform: translateX(-5%) scale(.95) rotate(-2deg);
     filter: brightness(70%);
+}
+.image .quotes__wrapper {
+    display: none;
+}
+.lightbox-content .image .quotes__wrapper {
+    display: block;
+    --quote-height: 2.5em;
+    height: var(--quote-height);
+    overflow: hidden;
+}
+.image .quotes {
+    display: grid;
+    grid-template-rows: var(--quote-height) var(--quote-height);
+    transition: 0.2s ease;
+}
+.image:hover .quotes {
+    transform: translate(0, calc( -1 * var(--quote-height) ) );
+}
+.image .quotes > * {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    line-height: 1.2;
 }
 .cards-item .lightbox {
     display: none;
