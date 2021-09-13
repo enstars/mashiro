@@ -78,7 +78,7 @@
 .title-area__subtitle, .card__jp {
     font-family: 'Noto Sans JP';
 }
-.title-area__title,.card__name {
+.title-area__title, .card__name {
     font-weight: 700;
 }
 .title-area__title {
@@ -149,7 +149,7 @@
     flex-grow: 1;
     font-size: .9em;
 }
-.comment > .source {
+.tab-content .source {
     text-align: right;
     font-size: .9em;
 }
@@ -378,10 +378,7 @@ body.lightbox-visible {
     gap: 0 5px;
     margin: 10px 0;
 }
-li#live {
-    grid-row-start: 1;
-}
-li#live:before, li#lesson:before, li#support:before {
+li#live:before, li#lesson:before, li#support:before, li#center:before {
     color: #fff;
     background-color: #0C195C;
     padding: 2px 6px;
@@ -404,6 +401,9 @@ li#lesson:before {
 }
 li#support:before {
     content: 'SUPPORT';
+}
+li#center:before {
+    content: 'CENTER';
 }
 .skills .name {
     font-weight: 700;
@@ -504,7 +504,7 @@ li#support:before {
     .card__jp {
         font-size: .9em;
     }
-    li#live:before, li#lesson:before, li#support:before {
+    li#live:before, li#lesson:before, li#support:before, li#center:before {
         font-size: .7em;
     }
     .skills .name, .skills .desc {
@@ -519,9 +519,9 @@ li#support:before {
         grid-column-start: 1;
         grid-column-end: 5;
         padding: 0;
-	    margin: 0;
-	    background: none;
-	    box-shadow: none;
+        margin: 0;
+        background: none;
+        box-shadow: none;
     }
     .characters > .value a {
         height: 35px;
