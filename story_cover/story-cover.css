@@ -591,8 +591,8 @@ li#center:before {
         grid-column: 1/3;
     }
 }
-a#none { background: rgba(239, 240, 244, .1); }
-a#none:hover { background: rgba(239, 240, 244, .5); }
+#none { background: rgba(225,227,234,.4); }
+#none:hover { background: rgba(225,227,234,.8); }
 #adonis { background: url("https://cdn.jsdelivr.net/gh/enstars/img/charahead/adonis.png") 0 0/cover; }
 #aira { background: url("https://cdn.jsdelivr.net/gh/enstars/img/charahead/aira.png") 0 0/cover; }
 #akiomi { background: url("https://cdn.jsdelivr.net/gh/enstars/img/charahead/akiomi.png") 0 0/cover; }
