@@ -17,3 +17,6 @@ Utilities for EnStars TLs (?)
 
 ## Story Preview
 Included in `story-cover.css`, but separate code is in `story-preview.css`.
+
+## Bubble
+Dialogue layout make a translation seem like it came out of a chatroom. To be used with [hexo-bubble](https://github.com/watatomo/hexo-bubble).

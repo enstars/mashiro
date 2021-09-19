@@ -1,12 +1,10 @@
 @import url('https://fonts.googleapis.com/icon?family=Material+Icons+Round');
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;700&display=swap&subset=japanese');
-:root {
-    --storyColor-dark-l: calc(var(--storyColor-l) - 20%);
-    --storyColor-dark: hsl(var(--storyColor-h), var(--storyColor-s), var(--storyColor-dark-l))
-}
 .story-wrapper, .preview-wrapper, .lightbox__dim {
     width: 100%;
     font-size: .92em;
+    --storyColor-dark-l: calc(var(--storyColor-l) - 20%);
+    --storyColor-dark: hsl(var(--storyColor-h), var(--storyColor-s), var(--storyColor-dark-l));
 }
 .story-wrapper img, .lightbox__dim img, .preview-wrapper img {
     margin-bottom: 0;
@@ -14,10 +12,10 @@
 }
 .info-area ol, .info-area li {
     margin-block-start: 0;
-	margin-block-end: 0;
-	margin-inline-start: 0;
-	margin-inline-end: 0;
-	padding-inline-start: 0;
+    margin-block-end: 0;
+    margin-inline-start: 0;
+    margin-inline-end: 0;
+    padding-inline-start: 0;
 }
 .grid-wrapper {
     display: grid;
@@ -366,7 +364,7 @@
     transition: 0.2s ease;
 }
 .image:hover .quotes {
-    transform: translate(0, calc( -1 * var(--quote-height) ) );
+    transform: translate(0, calc( -1 * var(--quote-height)));
 }
 .image .quotes > * {
     display: flex;
@@ -524,6 +522,15 @@ li#center:before {
         display: flex;
         flex-direction: column;
         gap: 5px;
+    }
+    .mobile-reverse .story-box {
+        grid-template-columns: 1fr [col-start] auto [last];
+    }
+    .mobile-reverse .story-cover {
+        grid-column: 2/2;
+    }
+    .mobile-reverse .title-area {
+        grid-column: 1/2;
     }
     .info-area {
         grid-column: 1/3;
