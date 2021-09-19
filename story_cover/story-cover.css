@@ -1,12 +1,12 @@
 @import url('https://fonts.googleapis.com/icon?family=Material+Icons+Round');
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;700&display=swap&subset=japanese');
-.story-wrapper, .preview-wrapper, .lightbox__dim {
+.story-wrapper, .preview-wrapper, .lightbox__dim, .chapter-wrapper {
     width: 100%;
     font-size: .92em;
     --storyColor-dark-l: calc(var(--storyColor-l) - 20%);
     --storyColor-dark: hsl(var(--storyColor-h), var(--storyColor-s), var(--storyColor-dark-l));
 }
-.story-wrapper img, .lightbox__dim img, .preview-wrapper img {
+.story-wrapper img, .lightbox__dim img, .preview-wrapper img, .chapter-wrapper img {
     margin-bottom: 0;
     border-radius: 0;
 }
@@ -144,6 +144,16 @@
 }
 .info-item.pr {
     grid-column: 3/5;
+}
+.chapter-wrapper .info-item.writer {
+    grid-column: 1/2;
+    grid-row: 2/3;
+}
+.chapter-wrapper .info-item.tl {
+    grid-column: 2/4;
+}
+.chapter-wrapper .info-item.pr {
+    grid-column: 4/5;
 }
 .info-item > .label {
     padding: 0;
