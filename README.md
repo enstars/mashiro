@@ -4,19 +4,13 @@
 Utilities for EnStars TLs (?)
 
 ## Story Cover
-**LIVE PREVIEW:** [TL archive](https://watatomo.github.io/tl/post/phantom_thieves_vs_detectives/)
-
-### To-do
-- [x] Add featured cards
-- [x] Add story CGs
-- [x] Add associated event/gacha
-- [x] Collapsibles
-- [x] Mobile view
-- [x] Use chibi heads for characters
-- [ ] Make this work with pjax
+**LIVE PREVIEW:** [TL archive](https://watatomo.github.io/tl/post/sanctuary/)
 
 ## Story Preview
 Included in `story-cover.css`, but separate code is in `story-preview.css`.
 
 ## Bubble
 Dialogue layout make a translation seem like it came out of a chatroom. To be used with [hexo-bubble](https://github.com/watatomo/hexo-bubble).
+
+## Mini Talk
+A layout for Mini Talks.
