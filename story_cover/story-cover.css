@@ -242,7 +242,7 @@
     width: 40px;
     margin: 0 -3px;
 }
-.characters [character] a:before, .characters [character] a:after {
+.value > [character]:before, .value > [character]:after {
     content: none;
 }
 .story-wrapper .tab-content, .tab-header {
