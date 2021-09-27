@@ -795,17 +795,22 @@ body.lightbox-visible {
     margin-bottom: 15px;
     display: grid;
     grid-template-columns: 1fr 1fr;
-    border-bottom: solid #0c195c;
-    gap: 10px;
+    border-bottom: solid var(--light-mode, #f1f1f1);
+    gap: 5px;
 }
 .minitalk li {
     border-radius: 10px 10px 0 0;
-    background-color: #0c195c;
-    display: flex;
-    justify-content: center;
-    padding: 3px;
+    border: solid var(--light-mode, #f1f1f1);
+    border-bottom: none;
+    padding: 0;
 }
 .minitalk li > a {
     border: 0;
-    color: #fff;
+    display: block;
+    padding: 3px;
+    text-align: center;
+}
+.minitalk li.active {
+    background: var(--light-mode, #f1f1f1);
+    font-weight: 700;
 }
