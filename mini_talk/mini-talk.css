@@ -43,7 +43,7 @@
 }
 .minitalk-option_content {
     display: none;
-    padding: 15px 0;
+    padding: 15px 0 5px;
 }
 .minitalk[character]:before, .minitalk[character]:after {
     content: none;
@@ -66,12 +66,12 @@
     margin-bottom: 15px;
     display: grid;
     grid-template-columns: 1fr 1fr;
-    border-bottom: solid 2px var(--light-mode, #f1f1f1);
+    border-bottom: solid 3px var(--light-mode, #f1f1f1);
     gap: 5px;
 }
 .minitalk li {
     border-radius: 10px 10px 0 0;
-    border: solid 2px var(--light-mode, #f1f1f1);
+    border: solid 3px var(--light-mode, #f1f1f1);
     border-bottom: none;
     padding: 0;
 }

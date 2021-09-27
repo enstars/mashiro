@@ -10,6 +10,11 @@ span.spell {
         font-size: 1.15em;
     }
 }
+[character="Anzu"] {
+    --color: #ffb6da;
+    --light-mode: hsl(330.4, 54%, 93%);
+    --dark-mode: hsl(330.4, 12%, 25%);
+}
 [character="Adonis"] {
     --color: #915da3;
     --light-mode: hsl(284.6, 54%, 93%);
