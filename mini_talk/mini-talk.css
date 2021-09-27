@@ -24,10 +24,11 @@
 	border-radius: 5px;
 	cursor: pointer;
 	padding: 10px;
-	display: flex;
-	justify-content: space-between;
-    align-items: center;
+	display: grid;
+    grid-template-columns: 40px 1fr 1.5em;
     text-align: center;
+    align-items: center;
+    gap: 10px;
     color: #222;
 }
 .minitalk-option_header:after {
@@ -41,7 +42,7 @@
 }
 .minitalk-option_content {
     display: none;
-    padding: 20px 0;
+    padding: 15px 0;
 }
 .minitalk[character]:before, .minitalk[character]:after {
     content: none;
@@ -52,4 +53,30 @@
     height: 40px;
 	width: 40px;
     display: inline-block;
+}
+.minitalk ul {
+    margin-block-start: 0;
+    margin-block-end: 0;
+    margin-inline-start: 0;
+    margin-inline-end: 0;
+    padding-inline-start: 0;
+    list-style: none;
+    padding: 0;
+    margin-bottom: 15px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    border-bottom: solid #0c195c;
+    gap: 10px;
+}
+.minitalk li {
+    border-radius: 10px 10px 0 0;
+    background-color: #0c195c;
+    display: flex;
+    justify-content: center;
+    padding: 3px;
+
+}
+.minitalk li > a {
+    border: 0;
+    color: #fff;
 }
