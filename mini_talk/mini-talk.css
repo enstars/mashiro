@@ -39,7 +39,6 @@
     font-weight: 700;
     line-height: 1;
     transition: transform .4s ease;
-    align-self: end;
 }
 .minitalk-option_content {
     display: none;
