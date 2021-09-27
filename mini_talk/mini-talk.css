@@ -11,8 +11,13 @@
 [mt="rare"] {
     background-image: url('https://cdn.jsdelivr.net/gh/enstars/img/talkevent_rare.png');
 }
-.minitalk-option {
-    margin: 10px 0;
+.minitalk {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.minitalk [character] p:last-of-type {
+    margin-bottom: unset;
 }
 .minitalk-option_header {
     background: var(--light-mode, #f1f1f1);
@@ -23,6 +28,7 @@
 	justify-content: space-between;
     align-items: center;
     text-align: center;
+    color: #222;
 }
 .minitalk-option_header:after {
     content: '\e5cf';
@@ -35,7 +41,7 @@
 }
 .minitalk-option_content {
     display: none;
-    padding: 20px 0 0;
+    padding: 20px 0;
 }
 .minitalk[character]:before, .minitalk[character]:after {
     content: none;
