@@ -1,13 +1,6 @@
-# tl-utils
-[![](https://data.jsdelivr.com/v1/package/gh/enstars/tl-utils/badge?style=rounded)](https://www.jsdelivr.com/package/gh/enstars/tl-utils)
+# mashiro
+[![](https://data.jsdelivr.com/v1/package/gh/enstars/mashiro/badge?style=rounded)](https://www.jsdelivr.com/package/gh/enstars/mashiro)
 
-Utilities for EnStars TLs (?)
+CSS library for *Ensemble Stars* translation layouts, though it can be used for anything in particular.
 
-## Story Cover
-**LIVE PREVIEW:** [TL archive](https://watatomo.github.io/tl/post/sanctuary/)
-
-## Bubble
-Dialogue layout make a translation seem like it came out of a chatroom. To be used with [hexo-bubble](https://github.com/watatomo/hexo-bubble).
-
-## Mini Talk
-A layout for Mini Talks.
+Check out the [wiki](https://github.com/enstars/mashiro/wiki) for documentation.
