@@ -4,13 +4,8 @@ function cardLightboxInitialize(){
     </div>`);
 }
 $(document).ready(function() {
-    $('.preview-wrapper').remove();
     cardLightboxInitialize();
-    $('.tab-header').click(function(){
-        $(this).next().slideToggle();
-        $(this).toggleClass('tab-header__open');
-    })
-    $('.mt-header').click(function(){
+    $('.tab-header,.mt-header').click(function(){
         $(this).next().slideToggle();
         $(this).toggleClass('tab-header__open');
     })
