@@ -27,9 +27,17 @@ module.exports = function(grunt) {
             }
         },
         terser: {
-            build: {
+            compile: {
+                options: {
+                    compress: false
+                },
                 files: {
-                    'main.min.js': ['mini_talk/*.js', 'story_cover/*.js']
+                    'index.js': ['js/*.js']
+                }
+            },
+            minify: {
+                files: {
+                    'index.min.js': ['js/*.js']
                 }
             }
         },

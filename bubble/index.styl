@@ -8,6 +8,7 @@
         padding: .9em
         display: table
         border-radius: 10px
+        transition: 0.15s all ease
         &:first-child
             &::before
                 content: ''
@@ -49,6 +50,7 @@
     position: absolute
     top: 40px
     left: 76px
+    transition: 0.15s all ease
 
 [character][hidden] p:first-child::after, [character][unknown] p:first-child::after
     background: #000
@@ -77,7 +79,9 @@
     display: inline-block
 
 .thought
-    color: #5555c0 !important
+    color: #5555c0
 
+@import 'dark'
+@import 'spell'
 @import 'enst'
 @import 'mobile'
