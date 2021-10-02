@@ -1,0 +1,30 @@
+@css {
+  .story-wrapper, .preview-wrapper, .lightbox__dim, .three-wrapper, .two-wrapper {
+    width: 100%;
+    font-size: .92em;
+    --storyColor-dark-l: calc(var(--storyColor-l) - 20%);
+    --storyColor-dark: hsl(var(--storyColor-h), var(--storyColor-s), var(--storyColor-dark-l));
+  }
+}
+
+.story-wrapper img, .lightbox__dim img, .preview-wrapper img, .three-wrapper img, .two-wrapper img
+    normalizeImg()
+
+.grid-wrapper
+    display: grid
+
+@import 'fonts'
+
+@import 'story'
+@import 'preview'
+@import 'info'
+@import 'reverse'
+
+@import 'title'
+@import 'tab'
+@import 'cards'
+@import 'chapter'
+@import 'gallery'
+@import 'lightbox'
+
+@import 'mobile'

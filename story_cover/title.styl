@@ -1,0 +1,35 @@
+.title-area
+    line-height: 1.25
+    display: flex
+    flex-direction: column
+    gap: 5px
+
+.title-area__title, .title-area__subtitle, .tab-header__name, .card__name, .card__jp
+    font: inherit
+    margin: 0
+    border: 0
+
+.title-area__subtitle, .card__jp
+    font-family: 'Noto Sans JP'
+
+.title-area__title, .card__name
+    font-weight: 700
+
+.title-area__title
+    font-size: 1.35em
+
+@css {
+  .title-area__start a {
+    background: rgba(var(--storyColor-rgb), .1);
+    color: rgba(var(--storyColor-rgb), 1);
+    padding: 5px 10px;
+    display: inline-block;
+    border-radius: 5px;
+    transition: all .2s ease;
+    border: none;
+  }
+  .title-area__start a:hover, .preview-wrapper .title-area__start a:hover {
+    background: rgba(var(--storyColor-rgb), 1);
+    color: #fff;
+  }
+}
