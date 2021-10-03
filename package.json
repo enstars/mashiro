@@ -1,6 +1,5 @@
 {
   "name": "mashiro.css",
-  "title": "mashiro",
   "version": "1.2.61",
   "description": "CSS library for translation layouts",
   "main": "Gruntfile.js",

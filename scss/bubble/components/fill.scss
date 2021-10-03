@@ -1,0 +1,14 @@
+[character].fill {
+    p {
+        color: #fff;
+        background: var(--fill-mode, #0e0e0e);
+    }
+
+    &::after {
+        border-right-color: var(--fill-mode, #f1f1f1);
+    }
+}
+
+.fill .thought {
+    color: #e0e8ff;
+}
