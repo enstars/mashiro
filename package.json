@@ -19,12 +19,15 @@
   "bugs": {
     "url": "https://github.com/enstars/mashiro/issues"
   },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
   "homepage": "https://github.com/enstars/mashiro#readme",
   "devDependencies": {
     "grunt": "^1.4.1",
     "grunt-contrib-clean": "^2.0.0",
     "grunt-contrib-cssmin": "^4.0.0",
-    "grunt-contrib-stylus": "^1.2.0",
+    "grunt-contrib-sass": "^2.0.0",
     "grunt-contrib-watch": "^1.1.0",
     "grunt-terser": "^2.0.0"
   }

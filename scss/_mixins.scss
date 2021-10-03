@@ -1,0 +1,12 @@
+@mixin disableSelect {
+    -youbkit-touch-callout: none;
+    -youbkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+@mixin normalizeImg {
+    margin-bottom: 0;
+    border-radius: 0;
+}

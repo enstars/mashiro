@@ -2,18 +2,16 @@ module.exports = function(grunt) {
     grunt.initConfig({
         clean: {
             css: ['./*.css'],
-            js: ['./*.js', '!./Gruntfile.js']
+            js: ['./*.js', '!./Gruntfile.js'],
+            map: ['./*.map']
         },
-        stylus: {
-            options: {
-                compress: false
-            },
+        sass: {
             compile: {
                 options: {
-                    paths: ['main.styl']
+                    style: 'expanded'
                 },
                 files: {
-                    'main.css': 'main.styl'
+                    'mashiro.css': 'scss/main.scss'
                 }
             }
         },
@@ -21,35 +19,27 @@ module.exports = function(grunt) {
             target: {
                 files: [{
                     expand: true,
-                    src: ['main.css', 'main.min.css'],
+                    src: ['mashiro.css', 'mashiro.min.css'],
                     ext: '.min.css'
                 }]
             }
         },
         terser: {
             compile: {
-                options: {
-                    compress: false
-                },
-                files: {
-                    'index.js': ['js/*.js']
-                }
-            },
-            minify: {
                 files: {
                     'index.min.js': ['js/*.js']
                 }
             }
         },
         watch: {
-            files: ['**/*.styl', '**/*.js'],
+            files: ['*/*.scss', '*.js'],
             tasks: 'default',
         }
     });
-    grunt.loadNpmTasks('grunt-contrib-stylus');
+    grunt.loadNpmTasks('grunt-contrib-sass');
     grunt.loadNpmTasks('grunt-contrib-cssmin');
     grunt.loadNpmTasks('grunt-terser');
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-contrib-clean');
-    grunt.registerTask('default', ['clean', 'stylus', 'cssmin', 'terser']);
+    grunt.registerTask('default', ['clean', 'sass', 'cssmin', 'terser']);
 };

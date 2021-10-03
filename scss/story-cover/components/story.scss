@@ -1,0 +1,41 @@
+.story-background {
+    border-radius: 5px 5px 0 0;
+    width: 100%;
+    height: 400px;
+    background: var(--background) no-repeat;
+    background-size: cover;
+    background-position: top;
+    mask-image: linear-gradient(to bottom, #000 70%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to bottom, #000 70%, transparent 100%);
+}
+
+.story-box {
+    border-radius: 15px 5px;
+    background: #fff;
+    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.1), 0 0 15px 5px rgba(0, 0, 0, 0.05);
+    margin: -200px 15px 0;
+    padding: 20px;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: 120px 1fr 200px;
+    grid-template-rows: auto 1fr;
+    grid-gap: 15px;
+}
+
+.story-cover {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    > div {
+        height: 0;
+    }
+
+    img {
+        height: 150px;
+        width: 120px;
+        object-fit: cover;
+        border-radius: 3px;
+        box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.5);
+        transform: translate(0, -100%);
+    }
+}

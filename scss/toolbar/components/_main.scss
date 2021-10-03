@@ -1,0 +1,38 @@
+.toolbar {
+    display: grid;
+    grid-template: auto/auto auto auto auto;
+    gap: 10px;
+    position: sticky;
+    top: 5px;
+    margin: 0 auto 20px;
+    z-index: 9;
+    background: #fff;
+    justify-content: center;
+    align-items: center;
+    width: 80%;
+    border-radius: 15px;
+    box-shadow: 0 0 10px 0 #000;
+    padding: 4px;
+    a {
+        color: #555;
+        border-bottom: none;
+        transition: 0.2s ease-in-out;
+        line-height: 0;
+        &:hover {
+            color: #000;
+        }
+    }
+
+    .material-icons-round {
+        font-size: 1.35em;
+    }
+}
+
+.toolbar__section {
+    display: flex;
+    gap: 5px;
+    &.nav {
+        padding-right: 10px;
+        border-right: 1px solid #555;
+    }
+}
