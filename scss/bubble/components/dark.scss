@@ -1,11 +1,12 @@
 [character].dark {
+  --dark-mode: hsl(var(--hue), 12%, 25%);
   p {
     color: #eee;
     background: var(--dark-mode, #0e0e0e);
   }
 
   &::after {
-    border-right-color: var(--dark-mode, #f1f1f1);
+    border-right-color: var(--dark-mode, #0e0e0e);
   }
 }
 

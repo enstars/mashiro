@@ -1,7 +1,8 @@
 @use '_mixins.scss';
 
 [character],
-.minitalk {
+.minitalk,
+.toolbar {
   @include mixins.disableSelect;
 }
 

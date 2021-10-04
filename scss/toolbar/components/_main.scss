@@ -11,7 +11,7 @@
   align-items: center;
   width: 80%;
   border-radius: 15px;
-  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.25);
+  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.2);
   padding: 4px;
   a {
     color: #555;
@@ -30,7 +30,7 @@
 
 .toolbar__section {
   display: flex;
-  gap: 5px;
+  gap: 10px;
   &.nav {
     padding-right: 10px;
     border-right: 1px solid #555;

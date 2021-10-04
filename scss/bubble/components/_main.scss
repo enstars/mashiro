@@ -1,6 +1,7 @@
 [character] {
   position: relative;
   display: block;
+  --light-mode: hsl(var(--hue), 54%, 92%);
   p {
     margin: 0 0 0.4em 90px;
     background: var(--light-mode, #f1f1f1);
