@@ -3,41 +3,47 @@
   font-style: italic;
   font-weight: 400;
   font-display: swap;
-  src: url("https://fonts.gstatic.com/s/almendra/v15/H4ciBXKAlMnTn0CskxY4yLs.ttf") format("truetype");
+  src: url("https://fonts.gstatic.com/s/almendra/v15/H4ciBXKAlMnTn0CskxY4yLs.ttf")
+    format("truetype");
 }
 @font-face {
   font-family: "Almendra";
   font-style: italic;
   font-weight: 700;
   font-display: swap;
-  src: url("https://fonts.gstatic.com/s/almendra/v15/H4chBXKAlMnTn0CskxY48Ae9oqY.ttf") format("truetype");
+  src: url("https://fonts.gstatic.com/s/almendra/v15/H4chBXKAlMnTn0CskxY48Ae9oqY.ttf")
+    format("truetype");
 }
 @font-face {
   font-family: "Material Icons Round";
   font-style: normal;
   font-weight: 400;
-  src: url("https://fonts.gstatic.com/s/materialiconsround/v79/LDItaoyNOAY6Uewc665JcIzCKsKc_M9flwmM.otf") format("opentype");
+  src: url("https://fonts.gstatic.com/s/materialiconsround/v79/LDItaoyNOAY6Uewc665JcIzCKsKc_M9flwmM.otf")
+    format("opentype");
 }
 @font-face {
   font-family: "Noto Sans JP";
   font-style: normal;
   font-weight: 300;
   font-display: swap;
-  src: url("https://fonts.gstatic.com/s/notosansjp/v36/-F6pfjtqLzI2JPCgQBnw7HFQaioq1A.otf") format("opentype");
+  src: url("https://fonts.gstatic.com/s/notosansjp/v36/-F6pfjtqLzI2JPCgQBnw7HFQaioq1A.otf")
+    format("opentype");
 }
 @font-face {
   font-family: "Noto Sans JP";
   font-style: normal;
   font-weight: 400;
   font-display: swap;
-  src: url("https://fonts.gstatic.com/s/notosansjp/v36/-F62fjtqLzI2JPCgQBnw7HFowA.otf") format("opentype");
+  src: url("https://fonts.gstatic.com/s/notosansjp/v36/-F62fjtqLzI2JPCgQBnw7HFowA.otf")
+    format("opentype");
 }
 @font-face {
   font-family: "Noto Sans JP";
   font-style: normal;
   font-weight: 700;
   font-display: swap;
-  src: url("https://fonts.gstatic.com/s/notosansjp/v36/-F6pfjtqLzI2JPCgQBnw7HFQei0q1A.otf") format("opentype");
+  src: url("https://fonts.gstatic.com/s/notosansjp/v36/-F6pfjtqLzI2JPCgQBnw7HFQei0q1A.otf")
+    format("opentype");
 }
 .material-icons-round {
   font-family: "Material Icons Round";
@@ -53,7 +59,8 @@
   direction: ltr;
 }
 
-[character], .minitalk {
+[character],
+.minitalk {
   -youbkit-touch-callout: none;
   -youbkit-user-select: none;
   -moz-user-select: none;
@@ -61,7 +68,9 @@
   user-select: none;
 }
 
-.note.location, .note.narration, .note.cw {
+.note.location,
+.note.narration,
+.note.cw {
   -youbkit-touch-callout: none;
   -youbkit-user-select: none;
   -moz-user-select: none;
@@ -101,7 +110,8 @@
   left: 0;
   width: 70px;
   height: 70px;
-  background: 100%/100% var(--icon, url("https://cdn.jsdelivr.net/gh/enstars/img/icon/unknown.png"));
+  background: 100%/100%
+    var(--icon, url("https://cdn.jsdelivr.net/gh/enstars/img/icon/unknown.png"));
   border-radius: 10px;
 }
 [character] p:last-of-type {
@@ -128,10 +138,16 @@
 }
 [character][hidden] p:first-child::after {
   background: #000;
-  -webkit-mask-image: var(--icon, url("https://cdn.jsdelivr.net/gh/enstars/img/icon/unknown.png"));
+  -webkit-mask-image: var(
+    --icon,
+    url("https://cdn.jsdelivr.net/gh/enstars/img/icon/unknown.png")
+  );
   -webkit-mask-size: 100%;
   -webkit-mask-position: 100%;
-  mask-image: var(--icon, url("https://cdn.jsdelivr.net/gh/enstars/img/icon/unknown.png"));
+  mask-image: var(
+    --icon,
+    url("https://cdn.jsdelivr.net/gh/enstars/img/icon/unknown.png")
+  );
   mask-size: 100%;
   mask-position: 100%;
   border-radius: 10px;
@@ -141,10 +157,16 @@
 }
 [character][unknown] p:first-child::after {
   background: #000;
-  -webkit-mask-image: var(--icon, url("https://cdn.jsdelivr.net/gh/enstars/img/icon/unknown.png"));
+  -webkit-mask-image: var(
+    --icon,
+    url("https://cdn.jsdelivr.net/gh/enstars/img/icon/unknown.png")
+  );
   -webkit-mask-size: 100%;
   -webkit-mask-position: 100%;
-  mask-image: var(--icon, url("https://cdn.jsdelivr.net/gh/enstars/img/icon/unknown.png"));
+  mask-image: var(
+    --icon,
+    url("https://cdn.jsdelivr.net/gh/enstars/img/icon/unknown.png")
+  );
   mask-size: 100%;
   mask-position: 100%;
   border-radius: 10px;
@@ -156,7 +178,7 @@
   content: "???" !important;
 }
 
-[character=Unknown]::before {
+[character="Unknown"]::before {
   content: "???" !important;
 }
 
@@ -203,14 +225,14 @@
   color: #e0e8ff;
 }
 
-[character=Anzu] {
+[character="Anzu"] {
   --color: #ffb6da;
   --light-mode: hsl(330.4, 54%, 92%);
   --dark-mode: hsl(330.4, 12%, 25%);
   --fill-mode: hsl(330.4, 35%, 42%);
 }
 
-[character=Adonis] {
+[character="Adonis"] {
   --color: #915da3;
   --light-mode: hsl(284.6, 54%, 92%);
   --dark-mode: hsl(284.6, 12%, 25%);
@@ -219,7 +241,7 @@
   --charahead: url("https://cdn.jsdelivr.net/gh/enstars/img/charahead/adonis.png");
 }
 
-[character=Aira] {
+[character="Aira"] {
   --color: #fff1cf;
   --light-mode: hsl(42.5, 54%, 92%);
   --dark-mode: hsl(42.5, 12%, 25%);
@@ -228,7 +250,7 @@
   --charahead: url("https://cdn.jsdelivr.net/gh/enstars/img/charahead/aira.png");
 }
 
-[character=Akiomi] {
+[character="Akiomi"] {
   --color: #915c8b;
   --light-mode: hsl(306.8, 54%, 92%);
   --dark-mode: hsl(306.8, 12%, 25%);
@@ -237,7 +259,7 @@
   --charahead: url("https://cdn.jsdelivr.net/gh/enstars/img/charahead/akiomi.png");
 }
 
-[character=Arashi] {
+[character="Arashi"] {
   --color: #edde7b;
   --light-mode: hsl(52.1, 54%, 92%);
   --dark-mode: hsl(52.1, 12%, 25%);
@@ -246,7 +268,7 @@
   --charahead: url("https://cdn.jsdelivr.net/gh/enstars/img/charahead/arashi.png");
 }
 
-[character=Chiaki] {
+[character="Chiaki"] {
   --color: #e60033;
   --light-mode: hsl(346.7, 54%, 92%);
   --dark-mode: hsl(346.7, 12%, 25%);
@@ -255,7 +277,7 @@
   --charahead: url("https://cdn.jsdelivr.net/gh/enstars/img/charahead/chiaki.png");
 }
 
-[character=Eichi] {
+[character="Eichi"] {
   --color: #fff3b8;
   --light-mode: hsl(49.9, 54%, 92%);
   --fill-mode: hsl(49.9, 35%, 42%);
@@ -263,7 +285,7 @@
   --charahead: url("https://cdn.jsdelivr.net/gh/enstars/img/charahead/eichi.png");
 }
 
-[character=Gatekeeper] {
+[character="Gatekeeper"] {
   --color: #7e6407;
   --light-mode: hsl(46.9, 54%, 92%);
   --dark-mode: hsl(49.9, 12%, 25%);
@@ -272,7 +294,7 @@
   --charahead: url("https://cdn.jsdelivr.net/gh/enstars/img/charahead/gatekeeper.png");
 }
 
-[character=Hajime] {
+[character="Hajime"] {
   --color: #cab8d9;
   --light-mode: hsl(272.7, 54%, 92%);
   --dark-mode: hsl(272.7, 12%, 25%);
@@ -281,7 +303,7 @@
   --charahead: url("https://cdn.jsdelivr.net/gh/enstars/img/charahead/hajime.png");
 }
 
-[character=Hiiro] {
+[character="Hiiro"] {
   --color: #ba2636;
   --light-mode: hsl(353.5, 54%, 92%);
   --dark-mode: hsl(353.5, 12%, 25%);
@@ -290,7 +312,7 @@
   --charahead: url("https://cdn.jsdelivr.net/gh/enstars/img/charahead/hiiro.png");
 }
 
-[character=HiMERU] {
+[character="HiMERU"] {
   --color: #89c3eb;
   --light-mode: hsl(204.5, 54%, 92%);
   --dark-mode: hsl(204.5, 12%, 25%);
@@ -299,7 +321,7 @@
   --charahead: url("https://cdn.jsdelivr.net/gh/enstars/img/charahead/himeru.png");
 }
 
-[character=Hinata] {
+[character="Hinata"] {
   --color: #eb6ea0;
   --light-mode: hsl(336, 54%, 92%);
   --dark-mode: hsl(336, 12%, 25%);
@@ -308,7 +330,7 @@
   --charahead: url("https://cdn.jsdelivr.net/gh/enstars/img/charahead/hinata.png");
 }
 
-[character=Hiyori] {
+[character="Hiyori"] {
   --color: #b8d200;
   --light-mode: hsl(67.4, 54%, 92%);
   --dark-mode: hsl(67.4, 12%, 25%);
@@ -317,7 +339,7 @@
   --charahead: url("https://cdn.jsdelivr.net/gh/enstars/img/charahead/hiyori.png");
 }
 
-[character=Hokuto] {
+[character="Hokuto"] {
   --color: #0068b7;
   --light-mode: hsl(205.9, 54%, 92%);
   --dark-mode: hsl(205.9, 12%, 25%);
@@ -326,7 +348,7 @@
   --charahead: url("https://cdn.jsdelivr.net/gh/enstars/img/charahead/hokuto.png");
 }
 
-[character=Ibara] {
+[character="Ibara"] {
   --color: #74325c;
   --light-mode: hsl(321.8, 54%, 92%);
   --dark-mode: hsl(321.8, 12%, 25%);
@@ -335,7 +357,7 @@
   --charahead: url("https://cdn.jsdelivr.net/gh/enstars/img/charahead/ibara.png");
 }
 
-[character=Izumi] {
+[character="Izumi"] {
   --color: #bbdbf3;
   --light-mode: hsl(205.7, 54%, 92%);
   --dark-mode: hsl(205.7, 12%, 25%);
@@ -344,7 +366,7 @@
   --charahead: url("https://cdn.jsdelivr.net/gh/enstars/img/charahead/izumi.png");
 }
 
-[character=Jin] {
+[character="Jin"] {
   --color: #8da0b6;
   --light-mode: hsl(212.2, 54%, 92%);
   --dark-mode: hsl(212.2, 12%, 25%);
@@ -353,7 +375,7 @@
   --charahead: url("https://cdn.jsdelivr.net/gh/enstars/img/charahead/jin.png");
 }
 
-[character=Jun] {
+[character="Jun"] {
   --color: #192f60;
   --light-mode: hsl(221.4, 54%, 92%);
   --dark-mode: hsl(221.4, 12%, 25%);
@@ -362,7 +384,7 @@
   --charahead: url("https://cdn.jsdelivr.net/gh/enstars/img/charahead/jun.png");
 }
 
-[character=Kanata] {
+[character="Kanata"] {
   --color: #008db7;
   --light-mode: hsl(193.8, 54%, 92%);
   --dark-mode: hsl(193.8, 12%, 25%);
@@ -371,7 +393,7 @@
   --charahead: url("https://cdn.jsdelivr.net/gh/enstars/img/charahead/kanata.png");
 }
 
-[character=Kaoru] {
+[character="Kaoru"] {
   --color: #fdd35c;
   --light-mode: hsl(44.3, 54%, 92%);
   --dark-mode: hsl(44.3, 12%, 25%);
@@ -380,7 +402,7 @@
   --charahead: url("https://cdn.jsdelivr.net/gh/enstars/img/charahead/kaoru.png");
 }
 
-[character=Keito] {
+[character="Keito"] {
   --color: #316745;
   --light-mode: hsl(142.2, 54%, 92%);
   --dark-mode: hsl(142.2, 12%, 25%);
@@ -389,7 +411,7 @@
   --charahead: url("https://cdn.jsdelivr.net/gh/enstars/img/charahead/keito.png");
 }
 
-[character=Koga] {
+[character="Koga"] {
   --color: #c9caca;
   --light-mode: hsl(180, 9%, 92%);
   --dark-mode: hsl(180, 5%, 25%);
@@ -398,7 +420,7 @@
   --charahead: url("https://cdn.jsdelivr.net/gh/enstars/img/charahead/koga.png");
 }
 
-[character=Kohaku] {
+[character="Kohaku"] {
   --color: #f4b3c2;
   --light-mode: hsl(346.2, 54%, 92%);
   --dark-mode: hsl(346.2, 12%, 25%);
@@ -407,7 +429,7 @@
   --charahead: url("https://cdn.jsdelivr.net/gh/enstars/img/charahead/kohaku.png");
 }
 
-[character=Kuro] {
+[character="Kuro"] {
   --color: #e83929;
   --light-mode: hsl(5, 54%, 92%);
   --dark-mode: hsl(5, 12%, 25%);
@@ -416,7 +438,7 @@
   --charahead: url("https://cdn.jsdelivr.net/gh/enstars/img/charahead/kuro.png");
 }
 
-[character=Leo] {
+[character="Leo"] {
   --color: #ec6d51;
   --light-mode: hsl(10.8, 54%, 92%);
   --dark-mode: hsl(10.8, 12%, 25%);
@@ -425,7 +447,7 @@
   --charahead: url("https://cdn.jsdelivr.net/gh/enstars/img/charahead/leo.png");
 }
 
-[character=Madara] {
+[character="Madara"] {
   --color: #622d18;
   --light-mode: hsl(17, 54%, 92%);
   --dark-mode: hsl(17, 12%, 25%);
@@ -434,7 +456,7 @@
   --charahead: url("https://cdn.jsdelivr.net/gh/enstars/img/charahead/madara.png");
 }
 
-[character=Makoto] {
+[character="Makoto"] {
   --color: #65ab31;
   --light-mode: hsl(94.4, 54%, 92%);
   --dark-mode: hsl(94.4, 12%, 25%);
@@ -443,7 +465,7 @@
   --charahead: url("https://cdn.jsdelivr.net/gh/enstars/img/charahead/makoto.png");
 }
 
-[character=Mao] {
+[character="Mao"] {
   --color: #941f57;
   --light-mode: hsl(331.3, 54%, 92%);
   --dark-mode: hsl(331.3, 12%, 25%);
@@ -452,7 +474,7 @@
   --charahead: url("https://cdn.jsdelivr.net/gh/enstars/img/charahead/mao.png");
 }
 
-[character=Mayoi] {
+[character="Mayoi"] {
   --color: #522f60;
   --light-mode: hsl(282.9, 54%, 92%);
   --dark-mode: hsl(282.9, 12%, 25%);
@@ -461,7 +483,7 @@
   --charahead: url("https://cdn.jsdelivr.net/gh/enstars/img/charahead/mayoi.png");
 }
 
-[character=Midori] {
+[character="Midori"] {
   --color: #00533f;
   --light-mode: hsl(165.5, 54%, 92%);
   --dark-mode: hsl(165.5, 12%, 25%);
@@ -470,7 +492,7 @@
   --charahead: url("https://cdn.jsdelivr.net/gh/enstars/img/charahead/midori.png");
 }
 
-[character=Mika] {
+[character="Mika"] {
   --color: #006a6c;
   --light-mode: hsl(181.1, 54%, 92%);
   --dark-mode: hsl(181.1, 12%, 25%);
@@ -479,7 +501,7 @@
   --charahead: url("https://cdn.jsdelivr.net/gh/enstars/img/charahead/mika.png");
 }
 
-[character=Mitsuru] {
+[character="Mitsuru"] {
   --color: #ed6d35;
   --light-mode: hsl(18.3, 54%, 92%);
   --dark-mode: hsl(18.3, 12%, 25%);
@@ -488,7 +510,7 @@
   --charahead: url("https://cdn.jsdelivr.net/gh/enstars/img/charahead/mitsuru.png");
 }
 
-[character=Nagisa] {
+[character="Nagisa"] {
   --color: #a73836;
   --light-mode: hsl(1.1, 54%, 92%);
   --dark-mode: hsl(1.1, 12%, 25%);
@@ -497,7 +519,7 @@
   --charahead: url("https://cdn.jsdelivr.net/gh/enstars/img/charahead/nagisa.png");
 }
 
-[character=Natsume] {
+[character="Natsume"] {
   --color: #d70035;
   --light-mode: hsl(345.2, 54%, 92%);
   --dark-mode: hsl(345.2, 12%, 25%);
@@ -506,7 +528,7 @@
   --charahead: url("https://cdn.jsdelivr.net/gh/enstars/img/charahead/natsume.png");
 }
 
-[character=Nazuna] {
+[character="Nazuna"] {
   --color: #ffec47;
   --light-mode: hsl(53.8, 54%, 92%);
   --dark-mode: hsl(53.8, 12%, 25%);
@@ -515,7 +537,7 @@
   --charahead: url("https://cdn.jsdelivr.net/gh/enstars/img/charahead/nazuna.png");
 }
 
-[character=Niki] {
+[character="Niki"] {
   --color: #507ea4;
   --light-mode: hsl(207.1, 54%, 92%);
   --dark-mode: hsl(207.1, 12%, 25%);
@@ -524,7 +546,7 @@
   --charahead: url("https://cdn.jsdelivr.net/gh/enstars/img/charahead/niki.png");
 }
 
-[character=Rei] {
+[character="Rei"] {
   --color: #47266e;
   --light-mode: hsl(267.5, 54%, 92%);
   --dark-mode: hsl(267.5, 12%, 25%);
@@ -533,7 +555,7 @@
   --charahead: url("https://cdn.jsdelivr.net/gh/enstars/img/charahead/rei.png");
 }
 
-[character=Rinne] {
+[character="Rinne"] {
   --color: #b7282e;
   --light-mode: hsl(357.5, 54%, 92%);
   --dark-mode: hsl(357.5, 12%, 25%);
@@ -542,7 +564,7 @@
   --charahead: url("https://cdn.jsdelivr.net/gh/enstars/img/charahead/rinne.png");
 }
 
-[character=Ritsu] {
+[character="Ritsu"] {
   --color: #001e43;
   --light-mode: hsl(213.1, 54%, 92%);
   --dark-mode: hsl(213.1, 12%, 25%);
@@ -551,7 +573,7 @@
   --charahead: url("https://cdn.jsdelivr.net/gh/enstars/img/charahead/ritsu.png");
 }
 
-[character=Seiya] {
+[character="Seiya"] {
   --color: #07467f;
   --light-mode: hsl(208.5, 54%, 92%);
   --dark-mode: hsl(208.5, 12%, 25%);
@@ -560,7 +582,7 @@
   --charahead: url("https://cdn.jsdelivr.net/gh/enstars/img/charahead/seiya.png");
 }
 
-[character=Shinobu] {
+[character="Shinobu"] {
   --color: #ffdc00;
   --light-mode: hsl(51.8, 54%, 92%);
   --dark-mode: hsl(51.8, 12%, 25%);
@@ -569,7 +591,7 @@
   --charahead: url("https://cdn.jsdelivr.net/gh/enstars/img/charahead/shinobu.png");
 }
 
-[character=Shu] {
+[character="Shu"] {
   --color: #e3acae;
   --light-mode: hsl(357.8, 54%, 92%);
   --dark-mode: hsl(357.8, 12%, 25%);
@@ -578,7 +600,7 @@
   --charahead: url("https://cdn.jsdelivr.net/gh/enstars/img/charahead/shu.png");
 }
 
-[character=Sora] {
+[character="Sora"] {
   --color: #fff352;
   --light-mode: hsl(55.8, 54%, 92%);
   --dark-mode: hsl(55.8, 12%, 25%);
@@ -587,7 +609,7 @@
   --charahead: url("https://cdn.jsdelivr.net/gh/enstars/img/charahead/sora.png");
 }
 
-[character=Souma] {
+[character="Souma"] {
   --color: #5654a2;
   --light-mode: hsl(241.5, 54%, 92%);
   --dark-mode: hsl(241.5, 12%, 25%);
@@ -596,7 +618,7 @@
   --charahead: url("https://cdn.jsdelivr.net/gh/enstars/img/charahead/souma.png");
 }
 
-[character=Subaru] {
+[character="Subaru"] {
   --color: #f3981d;
   --light-mode: hsl(34.5, 54%, 92%);
   --dark-mode: hsl(34.5, 12%, 25%);
@@ -605,7 +627,7 @@
   --charahead: url("https://cdn.jsdelivr.net/gh/enstars/img/charahead/subaru.png");
 }
 
-[character=Tatsumi] {
+[character="Tatsumi"] {
   --color: #7ebea5;
   --light-mode: hsl(156.6, 54%, 92%);
   --dark-mode: hsl(156.6, 12%, 25%);
@@ -614,7 +636,7 @@
   --charahead: url("https://cdn.jsdelivr.net/gh/enstars/img/charahead/tatsumi.png");
 }
 
-[character=Tetora] {
+[character="Tetora"] {
   --color: #302833;
   --light-mode: hsl(283.6, 9%, 92%);
   --dark-mode: hsl(283.6, 5%, 25%);
@@ -623,7 +645,7 @@
   --charahead: url("https://cdn.jsdelivr.net/gh/enstars/img/charahead/tetora.png");
 }
 
-[character=Tomoya] {
+[character="Tomoya"] {
   --color: #eedcb3;
   --light-mode: hsl(41.7, 54%, 92%);
   --dark-mode: hsl(41.7, 12%, 25%);
@@ -632,7 +654,7 @@
   --charahead: url("https://cdn.jsdelivr.net/gh/enstars/img/charahead/tomoya.png");
 }
 
-[character=Tori] {
+[character="Tori"] {
   --color: #f5b2b2;
   --light-mode: hsl(0, 54%, 92%);
   --dark-mode: hsl(0, 12%, 25%);
@@ -641,7 +663,7 @@
   --charahead: url("https://cdn.jsdelivr.net/gh/enstars/img/charahead/tori.png");
 }
 
-[character=Tsukasa] {
+[character="Tsukasa"] {
   --color: #942343;
   --light-mode: hsl(343, 54%, 92%);
   --dark-mode: hsl(343, 12%, 25%);
@@ -650,7 +672,7 @@
   --charahead: url("https://cdn.jsdelivr.net/gh/enstars/img/charahead/tsukasa.png");
 }
 
-[character=Tsumugi] {
+[character="Tsumugi"] {
   --color: #00608d;
   --light-mode: hsl(199.1, 54%, 92%);
   --dark-mode: hsl(199.1, 12%, 25%);
@@ -659,7 +681,7 @@
   --charahead: url("https://cdn.jsdelivr.net/gh/enstars/img/charahead/tsumugi.png");
 }
 
-[character=Wataru] {
+[character="Wataru"] {
   --color: #a1d8e2;
   --light-mode: hsl(189.2, 54%, 92%);
   --dark-mode: hsl(189.2, 12%, 25%);
@@ -668,7 +690,7 @@
   --charahead: url("https://cdn.jsdelivr.net/gh/enstars/img/charahead/wataru.png");
 }
 
-[character=Yuta] {
+[character="Yuta"] {
   --color: #00a1e9;
   --light-mode: hsl(198.5, 54%, 92%);
   --dark-mode: hsl(198.5, 12%, 25%);
@@ -677,7 +699,7 @@
   --charahead: url("https://cdn.jsdelivr.net/gh/enstars/img/charahead/yuta.png");
 }
 
-[character=Yuzuru] {
+[character="Yuzuru"] {
   --color: #3e62ad;
   --light-mode: hsl(220.5, 54%, 92%);
   --dark-mode: hsl(220.5, 12%, 25%);
@@ -692,7 +714,9 @@
   }
 }
 @media (max-width: 650px) {
-  [character]::before, [character][unknown]::before, [character][hidden]::before {
+  [character]::before,
+  [character][unknown]::before,
+  [character][hidden]::before {
     margin-left: 70px;
   }
 }
@@ -716,19 +740,32 @@
   }
 }
 @media (max-width: 650px) {
-  [character] p:first-child::before, [character] p:first-child::after {
+  [character] p:first-child::before,
+  [character] p:first-child::after {
     width: 50px;
     height: 50px;
   }
 }
-.story-wrapper, .preview-wrapper, .lightbox__dim, .three-wrapper, .two-wrapper {
+.story-wrapper,
+.preview-wrapper,
+.lightbox__dim,
+.three-wrapper,
+.two-wrapper {
   width: 100%;
   font-size: 0.92em;
   --storyColor-dark-l: calc(var(--storyColor-l) - 20%);
-  --storyColor-dark: hsl(var(--storyColor-h), var(--storyColor-s), var(--storyColor-dark-l));
+  --storyColor-dark: hsl(
+    var(--storyColor-h),
+    var(--storyColor-s),
+    var(--storyColor-dark-l)
+  );
 }
 
-.story-wrapper img, .lightbox__dim img, .preview-wrapper img, .three-wrapper img, .two-wrapper img {
+.story-wrapper img,
+.lightbox__dim img,
+.preview-wrapper img,
+.three-wrapper img,
+.two-wrapper img {
   margin-bottom: 0;
   border-radius: 0;
 }
@@ -737,7 +774,8 @@
   display: grid;
 }
 
-.chapter-area ul, .lightbox ul {
+.chapter-area ul,
+.lightbox ul {
   list-style: none;
   padding: 0;
   margin: 0;
@@ -807,7 +845,8 @@
   font-size: 0.88em;
 }
 
-.preview-background, .preview-box {
+.preview-background,
+.preview-box {
   grid-row-start: 1;
   grid-column-end: span 3;
 }
@@ -840,17 +879,23 @@
   gap: 5px;
 }
 
-.title-area__title, .title-area__subtitle, .tab-header__name, .card__name, .card__jp {
+.title-area__title,
+.title-area__subtitle,
+.tab-header__name,
+.card__name,
+.card__jp {
   font: inherit;
   margin: 0;
   border: 0;
 }
 
-.title-area__subtitle, .card__jp {
+.title-area__subtitle,
+.card__jp {
   font-family: "Noto Sans JP";
 }
 
-.title-area__title, .card__name {
+.title-area__title,
+.card__name {
   font-weight: 700;
 }
 
@@ -894,7 +939,8 @@
 .info-area .synopsis {
   margin-bottom: 5px;
 }
-.info-area ol, .info-area li {
+.info-area ol,
+.info-area li {
   margin-block-start: 0;
   margin-block-end: 0;
   margin-inline-start: 0;
@@ -965,13 +1011,14 @@
 
 .characters > .value a {
   display: inline-block;
-  background: var(--charahead) 0 0/cover;
+  background: var(--charahead) 0 0 / cover;
   height: 40px;
   width: 40px;
   margin: 0 -3px;
 }
 
-.value > [character]:before, .value > [character]:after {
+.value > [character]:before,
+.value > [character]:after {
   content: none;
 }
 
@@ -1049,11 +1096,13 @@
   font-size: 0.9em;
 }
 
-.story-wrapper .tab-content, .tab-header {
+.story-wrapper .tab-content,
+.tab-header {
   font-size: 0.9em;
 }
 
-.chapter-area > .mini-talk__open:after, .tab-header__open:first-child:after {
+.chapter-area > .mini-talk__open:after,
+.tab-header__open:first-child:after {
   transform: rotate(180deg);
 }
 
@@ -1291,7 +1340,8 @@ body.lightbox-visible {
   grid-column: 1/4;
 }
 
-.reverse .preview-background, .reverse .preview-box {
+.reverse .preview-background,
+.reverse .preview-box {
   grid-column-end: 3 span;
 }
 
@@ -1366,7 +1416,8 @@ body.lightbox-visible {
   .skills li:before {
     font-size: 0.7em;
   }
-  .skills .name, .skills .desc {
+  .skills .name,
+  .skills .desc {
     font-size: 0.88em;
   }
 
@@ -1469,7 +1520,7 @@ body.lightbox-visible {
 }
 .minitalk-option_header:before {
   content: "";
-  background: var(--charahead) 0 0/cover;
+  background: var(--charahead) 0 0 / cover;
   height: 40px;
   width: 40px;
   display: inline-block;
@@ -1480,11 +1531,13 @@ body.lightbox-visible {
   padding: 15px 0 5px;
 }
 
-.minitalk[character]:before, .minitalk[character]:after {
+.minitalk[character]:before,
+.minitalk[character]:after {
   content: none;
 }
 
-[mt=normal], [mt=rare] {
+[mt="normal"],
+[mt="rare"] {
   display: inline-block;
   width: 25px;
   height: 29.28px;
@@ -1492,11 +1545,11 @@ body.lightbox-visible {
   background-size: cover;
 }
 
-[mt=normal] {
+[mt="normal"] {
   background-image: url("https://cdn.jsdelivr.net/gh/enstars/img/talkevent_normal.png");
 }
 
-[mt=rare] {
+[mt="rare"] {
   background-image: url("https://cdn.jsdelivr.net/gh/enstars/img/talkevent_rare.png");
 }
 
@@ -1513,7 +1566,7 @@ body.lightbox-visible {
   align-items: center;
   width: 80%;
   border-radius: 15px;
-  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.3);
+  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.25);
   padding: 4px;
 }
 .toolbar a {

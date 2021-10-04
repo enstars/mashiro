@@ -1,11 +1,14 @@
 @use '_mixins.scss';
 
-[character], .minitalk {
-    @include mixins.disableSelect;
+[character],
+.minitalk {
+  @include mixins.disableSelect;
 }
 
 .note {
-    &.location, &.narration, &.cw {
-        @include mixins.disableSelect;
-    }
+  &.location,
+  &.narration,
+  &.cw {
+    @include mixins.disableSelect;
+  }
 }
