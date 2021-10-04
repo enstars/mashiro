@@ -4,6 +4,3 @@ function colorMode(){
         $('#modechange').text('light_mode');
     }); */
 }
-$(document).ready(function() {
-    colorMode();
-});
