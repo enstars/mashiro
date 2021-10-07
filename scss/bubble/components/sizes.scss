@@ -1,0 +1,31 @@
+[character].smallest {
+    p {
+        font-size: 0.8em;
+    }
+
+    &::after {
+        top: 30px;
+    }
+}
+
+[character].smaller {
+    p {
+        font-size: 0.9em;
+    }
+
+    &::after {
+        top: 25px;
+    }
+}
+
+[character].bigger {
+    p {
+        font-size: 1.1em;
+    }
+}
+
+[character].biggest {
+    p {
+        font-size: 1.2em;
+    }
+}

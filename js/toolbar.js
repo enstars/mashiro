@@ -1,5 +1,28 @@
 function colorFill() {
-  $("[character]").toggleClass("fill");
-  $("#dark-toggle").toggle();
-  $("#light-toggle").toggle();
+    $("[character]").toggleClass("fill");
+    $("#dark-toggle").toggle();
+    $("#light-toggle").toggle();
+    mashiroConfig["darkColors"] = !mashiroConfig["darkColors"];
+    localStorage.setItem("mashiroCookie", JSON.stringify(mashiroConfig));
+}
+
+function sliderDrop() {
+    $(".slider__container").toggle();
+}
+
+mashiroConfig = {
+    darkColors: false,
+    fontSize: ""
+};
+
+const mashiroCookie = localStorage.getItem("mashiroCookie");
+if (mashiroCookie == null) {
+    mashiroCookie = JSON.stringify(mashiroConfig);
+    localStorage.setItem("mashiroCookie", mashiroCookie);
+}
+
+mashiroConfig = JSON.parse(mashiroCookie);
+
+if (mashiroConfig["darkColors"]) {
+    colorFill();
 }

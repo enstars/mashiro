@@ -1,8 +1,8 @@
 .title-area {
-  line-height: 1.25;
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
+    line-height: 1.25;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
 }
 
 .title-area__title,
@@ -10,40 +10,40 @@
 .tab-header__name,
 .card__name,
 .card__jp {
-  font: inherit;
-  margin: 0;
-  border: 0;
+    font: inherit;
+    margin: 0;
+    border: 0;
 }
 
 .title-area__subtitle,
 .card__jp {
-  font-family: "Noto Sans JP";
+    font-family: "Noto Sans JP";
 }
 
 .title-area__title,
 .card__name {
-  font-weight: 700;
+    font-weight: 700;
 }
 
 .title-area__title {
-  font-size: 1.35em;
+    font-size: 1.35em;
 }
 
 .title-area__start a {
-  background: rgba(var(--storyColor-rgb), 0.1);
-  color: rgba(var(--storyColor-rgb), 1);
-  padding: 5px 10px;
-  display: inline-block;
-  border-radius: 5px;
-  transition: all 0.2s ease;
-  border: none;
-  &:hover {
-    background: rgba(var(--storyColor-rgb), 1);
-    color: #fff;
-  }
+    background: rgba(var(--storyColor-rgb), 0.1);
+    color: rgba(var(--storyColor-rgb), 1);
+    padding: 5px 10px;
+    display: inline-block;
+    border-radius: 5px;
+    transition: all 0.2s ease;
+    border: none;
+    &:hover {
+        background: rgba(var(--storyColor-rgb), 1);
+        color: #fff;
+    }
 }
 
 .preview-wrapper .title-area__start a:hover {
-  background: rgba(var(--storyColor-rgb), 1);
-  color: #fff;
+    background: rgba(var(--storyColor-rgb), 1);
+    color: #fff;
 }

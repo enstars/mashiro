@@ -3,13 +3,13 @@
 [character],
 .minitalk,
 .toolbar {
-  @include mixins.disableSelect;
+    @include mixins.disableSelect;
 }
 
 .note {
-  &.location,
-  &.narration,
-  &.cw {
-    @include mixins.disableSelect;
-  }
+    &.location,
+    &.narration,
+    &.cw {
+        @include mixins.disableSelect;
+    }
 }

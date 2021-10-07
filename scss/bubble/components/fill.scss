@@ -1,15 +1,15 @@
 [character].fill {
-  --fill-mode: hsl(var(--hue), 30%, 45%);
-  p {
-    color: #fff;
-    background: var(--fill-mode, #737373);
-  }
+    --fill-mode: hsl(var(--hue), 30%, 45%);
+    p {
+        color: #fff;
+        background: var(--fill-mode, #737373);
+    }
 
-  &::after {
-    border-right-color: var(--fill-mode, #737373);
-  }
+    &::after {
+        border-right-color: var(--fill-mode, #737373);
+    }
 }
 
 .fill .thought {
-  color: #e9efff;
+    color: #e9efff;
 }
