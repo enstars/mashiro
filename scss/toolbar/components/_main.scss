@@ -1,40 +1,48 @@
+@use '_mixins.scss';
+
 .toolbar-wrapper {
-    display: flex;
     position: sticky;
-    width: 80%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
     top: 5px;
-    margin: 0 auto 20px;
     z-index: 9;
-    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.2);
+    margin-bottom: 20px;
 }
 
-.toolbar__section {
+.toolbar {
+    display: grid;
+    grid-template: auto/auto auto auto auto auto;
+    gap: 23px;
     background: #fff;
     justify-content: center;
     align-items: center;
+    width: 50%;
     border-radius: 15px;
-    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.2);
-    padding: 4px;
+    @include mixins.toolbarShadow;
+    padding: 2px;
+
     a {
         color: #555;
         border-bottom: none;
         transition: 0.2s ease-in-out;
         line-height: 0;
+        border-radius: 5px;
+        padding: 2px;
+
         &:hover {
             color: #000;
+            background-color: #e0e0e0;
         }
     }
 
     .material-icons-round {
         font-size: 1.35em;
+        font-weight: 700;
     }
 }
 
 .toolbar__section {
     display: flex;
-    gap: 10px;
-    &.nav {
-        padding-right: 10px;
-        border-right: 1px solid #555;
-    }
 }

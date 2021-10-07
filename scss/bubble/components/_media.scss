@@ -39,9 +39,4 @@
             border-right: 10px solid #f1f1f1;
         }
     }
-    [character].smaller {
-        &::after {
-            top: 25px;
-        }
-    }
 }

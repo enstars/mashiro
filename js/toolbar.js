@@ -11,8 +11,7 @@ function sliderDrop() {
 }
 
 mashiroConfig = {
-    darkColors: false,
-    fontSize: ""
+    darkColors: false
 };
 
 const mashiroCookie = localStorage.getItem("mashiroCookie");
