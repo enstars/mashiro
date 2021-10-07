@@ -7,7 +7,7 @@ function colorFill() {
 }
 
 function sliderDrop() {
-    $(".slider__container").toggle();
+    $(".slider-container").toggle();
 }
 
 mashiroConfig = {
