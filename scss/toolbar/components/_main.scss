@@ -13,7 +13,7 @@
 
 .toolbar {
     display: grid;
-    grid-template: auto/auto auto auto auto auto;
+    grid-auto-flow: column;
     gap: 23px;
     background: #fff;
     justify-content: center;
