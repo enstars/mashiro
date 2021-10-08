@@ -1,7 +1,6 @@
 let mashiroConfig;
 
 function saveConfig() {
-    console.log("saveConfig", JSON.stringify(mashiroConfig));
     localStorage.setItem("mashiroCookie", JSON.stringify(mashiroConfig));
 }
 
@@ -23,7 +22,7 @@ $(document).ready(() => {
     if (!mashiroCookie) {
         const defaultMashiroConfig = {
             darkColors: false,
-            fontSize: ""
+            fontSize: "",
         };
         mashiroConfig = defaultMashiroConfig;
         saveConfig();
@@ -31,23 +30,21 @@ $(document).ready(() => {
     }
 
     mashiroConfig = JSON.parse(mashiroCookie);
-    console.log("mashiroConfig onReady", mashiroConfig);
     const fontSizes = ["smallest", "smaller", "", "bigger", "biggest"];
 
     if (mashiroConfig.darkColors) {
         colorFill();
     }
     if (mashiroConfig.fontSize) {
-        $("[character]").removeClass(fontSizes.filter(size => !!size));
+        $("[character]").removeClass(fontSizes.filter((size) => !!size));
         $("[character]").addClass(mashiroConfig.fontSize);
     }
 
-    const handleSliderChange = event => {
+    const handleSliderChange = (event) => {
         const fontSize = fontSizes[event.target.value - 1];
-        $("[character]").removeClass(fontSizes.filter(size => !!size));
+        $("[character]").removeClass(fontSizes.filter((size) => !!size));
         $("[character]").addClass(fontSize);
         mashiroConfig.fontSize = fontSize;
-        console.log("handleSliderChange mashiroConfig", mashiroConfig);
         saveConfig();
     };
     $("input.slider").on("change", handleSliderChange);
