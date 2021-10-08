@@ -116,8 +116,8 @@ $(document).ready(() => {
         colorFill();
     }
     if (mashiroConfig.fontSize) {
-        // Since onChange event listener has already been attached,
-        // Setting the value programmatically will trigger the event listener
         $("input.slider").val(mashiroConfig.fontSize);
+        const fakeEvent = { target: { value: mashiroConfig.fontSize } };
+        handleSliderChange(fakeEvent);
     }
 });
