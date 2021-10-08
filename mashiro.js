@@ -117,7 +117,7 @@ $(document).ready(() => {
     }
     if (mashiroConfig.fontSize) {
         $("input.slider").val(mashiroConfig.fontSize);
-        const fakeEvent = { target: { value: mashiroConfig.fontSize } };
-        handleSliderChange(fakeEvent);
+        // Need to manually invoke event listener
+        $("input.slider").change();
     }
 });
