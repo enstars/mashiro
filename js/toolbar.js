@@ -1,7 +1,6 @@
 let mashiroConfig;
 
 function saveConfig() {
-    console.log("saveConfig", JSON.stringify(mashiroConfig));
     localStorage.setItem("mashiroCookie", JSON.stringify(mashiroConfig));
 }
 
@@ -19,11 +18,13 @@ function sliderDrop() {
 
 $(document).ready(() => {
     let mashiroCookie = localStorage.getItem("mashiroCookie");
+    const fontSizes = ["smallest", "smaller", "", "bigger", "biggest"];
 
     if (!mashiroCookie) {
         const defaultMashiroConfig = {
             darkColors: false,
-            fontSize: ""
+            // Slider range is 1-5, but font size array indices are 0-4
+            fontSize: fontSizes.indexOf("") + 1,
         };
         mashiroConfig = defaultMashiroConfig;
         saveConfig();
@@ -31,24 +32,22 @@ $(document).ready(() => {
     }
 
     mashiroConfig = JSON.parse(mashiroCookie);
-    console.log("mashiroConfig onReady", mashiroConfig);
-    const fontSizes = ["smallest", "smaller", "", "bigger", "biggest"];
+
+    const handleSliderChange = (event) => {
+        const fontSize = fontSizes[event.target.value - 1];
+        $("[character]").removeClass(fontSizes.filter((size) => !!size));
+        $("[character]").addClass(fontSize);
+        mashiroConfig.fontSize = event.target.value;
+        saveConfig();
+    };
+    $("input.slider").on("change", handleSliderChange);
 
     if (mashiroConfig.darkColors) {
         colorFill();
     }
     if (mashiroConfig.fontSize) {
-        $("[character]").removeClass(fontSizes.filter(size => !!size));
-        $("[character]").addClass(mashiroConfig.fontSize);
+        // Since onChange event listener has already been attached,
+        // Setting the value programmatically will trigger the event listener
+        $("input.slider").val(mashiroConfig.fontSize);
     }
-
-    const handleSliderChange = event => {
-        const fontSize = fontSizes[event.target.value - 1];
-        $("[character]").removeClass(fontSizes.filter(size => !!size));
-        $("[character]").addClass(fontSize);
-        mashiroConfig.fontSize = fontSize;
-        console.log("handleSliderChange mashiroConfig", mashiroConfig);
-        saveConfig();
-    };
-    $("input.slider").on("change", handleSliderChange);
 });
