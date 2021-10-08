@@ -23,7 +23,7 @@ $(document).ready(() => {
     if (!mashiroCookie) {
         const defaultMashiroConfig = {
             darkColors: false,
-            fontSize: "",
+            fontSize: ""
         };
         mashiroConfig = defaultMashiroConfig;
         saveConfig();
@@ -38,13 +38,13 @@ $(document).ready(() => {
         colorFill();
     }
     if (mashiroConfig.fontSize) {
-        $("[character]").removeClass(fontSizes.filter((size) => !!size));
+        $("[character]").removeClass(fontSizes.filter(size => !!size));
         $("[character]").addClass(mashiroConfig.fontSize);
     }
 
-    const handleSliderChange = (event) => {
+    const handleSliderChange = event => {
         const fontSize = fontSizes[event.target.value - 1];
-        $("[character]").removeClass(fontSizes.filter((size) => !!size));
+        $("[character]").removeClass(fontSizes.filter(size => !!size));
         $("[character]").addClass(fontSize);
         mashiroConfig.fontSize = fontSize;
         console.log("handleSliderChange mashiroConfig", mashiroConfig);
