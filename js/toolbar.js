@@ -13,7 +13,7 @@ function colorFill() {
 }
 
 function sliderDrop() {
-    $(".toolbar-wrapper").toggleClass("hideSlider");
+    $(".toolbar-wrapper").toggleClass("showSlider");
 }
 
 $(document).ready(() => {

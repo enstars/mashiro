@@ -1,38 +1,20 @@
 @use '_mixins.scss';
 
-.toolbar-wrapper.hideSlider {
-    > .slider-container {
-        transform: translateY(calc(-100% - 15px));
-        transition: transform 0.3s ease, max-height 0s 0.3s step-end;
-    }
-
-    .slider-container {
-        height: 0;
-    }
-
-    .slider {
-        height: 0;
-
-        &::-webkit-slider-thumb,
-        &::-moz-range-thumb {
-            height: 0;
-        }
-    }
-
-    margin-bottom: unset;
-}
-
 .slider-container {
-    position: relative;
-    left: 6%;
+    position: absolute;
     background: #fff;
     justify-content: center;
     align-items: center;
     width: auto;
     padding: 0 8px 5px;
     border-radius: 15px;
-    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.2);
-    transition: max-height 0s step-start, transform 0.3s 0s ease;
+    @include mixins.toolbarShadow;
+    @include mixins.sliderTransition;
+}
+
+.toolbar-wrapper.showSlider .slider-container {
+    @include mixins.sliderTransition;
+    transform: translateY(calc(100% + 5px));
 }
 
 .slider {
