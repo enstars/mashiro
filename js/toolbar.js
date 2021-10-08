@@ -1,11 +1,15 @@
 let mashiroConfig;
 
+function saveConfig() {
+    localStorage.setItem("mashiroCookie", JSON.stringify(mashiroConfig));
+}
+
 function colorFill() {
     $("[character]").toggleClass("fill");
     $("#dark-toggle").toggle();
     $("#light-toggle").toggle();
-    mashiroConfig["darkColors"] = !mashiroConfig["darkColors"];
-    localStorage.setItem("mashiroCookie", JSON.stringify(mashiroConfig));
+    mashiroConfig.darkColors = !mashiroConfig.darkColors;
+    saveConfig();
 }
 
 function sliderDrop() {
@@ -13,31 +17,35 @@ function sliderDrop() {
 }
 
 $(document).ready(() => {
-    const fontSizes = ["smallest", "smaller", "", "bigger", "biggest"];
-
-    const handleSliderChange = event => {
-        $("[character]").removeClass(fontSizes.filter(size => !!size));
-        $("[character]").addClass(fontSizes[event.target.value - 1]);
-    };
-    $("input.slider").on("change", handleSliderChange);
-
     let mashiroCookie = localStorage.getItem("mashiroCookie");
 
     if (!mashiroCookie) {
         const defaultMashiroConfig = {
-            darkColors: false
+            darkColors: false,
+            fontSize: ""
         };
+        mashiroConfig = defaultMashiroConfig;
+        saveConfig();
         mashiroCookie = JSON.stringify(defaultMashiroConfig);
-        localStorage.setItem("mashiroCookie", mashiroCookie);
     }
 
     mashiroConfig = JSON.parse(mashiroCookie);
+    const fontSizes = ["smallest", "smaller", "", "bigger", "biggest"];
 
-    if (mashiroConfig["darkColors"]) {
+    if (mashiroConfig.darkColors) {
         colorFill();
     }
-});
+    if (mashiroConfig.fontSize) {
+        $("[character]").removeClass(fontSizes.filter(size => !!size));
+        $("[character]").addClass(mashiroConfig.fontSize);
+    }
 
-mashiroConfig = {
-    darkColors: false
-};
+    const handleSliderChange = event => {
+        const fontSize = fontSizes[event.target.value - 1];
+        $("[character]").removeClass(fontSizes.filter(size => !!size));
+        $("[character]").addClass(fontSize);
+        mashiroConfig.fontSize = fontSize;
+        saveConfig();
+    };
+    $("input.slider").on("change", handleSliderChange);
+});
