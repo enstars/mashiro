@@ -84,7 +84,7 @@
 [character] {
     position: relative;
     display: block;
-    --light-mode: hsl(var(--hue), 54%, 94%);
+    --light-mode: hsl(var(--hue), 54%, 93%);
 }
 [character] p {
     font-size: 1em;
@@ -242,15 +242,14 @@
 [character].smallest p {
     font-size: 0.8em;
 }
-[character].smallest::after {
-    top: 30px;
-}
 
 [character].smaller p {
     font-size: 0.9em;
 }
+
+[character].smallest::after,
 [character].smaller::after {
-    top: 25px;
+    top: 30px;
 }
 
 [character].bigger p {
@@ -1505,10 +1504,10 @@ body.lightbox-visible {
     background: #fff;
     justify-content: center;
     align-items: center;
-    width: 50%;
+    width: auto;
     border-radius: 15px;
     box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.2);
-    padding: 2px;
+    padding: 2px 35px;
 }
 .toolbar a {
     color: #555;
@@ -1543,7 +1542,12 @@ body.lightbox-visible {
     box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.2);
 }
 
+.slider-container div {
+    transition: all 0.3s ease;
+}
+
 .slider {
+    -webkit-appearance: none;
     appearance: none;
     width: 100%;
     height: 6px;
@@ -1557,6 +1561,7 @@ body.lightbox-visible {
     opacity: 1;
 }
 .slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
     appearance: none;
     width: 15px;
     height: 15px;
@@ -1572,11 +1577,11 @@ body.lightbox-visible {
     cursor: pointer;
 }
 
-@media (max-width: 650px) {
+/* @media (max-width: 650px) {
     .toolbar {
         width: 70%;
     }
-}
+} */
 @media (max-width: 400px) {
     .slider-container {
         left: 14%;

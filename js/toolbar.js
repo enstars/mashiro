@@ -7,8 +7,18 @@ function colorFill() {
 }
 
 function sliderDrop() {
-    $(".slider-container").toggle();
+    $(".slider-container").toggleClass();
 }
+
+$(document).ready(() => {
+    const fontSizes = ["smallest", "smaller", "", "bigger", "biggest"];
+
+    const handleSliderChange = event => {
+        $("[character]").removeClass(fontSizes.filter(size => !!size));
+        $("[character]").addClass(fontSizes[event.target.value - 1]);
+    };
+    $("input.slider").on("change", handleSliderChange);
+});
 
 mashiroConfig = {
     darkColors: false

@@ -2,19 +2,18 @@
     p {
         font-size: 0.8em;
     }
-
-    &::after {
-        top: 30px;
-    }
 }
 
 [character].smaller {
     p {
         font-size: 0.9em;
     }
+}
 
+[character].smallest,
+[character].smaller {
     &::after {
-        top: 25px;
+        top: 30px;
     }
 }
 

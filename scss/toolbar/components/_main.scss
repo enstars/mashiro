@@ -18,10 +18,10 @@
     background: #fff;
     justify-content: center;
     align-items: center;
-    width: 50%;
+    width: auto;
     border-radius: 15px;
     @include mixins.toolbarShadow;
-    padding: 2px;
+    padding: 2px 35px;
 
     a {
         color: #555;
