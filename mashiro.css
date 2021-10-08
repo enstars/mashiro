@@ -1493,7 +1493,7 @@ body.lightbox-visible {
     align-items: center;
     gap: 4px;
     top: 5px;
-    z-index: 9;
+    z-index: 2;
     margin-bottom: 20px;
 }
 
@@ -1508,6 +1508,7 @@ body.lightbox-visible {
     border-radius: 15px;
     box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.2);
     padding: 2px 35px;
+    z-index: 3;
 }
 .toolbar a {
     color: #555;
@@ -1530,6 +1531,24 @@ body.lightbox-visible {
     display: flex;
 }
 
+.toolbar-wrapper.hideSlider {
+    margin-bottom: unset;
+}
+.toolbar-wrapper.hideSlider > .slider-container {
+    transform: translateY(calc(-100% - 15px));
+    transition: transform 0.3s ease, max-height 0s 0.3s step-end;
+}
+.toolbar-wrapper.hideSlider .slider-container {
+    height: 0;
+}
+.toolbar-wrapper.hideSlider .slider {
+    height: 0;
+}
+.toolbar-wrapper.hideSlider .slider::-webkit-slider-thumb,
+.toolbar-wrapper.hideSlider .slider::-moz-range-thumb {
+    height: 0;
+}
+
 .slider-container {
     position: relative;
     left: 6%;
@@ -1540,10 +1559,7 @@ body.lightbox-visible {
     padding: 0 8px 5px;
     border-radius: 15px;
     box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.2);
-}
-
-.slider-container div {
-    transition: all 0.3s ease;
+    transition: max-height 0s step-start, transform 0.3s 0s ease;
 }
 
 .slider {
@@ -1553,7 +1569,7 @@ body.lightbox-visible {
     height: 6px;
     border-radius: 5px;
     background: #d3d3d3;
-    outline: none;
+    outline: 0;
     opacity: 0.7;
     transition: opacity 0.2s;
 }

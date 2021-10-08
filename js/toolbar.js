@@ -1,3 +1,5 @@
+let mashiroConfig;
+
 function colorFill() {
     $("[character]").toggleClass("fill");
     $("#dark-toggle").toggle();
@@ -7,7 +9,7 @@ function colorFill() {
 }
 
 function sliderDrop() {
-    $(".slider-container").toggleClass();
+    $(".toolbar-wrapper").toggleClass("hideSlider");
 }
 
 $(document).ready(() => {
@@ -18,20 +20,24 @@ $(document).ready(() => {
         $("[character]").addClass(fontSizes[event.target.value - 1]);
     };
     $("input.slider").on("change", handleSliderChange);
+
+    let mashiroCookie = localStorage.getItem("mashiroCookie");
+
+    if (!mashiroCookie) {
+        const defaultMashiroConfig = {
+            darkColors: false
+        };
+        mashiroCookie = JSON.stringify(defaultMashiroConfig);
+        localStorage.setItem("mashiroCookie", mashiroCookie);
+    }
+
+    mashiroConfig = JSON.parse(mashiroCookie);
+
+    if (mashiroConfig["darkColors"]) {
+        colorFill();
+    }
 });
 
 mashiroConfig = {
     darkColors: false
 };
-
-const mashiroCookie = localStorage.getItem("mashiroCookie");
-if (mashiroCookie == null) {
-    mashiroCookie = JSON.stringify(mashiroConfig);
-    localStorage.setItem("mashiroCookie", mashiroCookie);
-}
-
-mashiroConfig = JSON.parse(mashiroCookie);
-
-if (mashiroConfig["darkColors"]) {
-    colorFill();
-}
