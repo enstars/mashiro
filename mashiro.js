@@ -112,9 +112,11 @@ $(document).ready(() => {
     };
     $("input.slider").on("change", handleSliderChange);
 
-    if (mashiroConfig.darkColors) {
-        colorFill();
-    }
+    // Initialize fill mode based on config value
+    $("[character]").toggleClass("fill", mashiroConfig.darkColors);
+    $("#dark-toggle").toggle(mashiroConfig.darkColors);
+    $("#light-toggle").toggle(!mashiroConfig.darkColors);
+
     if (mashiroConfig.fontSize) {
         $("input.slider").val(mashiroConfig.fontSize);
         // Need to manually invoke event listener
