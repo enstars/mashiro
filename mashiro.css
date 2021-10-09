@@ -1469,6 +1469,16 @@ body.lightbox-visible {
     content: none;
 }
 
+.dark .minitalk-option_header {
+    color: #eee;
+    background: var(--dark-mode, #0e0e0e);
+}
+
+.fill .minitalk-option_header {
+    color: #fff;
+    background: var(--fill-mode, #737373);
+}
+
 [mt="normal"],
 [mt="rare"] {
     display: inline-block;
