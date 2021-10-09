@@ -1,14 +1,5 @@
-# mashiro
+# Mashiro
 
-[![](https://data.jsdelivr.com/v1/package/gh/enstars/mashiro/badge)](https://www.jsdelivr.com/package/gh/enstars/mashiro)
+Mashiro is a CSS library (?) for translation layouts. It mainly serves for *Ensemble Stars*, but can be customized for any series in particular.
 
-CSS library for _Ensemble Stars_ translation layouts, though it can be used for anything in particular.
-
-Check out the [wiki](https://github.com/enstars/mashiro/wiki) for documentation.
-
-## To-do
-
--   [ ] Library
--   [x] Toolbar
--   [ ] Documentation website
--   [ ] Refine bubble layout
+This library is optimized for use in [Hexo](https://hexo.io/) with the [NexT](https://github.com/next-theme/hexo-theme-next) theme.
