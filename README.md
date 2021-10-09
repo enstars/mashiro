@@ -8,7 +8,7 @@ Check out the [wiki](https://github.com/enstars/mashiro/wiki) for documentation.
 
 ## To-do
 
-- [ ] Library
-- [ ] Toolbar
-- [ ] Documentation website
-- [ ] Refine bubble layout
+-   [ ] Library
+-   [x] Toolbar
+-   [ ] Documentation website
+-   [ ] Refine bubble layout
