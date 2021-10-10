@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkmashiro_gh_pages=self.webpackChunkmashiro_gh_pages||[]).push([[829],{84:function(s){s.exports=JSON.parse('{"allTagsPath":"/mashiro/blog/tags","slug":"/mashiro/blog/tags/hello","name":"hello","count":2,"permalink":"/mashiro/blog/tags/hello"}')}}]);
