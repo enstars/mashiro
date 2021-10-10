@@ -1393,6 +1393,7 @@ body.lightbox-visible {
     display: flex;
     flex-direction: column;
     gap: 10px;
+    transition: 0.15s all ease;
 }
 .minitalk [character] p:last-of-type {
     margin-bottom: unset;
@@ -1439,6 +1440,7 @@ body.lightbox-visible {
     align-items: center;
     gap: 10px;
     color: #222;
+    transition: 0.15s all ease;
 }
 .minitalk-option_header:after {
     content: "\e5cf";
@@ -1477,6 +1479,55 @@ body.lightbox-visible {
 .fill .minitalk-option_header {
     color: #fff;
     background: var(--fill-mode, #737373);
+}
+
+.smallest .minitalk-option_header {
+    font-size: 0.8em;
+}
+.smallest .minitalk-option_header:after {
+    font-size: 1.7em;
+}
+
+.smaller .minitalk-option_header {
+    font-size: 0.9em;
+}
+.smaller .minitalk-option_header:after {
+    font-size: 1.6em;
+}
+
+.smallest .minitalk-option_header,
+.smaller .minitalk-option_header {
+    padding: 6px;
+    grid-template-columns: 35px 1fr 35px;
+}
+.smallest .minitalk-option_header:before,
+.smaller .minitalk-option_header:before {
+    height: 35px;
+    width: 35px;
+}
+
+.bigger .minitalk-option_header {
+    font-size: 1.1em;
+}
+.bigger .minitalk-option_header:after {
+    font-size: 1.4em;
+}
+
+.biggest .minitalk-option_header {
+    font-size: 1.2em;
+}
+.biggest .minitalk-option_header:after {
+    font-size: 1.3em;
+}
+
+.bigger .minitalk-option_header,
+.biggest .minitalk-option_header {
+    grid-template-columns: 45px 1fr 45px;
+}
+.bigger .minitalk-option_header:before,
+.biggest .minitalk-option_header:before {
+    height: 45px;
+    width: 45px;
 }
 
 [mt="normal"],

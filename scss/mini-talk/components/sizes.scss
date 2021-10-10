@@ -1,0 +1,46 @@
+.smallest .minitalk-option_header {
+    font-size: 0.8em;
+    &:after {
+        font-size: 1.7em;
+    }
+}
+
+.smaller .minitalk-option_header {
+    font-size: 0.9em;
+    &:after {
+        font-size: 1.6em;
+    }
+}
+
+.smallest .minitalk-option_header,
+.smaller .minitalk-option_header {
+    padding: 6px;
+    grid-template-columns: 35px 1fr 35px;
+    &:before {
+        height: 35px;
+        width: 35px;
+    }
+}
+
+.bigger .minitalk-option_header {
+    font-size: 1.1em;
+    &:after {
+        font-size: 1.4em;
+    }
+}
+
+.biggest .minitalk-option_header {
+    font-size: 1.2em;
+    &:after {
+        font-size: 1.3em;
+    }
+}
+
+.bigger .minitalk-option_header,
+.biggest .minitalk-option_header {
+    grid-template-columns: 45px 1fr 45px;
+    &:before {
+        height: 45px;
+        width: 45px;
+    }
+}

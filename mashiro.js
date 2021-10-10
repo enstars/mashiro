@@ -1,4 +1,3 @@
-
 /* document.oncontextmenu = new Function("return false;");
 $(document).ready(function() {
     $("[character] p, .minitalk").on("contextmenu", function(e) {
@@ -94,7 +93,7 @@ $(document).ready(() => {
         const defaultMashiroConfig = {
             darkColors: false,
             // Slider range is 1-5, but font size array indices are 0-4
-            fontSize: fontSizes.indexOf("") + 1,
+            fontSize: fontSizes.indexOf("") + 1
         };
         mashiroConfig = defaultMashiroConfig;
         saveConfig();
@@ -103,9 +102,9 @@ $(document).ready(() => {
 
     mashiroConfig = JSON.parse(mashiroCookie);
 
-    const handleSliderChange = (event) => {
+    const handleSliderChange = event => {
         const fontSize = fontSizes[event.target.value - 1];
-        $("[character]").removeClass(fontSizes.filter((size) => !!size));
+        $("[character]").removeClass(fontSizes.filter(size => !!size));
         $("[character]").addClass(fontSize);
         mashiroConfig.fontSize = event.target.value;
         saveConfig();
