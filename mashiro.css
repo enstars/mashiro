@@ -1476,8 +1476,28 @@ body.lightbox-visible {
     background: var(--dark-mode, #0e0e0e);
 }
 
+.dark .minitalk ul {
+    border-bottom: solid 3px var(--dark-mode, #0e0e0e);
+}
+.dark .minitalk li {
+    border: solid 3px var(--dark-mode, #0e0e0e);
+}
+.dark .minitalk li.active {
+    background: var(--dark-mode, #0e0e0e);
+}
+
 .fill .minitalk-option_header {
     color: #fff;
+    background: var(--fill-mode, #737373);
+}
+
+.fill .minitalk ul {
+    border-bottom: solid 3px var(--fill-mode, #737373);
+}
+.fill .minitalk li {
+    border: solid 3px var(--fill-mode, #737373);
+}
+.fill .minitalk li.active {
     background: var(--fill-mode, #737373);
 }
 
@@ -1612,7 +1632,7 @@ body.lightbox-visible {
 .slider {
     -webkit-appearance: none;
     appearance: none;
-    width: 100%;
+    width: 100px;
     height: 6px;
     border-radius: 5px;
     background: #d3d3d3;

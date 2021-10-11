@@ -2,3 +2,17 @@
     color: #fff;
     background: var(--fill-mode, #737373);
 }
+
+.fill .minitalk {
+    ul {
+        border-bottom: solid 3px var(--fill-mode, #737373);
+    }
+
+    li {
+        border: solid 3px var(--fill-mode, #737373);
+
+        &.active {
+            background: var(--fill-mode, #737373);
+        }
+    }
+}
