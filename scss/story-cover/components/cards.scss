@@ -9,14 +9,17 @@
     position: relative;
     display: inline-block;
     filter: drop-shadow(0px 0px 4px rgba(0, 0, 0, 0.6));
+
     img {
         object-fit: contain;
         width: 100%;
+        margin-bottom: 0 !important;
     }
 }
 
 .image {
     position: relative;
+
     .single {
         &.unbloomed {
             z-index: 2;
@@ -64,6 +67,7 @@
         display: grid;
         grid-template-rows: var(--quote-height) var(--quote-height);
         transition: 0.2s ease;
+
         > * {
             display: flex;
             justify-content: center;

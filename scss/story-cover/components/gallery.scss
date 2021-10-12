@@ -10,8 +10,10 @@
     position: relative;
     width: 100%;
     height: auto;
+
     img {
         transition: 0.2s ease;
+        margin-bottom: 0 !important;
     }
 
     &:hover {

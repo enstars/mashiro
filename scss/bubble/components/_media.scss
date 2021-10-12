@@ -9,6 +9,7 @@
         p {
             margin: 0 0 0.4em 65px;
             padding: 0.72em;
+
             &:first-child {
                 &::before,
                 &::after {
@@ -16,8 +17,9 @@
                     height: 50px;
                 }
             }
+
             &:last-of-type {
-                margin-bottom: 1.55em;
+                margin-bottom: 15px;
             }
         }
 
@@ -30,7 +32,8 @@
         &::after {
             border-top: 6px solid transparent;
             border-bottom: 6px solid transparent;
-            border-right: 10px solid var(--light-mode, #f1f1f1);
+            border-right: 10px solid;
+            border-right-color: var(--light-mode, #f1f1f1);
             top: 30px;
             left: 56px;
         }

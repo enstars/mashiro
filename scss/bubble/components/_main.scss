@@ -2,6 +2,7 @@
     position: relative;
     display: block;
     --light-mode: hsl(var(--hue), 54%, 93%);
+
     p {
         font-size: 1em;
         margin: 0 0 0.4em 90px;
@@ -11,6 +12,7 @@
         display: table;
         border-radius: 10px;
         transition: 0.15s all ease;
+
         &:first-child {
             &::before {
                 content: "";
@@ -60,7 +62,8 @@
         content: "";
         border-top: 8px solid transparent;
         border-bottom: 8px solid transparent;
-        border-right: 15px solid var(--light-mode, #f1f1f1);
+        border-right: 15px solid;
+        border-right-color: var(--light-mode, #f1f1f1);
         position: absolute;
         top: 35px;
         left: 76px;
@@ -108,7 +111,6 @@
                     background-color: #b3b3b3;
                 }
             }
-
             background: #f1f1f1;
         }
 
@@ -123,7 +125,8 @@
 }
 
 [character][unknown]::after {
-    border-right: 15px solid #f1f1f1;
+    border-right: 15px solid;
+    border-right-color: #f1f1f1;
 }
 
 .hold {

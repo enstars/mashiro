@@ -11,6 +11,7 @@
     border-radius: 5px;
     box-shadow: 0 5px 10px 0 rgba(0, 0, 0, 0.2), 0 0 40px 0 rgba(0, 0, 0, 0.1);
     box-sizing: border-box;
+
     .image .quotes__wrapper {
         display: block;
         --quote-height: 2.5em;
@@ -54,6 +55,7 @@ body.lightbox-visible {
         grid-template-columns: 63px 1fr;
         gap: 0 5px;
         margin: 10px 0;
+
         &:before {
             color: #fff;
             background-color: #0c195c;

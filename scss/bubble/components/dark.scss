@@ -8,6 +8,16 @@
     &::after {
         border-right-color: var(--dark-mode, #0e0e0e);
     }
+
+    &[unknown] {
+        p {
+            background: #0e0e0e;
+        }
+
+        &::after {
+            border-right-color: #0e0e0e;
+        }
+    }
 }
 
 .dark .thought {

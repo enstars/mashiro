@@ -3,10 +3,12 @@
     display: flex;
     flex-direction: column;
     gap: 10px;
+
     a {
         color: var(--storyColor);
         transition: 0.2s ease-in-out;
         border-bottom: none;
+
         &:hover {
             color: var(--storyColor-dark);
         }
@@ -36,6 +38,7 @@
     border-radius: 5px;
     padding: 5px 10px;
     border: solid 2px rgba(var(--storyColor-rgb), 0.2);
+
     &.season {
         grid-column: 1/2;
         grid-row: 1/2;
