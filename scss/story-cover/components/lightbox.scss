@@ -56,7 +56,7 @@ body.lightbox-visible {
         gap: 0 5px;
         margin: 10px 0;
 
-        &:before {
+        &::before {
             color: #fff;
             background-color: #0c195c;
             padding: 2px 6px;

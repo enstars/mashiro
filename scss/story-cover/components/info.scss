@@ -115,8 +115,8 @@
 }
 
 .value > [character] {
-    &:before,
-    &:after {
+    &::before,
+    &::after {
         content: none;
     }
 }

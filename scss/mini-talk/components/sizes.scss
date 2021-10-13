@@ -1,7 +1,7 @@
 .smallest .minitalk-option_header {
     font-size: 0.8em;
 
-    &:after {
+    &::after {
         font-size: 1.7em;
     }
 }
@@ -9,7 +9,7 @@
 .smaller .minitalk-option_header {
     font-size: 0.9em;
 
-    &:after {
+    &::after {
         font-size: 1.6em;
     }
 }
@@ -19,7 +19,7 @@
     padding: 6px;
     grid-template-columns: 35px 1fr 35px;
 
-    &:before {
+    &::before {
         height: 35px;
         width: 35px;
     }
@@ -28,7 +28,7 @@
 .bigger .minitalk-option_header {
     font-size: 1.1em;
 
-    &:after {
+    &::after {
         font-size: 1.4em;
     }
 }
@@ -36,7 +36,7 @@
 .biggest .minitalk-option_header {
     font-size: 1.2em;
 
-    &:after {
+    &::after {
         font-size: 1.3em;
     }
 }
@@ -45,7 +45,7 @@
 .biggest .minitalk-option_header {
     grid-template-columns: 45px 1fr 45px;
 
-    &:before {
+    &::before {
         height: 45px;
         width: 45px;
     }

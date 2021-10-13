@@ -22,7 +22,8 @@
 
     > .mini-talks {
         border-top: solid 1px #eff0f4;
-        &:before {
+
+        &::before {
             content: "Mini Talks";
             display: flex;
             align-items: center;
@@ -32,6 +33,7 @@
 
         .mt-content {
             display: none;
+
             > .item {
                 display: grid;
                 grid-template-columns: 1fr 1fr;
@@ -42,7 +44,8 @@
         .mt-header {
             margin-bottom: 5px;
             cursor: pointer;
-            &:after {
+
+            &::after {
                 content: "\e5cf";
                 display: inline-block;
                 font-family: "Material Icons Round";
