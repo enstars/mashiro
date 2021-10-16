@@ -1,19 +1,19 @@
-module.exports = function (grunt) {
+module.exports = function(grunt) {
     grunt.initConfig({
         clean: {
             css: ["./*.css"],
             js: ["./*.min.js"],
-            map: ["./*.map"],
+            map: ["./*.map"]
         },
         sass: {
             compile: {
                 options: {
-                    style: "expanded",
+                    style: "expanded"
                 },
                 files: {
-                    "mashiro.css": "scss/main.scss",
-                },
-            },
+                    "mashiro.css": "scss/main.scss"
+                }
+            }
         },
         cssmin: {
             target: {
@@ -21,28 +21,28 @@ module.exports = function (grunt) {
                     {
                         expand: true,
                         src: ["mashiro.css", "mashiro.min.css"],
-                        ext: ".min.css",
-                    },
-                ],
-            },
+                        ext: ".min.css"
+                    }
+                ]
+            }
         },
         concat: {
             dist: {
                 src: "./js/**",
-                dest: "./mashiro.js",
-            },
+                dest: "./mashiro.js"
+            }
         },
         terser: {
             compile: {
                 files: {
-                    "mashiro.min.js": ["mashiro.js"],
-                },
-            },
+                    "mashiro.min.js": ["mashiro.js"]
+                }
+            }
         },
         watch: {
             files: ["*/*.scss", "*.js"],
-            tasks: "default",
-        },
+            tasks: "default"
+        }
     });
     grunt.loadNpmTasks("grunt-contrib-sass");
     grunt.loadNpmTasks("grunt-contrib-cssmin");
@@ -55,6 +55,6 @@ module.exports = function (grunt) {
         "sass",
         "cssmin",
         "concat",
-        "terser",
+        "terser"
     ]);
 };
