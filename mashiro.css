@@ -1062,7 +1062,7 @@
 }
 .story-wrapper .tab-content {
     display: none;
-    padding: 10px;
+    padding: 10px 10px 0;
 }
 .story-wrapper .tab-content > .tab-item:first-child {
     padding: 0 0 8px 0;
@@ -1435,7 +1435,7 @@ body.lightbox-visible {
     border-radius: 10px 10px 0 0;
     border: solid 3px;
     border-color: var(--light-mode, #f1f1f1);
-    border-bottom: none;
+    border-bottom: 0;
     padding: 0;
     margin-bottom: -2px;
 }
