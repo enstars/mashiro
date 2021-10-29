@@ -954,6 +954,11 @@
     grid-column: 3/5;
 }
 
+.three-wrapper,
+.two-wrapper {
+    margin-bottom: 20px;
+}
+
 .characters > .value a {
     display: inline-block;
     background: var(--charahead) 0 0 / cover;
