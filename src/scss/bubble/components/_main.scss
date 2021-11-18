@@ -1,132 +1,80 @@
-[character] {
-    position: relative;
-    display: block;
-    --light-mode: hsl(var(--hue), 54%, 93%);
-
-    p {
-        font-size: 1em;
-        margin: 0 0 0.4em 90px;
-        background: var(--light-mode, #f1f1f1);
-        color: #222;
-        padding: 0.9em;
-        display: table;
-        border-radius: 10px;
-        transition: 0.15s all ease;
-
-        &:first-child {
-            &::before {
-                content: "";
-                display: block;
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 70px;
-                height: 70px;
-                background-color: var(--color, #b3b3b3);
-                border-radius: 50%;
-            }
-
-            &::after {
-                content: "";
-                display: block;
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 70px;
-                height: 70px;
-                background: 100% / 100%
-                    var(
-                        --icon,
-                        url("https://cdn.jsdelivr.net/gh/enstars/img/icon/unknown.png")
-                    );
-                border-radius: 50%;
-            }
-        }
-
-        &:last-of-type {
-            margin-bottom: 20px;
-        }
+.msr-unit {
+    * {
+        transition: all 0.2s ease;
     }
+
+    display: grid;
+    grid-template-columns: 1fr auto;
+    column-gap: 20px;
+    row-gap: 2.5px;
+}
+
+.msr-icon {
+    grid-row: 1/3;
+}
+
+.msr-icon__base {
+    display: block;
+    background: 100% / 100%
+            var(
+                --icon,
+                url("https://cdn.jsdelivr.net/gh/enstars/img/icon/unknown.png")
+            ),
+        var(--color, #b3b3b3);
+    width: 60px;
+    height: 60px;
+    margin: 0 auto 0 0;
+    border-radius: 12px 4px;
+}
+
+.msr-name {
+    font-size: 0.8em;
+    line-height: 1;
+    font-weight: 700;
+    text-transform: uppercase;
 
     &::before {
-        content: attr(character);
-        margin-left: 95px;
-        display: block;
-        font-weight: 700;
-        font-size: smaller;
-        text-transform: uppercase;
-        line-height: 17px;
+        content: var(--name, "???");
     }
+}
 
-    &::after {
-        content: "";
-        border-top: 8px solid transparent;
-        border-bottom: 8px solid transparent;
-        border-right: 15px solid;
-        border-right-color: var(--light-mode, #f1f1f1);
-        position: absolute;
-        top: 35px;
-        left: 76px;
-        transition: 0.15s all ease;
-    }
+.msr-line {
+    display: flex;
+    flex-direction: column;
+    grid-column: 2;
 
-    &[hidden] p:first-child::after {
-        background: #000;
-        -webkit-mask-image: var(
-            --icon,
-            url("https://cdn.jsdelivr.net/gh/enstars/img/icon/unknown.png")
-        );
-        -webkit-mask-size: 100%;
-        -webkit-mask-position: 100%;
-        mask-image: var(
-            --icon,
-            url("https://cdn.jsdelivr.net/gh/enstars/img/icon/unknown.png")
-        );
-        mask-size: 100%;
-        mask-position: 100%;
-        border-radius: 50%;
-    }
+    p {
+        align-self: flex-start;
+        font-size: 1em;
+        background: var(--light-mode, #f1f1f1);
+        color: #222;
+        padding: 0.6em;
+        border-radius: 0.5em;
+        margin-bottom: 5px;
+        position: relative;
+        filter: drop-shadow(0 1px 1.5px rgba(0, 0, 0, 0.05))
+            drop-shadow(0 1px 1px rgba(0, 0, 0, 0.06));
 
-    &[unknown] {
-        p {
-            &:first-child {
-                &::after {
-                    background: #000;
-                    -webkit-mask-image: var(
-                        --icon,
-                        url("https://cdn.jsdelivr.net/gh/enstars/img/icon/unknown.png")
-                    );
-                    -webkit-mask-size: 100%;
-                    -webkit-mask-position: 100%;
-                    mask-image: var(
-                        --icon,
-                        url("https://cdn.jsdelivr.net/gh/enstars/img/icon/unknown.png")
-                    );
-                    mask-size: 100%;
-                    mask-position: 100%;
-                    border-radius: 50%;
-                }
+        &:hover {
+            transform: translate(2px, 0px);
+        }
 
-                &::before {
-                    background-color: #b3b3b3;
-                }
+        &:first-child {
+            border-top-left-radius: 0em;
+
+            &::before {
+                content: "";
+                position: absolute;
+                background-color: transparent;
+                left: -30px;
+                top: 0px;
+                height: 10px;
+                width: 30px;
+                border-top-right-radius: 25px;
+                box-shadow: 20px 0 0 0 var(--light-mode, #f1f1f1);
             }
-            background: #f1f1f1;
-        }
-
-        &::before {
-            content: "???";
         }
     }
-}
-
-[character="Unknown"]::before {
-    content: "???";
-}
-
-[character][unknown]::after {
-    border-right: 15px solid;
-    border-right-color: #f1f1f1;
 }
 
 .hold {

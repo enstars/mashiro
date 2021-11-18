@@ -72,7 +72,7 @@ function toolbarInitialize() {
         const defaultMashiroConfig = {
             darkColors: false,
             // Slider range is 1-5, but font size array indices are 0-4
-            fontSize: fontSizes.indexOf("") + 1
+            fontSize: fontSizes.indexOf("") + 1,
         };
         mashiroConfig = defaultMashiroConfig;
         saveConfig();
@@ -81,9 +81,9 @@ function toolbarInitialize() {
 
     mashiroConfig = JSON.parse(mashiroCookie);
 
-    const handleSliderChange = event => {
+    const handleSliderChange = (event) => {
         const fontSize = fontSizes[event.target.value - 1];
-        $("[character]").removeClass(fontSizes.filter(size => !!size));
+        $("[character]").removeClass(fontSizes.filter((size) => !!size));
         $("[character]").addClass(fontSize);
         mashiroConfig.fontSize = event.target.value;
         saveConfig();
@@ -112,7 +112,7 @@ function footnoteInitialize() {
         moveTransition: "transform 0.2s ease",
         interactive: true,
     });
-    tippy("[data-tippy-content]");    
+    tippy("[data-tippy-content]");
 }
 
 $(document).ready(function () {
