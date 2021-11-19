@@ -14,20 +14,6 @@ function cardLightboxInitialize() {
     </div>`);
 }
 
-$("#colorFill").click(function () {
-    alert("Handler for .colorFill() called.");
-    $("[character]").toggleClass("fill");
-    $("#dark-toggle").toggle();
-    $("#light-toggle").toggle();
-    mashiroConfig.darkColors = !mashiroConfig.darkColors;
-    saveConfig();
-});
-
-$("#sliderDrop").click(function () {
-    alert("Handler for .sliderDrop() called.");
-    $(".toolbar-wrapper").toggleClass("showSlider");
-});
-
 function minitalkInitialize() {
     $(".minitalk-option_header").click(function () {
         $(this).next().slideToggle();
@@ -124,4 +110,18 @@ $(document).ready(function () {
     storyCoverInitialize();
     toolbarInitialize();
     footnoteInitialize();
+
+    $("#colorFill").click(function () {
+        alert("Handler for .colorFill() called.");
+        $("[character]").toggleClass("fill");
+        $("#dark-toggle").toggle();
+        $("#light-toggle").toggle();
+        mashiroConfig.darkColors = !mashiroConfig.darkColors;
+        saveConfig();
+    });
+
+    $("#sliderDrop").click(function () {
+        alert("Handler for .sliderDrop() called.");
+        $(".toolbar-wrapper").toggleClass("showSlider");
+    });
 });

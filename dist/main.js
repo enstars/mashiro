@@ -17203,20 +17203,6 @@ function cardLightboxInitialize() {
     </div>`);
 }
 
-jquery__WEBPACK_IMPORTED_MODULE_0___default()("#colorFill").click(function () {
-    alert("Handler for .colorFill() called.");
-    jquery__WEBPACK_IMPORTED_MODULE_0___default()("[character]").toggleClass("fill");
-    jquery__WEBPACK_IMPORTED_MODULE_0___default()("#dark-toggle").toggle();
-    jquery__WEBPACK_IMPORTED_MODULE_0___default()("#light-toggle").toggle();
-    mashiroConfig.darkColors = !mashiroConfig.darkColors;
-    saveConfig();
-});
-
-jquery__WEBPACK_IMPORTED_MODULE_0___default()("#sliderDrop").click(function () {
-    alert("Handler for .sliderDrop() called.");
-    jquery__WEBPACK_IMPORTED_MODULE_0___default()(".toolbar-wrapper").toggleClass("showSlider");
-});
-
 function minitalkInitialize() {
     jquery__WEBPACK_IMPORTED_MODULE_0___default()(".minitalk-option_header").click(function () {
         jquery__WEBPACK_IMPORTED_MODULE_0___default()(this).next().slideToggle();
@@ -17313,6 +17299,20 @@ jquery__WEBPACK_IMPORTED_MODULE_0___default()(document).ready(function () {
     storyCoverInitialize();
     toolbarInitialize();
     footnoteInitialize();
+
+    jquery__WEBPACK_IMPORTED_MODULE_0___default()("#colorFill").click(function () {
+        alert("Handler for .colorFill() called.");
+        jquery__WEBPACK_IMPORTED_MODULE_0___default()("[character]").toggleClass("fill");
+        jquery__WEBPACK_IMPORTED_MODULE_0___default()("#dark-toggle").toggle();
+        jquery__WEBPACK_IMPORTED_MODULE_0___default()("#light-toggle").toggle();
+        mashiroConfig.darkColors = !mashiroConfig.darkColors;
+        saveConfig();
+    });
+
+    jquery__WEBPACK_IMPORTED_MODULE_0___default()("#sliderDrop").click(function () {
+        alert("Handler for .sliderDrop() called.");
+        jquery__WEBPACK_IMPORTED_MODULE_0___default()(".toolbar-wrapper").toggleClass("showSlider");
+    });
 });
 
 })();
