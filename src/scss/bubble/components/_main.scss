@@ -5,9 +5,10 @@
 
     display: grid;
     grid-template-columns: auto 1fr;
-    column-gap: 15px;
+    column-gap: 12px;
     row-gap: 2px;
-    margin-bottom: 0.8em;
+    margin-bottom: 0.95em;
+    font-size: 1em;
     --light-mode: hsl(var(--hue), 54%, 93%);
     --dark-mode: hsl(var(--hue), 12%, 25%);
     --fill-mode: hsl(var(--hue), 30%, 45%);
@@ -52,24 +53,24 @@
     display: flex;
     flex-direction: column;
     grid-column: 2;
+    row-gap: 5px;
 
     p {
         align-self: flex-start;
-        font-size: 1em;
+        font-size: var(--msr-line-size);
         background: var(--light-mode, #f1f1f1);
         color: #222;
-        padding: 0.595em;
-        border-radius: 0.5em;
-        margin-bottom: 5px;
+        padding: 0.6em;
+        border-radius: var(--msr-line-border);
         position: relative;
-        filter: var(--mashiro-line-filter, 0);
+        filter: var(--msr-line-filter, 0);
 
         &:hover {
             transform: translate(2px, 0px);
         }
 
         &:first-child {
-            border-top-left-radius: 0em;
+            border-top-left-radius: 0;
 
             &::before {
                 background: transparent;
@@ -80,7 +81,7 @@
                 height: 10px;
                 width: 30px;
                 border-top-right-radius: 25px;
-                box-shadow: 20px 0 0 0 var(--light-mode, #f1f1f1);
+                box-shadow: 23px 0 0 0 var(--light-mode, #f1f1f1);
             }
         }
     }
