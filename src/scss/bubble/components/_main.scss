@@ -5,12 +5,23 @@
 
     display: grid;
     grid-template-columns: 1fr auto;
-    column-gap: 20px;
-    row-gap: 2.5px;
+    column-gap: 15px;
+    row-gap: 2px;
+    --light-mode: hsl(var(--hue), 54%, 93%);
+    --dark-mode: hsl(var(--hue), 12%, 25%);
+    --fill-mode: hsl(var(--hue), 30%, 45%);
 }
 
 .msr-icon {
     grid-row: 1/3;
+}
+
+.msr-icon__wrapper {
+    border-radius: var(--msr-icon-border);
+    position: relative;
+    overflow: hidden;
+    width: var(--msr-icon-size);
+    height: var(--msr-icon-size);
 }
 
 .msr-icon__base {
@@ -21,17 +32,15 @@
                 url("https://cdn.jsdelivr.net/gh/enstars/img/icon/unknown.png")
             ),
         var(--color, #b3b3b3);
-    width: 60px;
-    height: 60px;
-    margin: 0 auto 0 0;
-    border-radius: 12px 4px;
+    width: 100%;
+    height: 100%;
 }
 
 .msr-name {
-    font-size: 0.8em;
+    font-size: 0.85em;
     line-height: 1;
     font-weight: 700;
-    text-transform: uppercase;
+    text-transform: var(--msr-name-case);
 
     &::before {
         content: var(--name, "???");
@@ -48,12 +57,11 @@
         font-size: 1em;
         background: var(--light-mode, #f1f1f1);
         color: #222;
-        padding: 0.6em;
+        padding: 0.595em;
         border-radius: 0.5em;
         margin-bottom: 5px;
         position: relative;
-        filter: drop-shadow(0 1px 1.5px rgba(0, 0, 0, 0.05))
-            drop-shadow(0 1px 1px rgba(0, 0, 0, 0.06));
+        filter: var(--mashiro-line-filter, 0);
 
         &:hover {
             transform: translate(2px, 0px);
@@ -63,9 +71,9 @@
             border-top-left-radius: 0em;
 
             &::before {
+                background: transparent;
                 content: "";
                 position: absolute;
-                background-color: transparent;
                 left: -30px;
                 top: 0px;
                 height: 10px;
@@ -75,19 +83,4 @@
             }
         }
     }
-}
-
-.hold {
-    display: inline-block;
-}
-
-.thought {
-    color: #5555c0;
-}
-
-.spell {
-    font-family: "Almendra", serif;
-    letter-spacing: 0.015em;
-    font-size: 1.1em;
-    line-height: 1.3;
 }

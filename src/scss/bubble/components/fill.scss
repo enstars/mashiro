@@ -1,22 +1,24 @@
 [character].fill {
-    --fill-mode: hsl(var(--hue), 30%, 45%);
-
-    p {
-        color: #fff;
-        background: var(--fill-mode, #737373);
-    }
-
-    &::after {
-        border-right-color: var(--fill-mode, #737373);
-    }
-
-    &[unknown] {
+    .msr-line {
         p {
-            background: #737373;
-        }
+            background: var(--fill-mode, #737373);
+            color: #fff;
 
-        &::after {
-            border-right-color: #737373;
+            &:first-child {
+                &::before {
+                    box-shadow: 20px 0 0 0 var(--fill-mode, #737373);
+                }
+            }
+        }
+        &[unknown] {
+            p {
+                background: #737373;
+            }
+            &:first-child {
+                &::before {
+                    box-shadow: 20px 0 0 0 #737373;
+                }
+            }
         }
     }
 }
