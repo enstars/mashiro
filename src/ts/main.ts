@@ -8,18 +8,6 @@ function saveConfig() {
     localStorage.setItem("mashiroCookie", JSON.stringify(mashiroConfig));
 }
 
-function colorFill() {
-    $("[character]").toggleClass("fill");
-    $("#dark-toggle").toggle();
-    $("#light-toggle").toggle();
-    mashiroConfig.darkColors = !mashiroConfig.darkColors;
-    saveConfig();
-}
-
-function sliderDrop() {
-    $(".toolbar-wrapper").toggleClass("showSlider");
-}
-
 function cardLightboxInitialize() {
     $("body").append(`<div class="lightbox__dim" style="display: none;">
         <div class="lightbox-content"></div>
@@ -28,12 +16,16 @@ function cardLightboxInitialize() {
 
 $("#colorFill").click(function () {
     alert("Handler for .colorFill() called.");
-    colorFill();
+    $("[character]").toggleClass("fill");
+    $("#dark-toggle").toggle();
+    $("#light-toggle").toggle();
+    mashiroConfig.darkColors = !mashiroConfig.darkColors;
+    saveConfig();
 });
 
 $("#sliderDrop").click(function () {
     alert("Handler for .sliderDrop() called.");
-    sliderDrop();
+    $(".toolbar-wrapper").toggleClass("showSlider");
 });
 
 function minitalkInitialize() {
