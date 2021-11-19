@@ -1,6 +1,3088 @@
 /******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
+/***/ "./node_modules/@popperjs/core/lib/createPopper.js":
+/*!*********************************************************!*\
+  !*** ./node_modules/@popperjs/core/lib/createPopper.js ***!
+  \*********************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "popperGenerator": () => (/* binding */ popperGenerator),
+/* harmony export */   "createPopper": () => (/* binding */ createPopper),
+/* harmony export */   "detectOverflow": () => (/* reexport safe */ _utils_detectOverflow_js__WEBPACK_IMPORTED_MODULE_13__["default"])
+/* harmony export */ });
+/* harmony import */ var _dom_utils_getCompositeRect_js__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./dom-utils/getCompositeRect.js */ "./node_modules/@popperjs/core/lib/dom-utils/getCompositeRect.js");
+/* harmony import */ var _dom_utils_getLayoutRect_js__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./dom-utils/getLayoutRect.js */ "./node_modules/@popperjs/core/lib/dom-utils/getLayoutRect.js");
+/* harmony import */ var _dom_utils_listScrollParents_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./dom-utils/listScrollParents.js */ "./node_modules/@popperjs/core/lib/dom-utils/listScrollParents.js");
+/* harmony import */ var _dom_utils_getOffsetParent_js__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./dom-utils/getOffsetParent.js */ "./node_modules/@popperjs/core/lib/dom-utils/getOffsetParent.js");
+/* harmony import */ var _dom_utils_getComputedStyle_js__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./dom-utils/getComputedStyle.js */ "./node_modules/@popperjs/core/lib/dom-utils/getComputedStyle.js");
+/* harmony import */ var _utils_orderModifiers_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./utils/orderModifiers.js */ "./node_modules/@popperjs/core/lib/utils/orderModifiers.js");
+/* harmony import */ var _utils_debounce_js__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./utils/debounce.js */ "./node_modules/@popperjs/core/lib/utils/debounce.js");
+/* harmony import */ var _utils_validateModifiers_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./utils/validateModifiers.js */ "./node_modules/@popperjs/core/lib/utils/validateModifiers.js");
+/* harmony import */ var _utils_uniqueBy_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./utils/uniqueBy.js */ "./node_modules/@popperjs/core/lib/utils/uniqueBy.js");
+/* harmony import */ var _utils_getBasePlacement_js__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./utils/getBasePlacement.js */ "./node_modules/@popperjs/core/lib/utils/getBasePlacement.js");
+/* harmony import */ var _utils_mergeByName_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./utils/mergeByName.js */ "./node_modules/@popperjs/core/lib/utils/mergeByName.js");
+/* harmony import */ var _utils_detectOverflow_js__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./utils/detectOverflow.js */ "./node_modules/@popperjs/core/lib/utils/detectOverflow.js");
+/* harmony import */ var _dom_utils_instanceOf_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./dom-utils/instanceOf.js */ "./node_modules/@popperjs/core/lib/dom-utils/instanceOf.js");
+/* harmony import */ var _enums_js__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./enums.js */ "./node_modules/@popperjs/core/lib/enums.js");
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+var INVALID_ELEMENT_ERROR = 'Popper: Invalid reference or popper argument provided. They must be either a DOM element or virtual element.';
+var INFINITE_LOOP_ERROR = 'Popper: An infinite loop in the modifiers cycle has been detected! The cycle has been interrupted to prevent a browser crash.';
+var DEFAULT_OPTIONS = {
+  placement: 'bottom',
+  modifiers: [],
+  strategy: 'absolute'
+};
+
+function areValidElements() {
+  for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
+    args[_key] = arguments[_key];
+  }
+
+  return !args.some(function (element) {
+    return !(element && typeof element.getBoundingClientRect === 'function');
+  });
+}
+
+function popperGenerator(generatorOptions) {
+  if (generatorOptions === void 0) {
+    generatorOptions = {};
+  }
+
+  var _generatorOptions = generatorOptions,
+      _generatorOptions$def = _generatorOptions.defaultModifiers,
+      defaultModifiers = _generatorOptions$def === void 0 ? [] : _generatorOptions$def,
+      _generatorOptions$def2 = _generatorOptions.defaultOptions,
+      defaultOptions = _generatorOptions$def2 === void 0 ? DEFAULT_OPTIONS : _generatorOptions$def2;
+  return function createPopper(reference, popper, options) {
+    if (options === void 0) {
+      options = defaultOptions;
+    }
+
+    var state = {
+      placement: 'bottom',
+      orderedModifiers: [],
+      options: Object.assign({}, DEFAULT_OPTIONS, defaultOptions),
+      modifiersData: {},
+      elements: {
+        reference: reference,
+        popper: popper
+      },
+      attributes: {},
+      styles: {}
+    };
+    var effectCleanupFns = [];
+    var isDestroyed = false;
+    var instance = {
+      state: state,
+      setOptions: function setOptions(setOptionsAction) {
+        var options = typeof setOptionsAction === 'function' ? setOptionsAction(state.options) : setOptionsAction;
+        cleanupModifierEffects();
+        state.options = Object.assign({}, defaultOptions, state.options, options);
+        state.scrollParents = {
+          reference: (0,_dom_utils_instanceOf_js__WEBPACK_IMPORTED_MODULE_0__.isElement)(reference) ? (0,_dom_utils_listScrollParents_js__WEBPACK_IMPORTED_MODULE_1__["default"])(reference) : reference.contextElement ? (0,_dom_utils_listScrollParents_js__WEBPACK_IMPORTED_MODULE_1__["default"])(reference.contextElement) : [],
+          popper: (0,_dom_utils_listScrollParents_js__WEBPACK_IMPORTED_MODULE_1__["default"])(popper)
+        }; // Orders the modifiers based on their dependencies and `phase`
+        // properties
+
+        var orderedModifiers = (0,_utils_orderModifiers_js__WEBPACK_IMPORTED_MODULE_2__["default"])((0,_utils_mergeByName_js__WEBPACK_IMPORTED_MODULE_3__["default"])([].concat(defaultModifiers, state.options.modifiers))); // Strip out disabled modifiers
+
+        state.orderedModifiers = orderedModifiers.filter(function (m) {
+          return m.enabled;
+        }); // Validate the provided modifiers so that the consumer will get warned
+        // if one of the modifiers is invalid for any reason
+
+        if (true) {
+          var modifiers = (0,_utils_uniqueBy_js__WEBPACK_IMPORTED_MODULE_4__["default"])([].concat(orderedModifiers, state.options.modifiers), function (_ref) {
+            var name = _ref.name;
+            return name;
+          });
+          (0,_utils_validateModifiers_js__WEBPACK_IMPORTED_MODULE_5__["default"])(modifiers);
+
+          if ((0,_utils_getBasePlacement_js__WEBPACK_IMPORTED_MODULE_6__["default"])(state.options.placement) === _enums_js__WEBPACK_IMPORTED_MODULE_7__.auto) {
+            var flipModifier = state.orderedModifiers.find(function (_ref2) {
+              var name = _ref2.name;
+              return name === 'flip';
+            });
+
+            if (!flipModifier) {
+              console.error(['Popper: "auto" placements require the "flip" modifier be', 'present and enabled to work.'].join(' '));
+            }
+          }
+
+          var _getComputedStyle = (0,_dom_utils_getComputedStyle_js__WEBPACK_IMPORTED_MODULE_8__["default"])(popper),
+              marginTop = _getComputedStyle.marginTop,
+              marginRight = _getComputedStyle.marginRight,
+              marginBottom = _getComputedStyle.marginBottom,
+              marginLeft = _getComputedStyle.marginLeft; // We no longer take into account `margins` on the popper, and it can
+          // cause bugs with positioning, so we'll warn the consumer
+
+
+          if ([marginTop, marginRight, marginBottom, marginLeft].some(function (margin) {
+            return parseFloat(margin);
+          })) {
+            console.warn(['Popper: CSS "margin" styles cannot be used to apply padding', 'between the popper and its reference element or boundary.', 'To replicate margin, use the `offset` modifier, as well as', 'the `padding` option in the `preventOverflow` and `flip`', 'modifiers.'].join(' '));
+          }
+        }
+
+        runModifierEffects();
+        return instance.update();
+      },
+      // Sync update – it will always be executed, even if not necessary. This
+      // is useful for low frequency updates where sync behavior simplifies the
+      // logic.
+      // For high frequency updates (e.g. `resize` and `scroll` events), always
+      // prefer the async Popper#update method
+      forceUpdate: function forceUpdate() {
+        if (isDestroyed) {
+          return;
+        }
+
+        var _state$elements = state.elements,
+            reference = _state$elements.reference,
+            popper = _state$elements.popper; // Don't proceed if `reference` or `popper` are not valid elements
+        // anymore
+
+        if (!areValidElements(reference, popper)) {
+          if (true) {
+            console.error(INVALID_ELEMENT_ERROR);
+          }
+
+          return;
+        } // Store the reference and popper rects to be read by modifiers
+
+
+        state.rects = {
+          reference: (0,_dom_utils_getCompositeRect_js__WEBPACK_IMPORTED_MODULE_9__["default"])(reference, (0,_dom_utils_getOffsetParent_js__WEBPACK_IMPORTED_MODULE_10__["default"])(popper), state.options.strategy === 'fixed'),
+          popper: (0,_dom_utils_getLayoutRect_js__WEBPACK_IMPORTED_MODULE_11__["default"])(popper)
+        }; // Modifiers have the ability to reset the current update cycle. The
+        // most common use case for this is the `flip` modifier changing the
+        // placement, which then needs to re-run all the modifiers, because the
+        // logic was previously ran for the previous placement and is therefore
+        // stale/incorrect
+
+        state.reset = false;
+        state.placement = state.options.placement; // On each update cycle, the `modifiersData` property for each modifier
+        // is filled with the initial data specified by the modifier. This means
+        // it doesn't persist and is fresh on each update.
+        // To ensure persistent data, use `${name}#persistent`
+
+        state.orderedModifiers.forEach(function (modifier) {
+          return state.modifiersData[modifier.name] = Object.assign({}, modifier.data);
+        });
+        var __debug_loops__ = 0;
+
+        for (var index = 0; index < state.orderedModifiers.length; index++) {
+          if (true) {
+            __debug_loops__ += 1;
+
+            if (__debug_loops__ > 100) {
+              console.error(INFINITE_LOOP_ERROR);
+              break;
+            }
+          }
+
+          if (state.reset === true) {
+            state.reset = false;
+            index = -1;
+            continue;
+          }
+
+          var _state$orderedModifie = state.orderedModifiers[index],
+              fn = _state$orderedModifie.fn,
+              _state$orderedModifie2 = _state$orderedModifie.options,
+              _options = _state$orderedModifie2 === void 0 ? {} : _state$orderedModifie2,
+              name = _state$orderedModifie.name;
+
+          if (typeof fn === 'function') {
+            state = fn({
+              state: state,
+              options: _options,
+              name: name,
+              instance: instance
+            }) || state;
+          }
+        }
+      },
+      // Async and optimistically optimized update – it will not be executed if
+      // not necessary (debounced to run at most once-per-tick)
+      update: (0,_utils_debounce_js__WEBPACK_IMPORTED_MODULE_12__["default"])(function () {
+        return new Promise(function (resolve) {
+          instance.forceUpdate();
+          resolve(state);
+        });
+      }),
+      destroy: function destroy() {
+        cleanupModifierEffects();
+        isDestroyed = true;
+      }
+    };
+
+    if (!areValidElements(reference, popper)) {
+      if (true) {
+        console.error(INVALID_ELEMENT_ERROR);
+      }
+
+      return instance;
+    }
+
+    instance.setOptions(options).then(function (state) {
+      if (!isDestroyed && options.onFirstUpdate) {
+        options.onFirstUpdate(state);
+      }
+    }); // Modifiers have the ability to execute arbitrary code before the first
+    // update cycle runs. They will be executed in the same order as the update
+    // cycle. This is useful when a modifier adds some persistent data that
+    // other modifiers need to use, but the modifier is run after the dependent
+    // one.
+
+    function runModifierEffects() {
+      state.orderedModifiers.forEach(function (_ref3) {
+        var name = _ref3.name,
+            _ref3$options = _ref3.options,
+            options = _ref3$options === void 0 ? {} : _ref3$options,
+            effect = _ref3.effect;
+
+        if (typeof effect === 'function') {
+          var cleanupFn = effect({
+            state: state,
+            name: name,
+            instance: instance,
+            options: options
+          });
+
+          var noopFn = function noopFn() {};
+
+          effectCleanupFns.push(cleanupFn || noopFn);
+        }
+      });
+    }
+
+    function cleanupModifierEffects() {
+      effectCleanupFns.forEach(function (fn) {
+        return fn();
+      });
+      effectCleanupFns = [];
+    }
+
+    return instance;
+  };
+}
+var createPopper = /*#__PURE__*/popperGenerator(); // eslint-disable-next-line import/no-unused-modules
+
+
+
+/***/ }),
+
+/***/ "./node_modules/@popperjs/core/lib/dom-utils/contains.js":
+/*!***************************************************************!*\
+  !*** ./node_modules/@popperjs/core/lib/dom-utils/contains.js ***!
+  \***************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ contains)
+/* harmony export */ });
+/* harmony import */ var _instanceOf_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./instanceOf.js */ "./node_modules/@popperjs/core/lib/dom-utils/instanceOf.js");
+
+function contains(parent, child) {
+  var rootNode = child.getRootNode && child.getRootNode(); // First, attempt with faster native method
+
+  if (parent.contains(child)) {
+    return true;
+  } // then fallback to custom implementation with Shadow DOM support
+  else if (rootNode && (0,_instanceOf_js__WEBPACK_IMPORTED_MODULE_0__.isShadowRoot)(rootNode)) {
+      var next = child;
+
+      do {
+        if (next && parent.isSameNode(next)) {
+          return true;
+        } // $FlowFixMe[prop-missing]: need a better way to handle this...
+
+
+        next = next.parentNode || next.host;
+      } while (next);
+    } // Give up, the result is false
+
+
+  return false;
+}
+
+/***/ }),
+
+/***/ "./node_modules/@popperjs/core/lib/dom-utils/getBoundingClientRect.js":
+/*!****************************************************************************!*\
+  !*** ./node_modules/@popperjs/core/lib/dom-utils/getBoundingClientRect.js ***!
+  \****************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ getBoundingClientRect)
+/* harmony export */ });
+// import { isHTMLElement } from './instanceOf';
+function getBoundingClientRect(element, // eslint-disable-next-line unused-imports/no-unused-vars
+includeScale) {
+  if (includeScale === void 0) {
+    includeScale = false;
+  }
+
+  var rect = element.getBoundingClientRect();
+  var scaleX = 1;
+  var scaleY = 1; // FIXME:
+  // `offsetWidth` returns an integer while `getBoundingClientRect`
+  // returns a float. This results in `scaleX` or `scaleY` being
+  // non-1 when it should be for elements that aren't a full pixel in
+  // width or height.
+  // if (isHTMLElement(element) && includeScale) {
+  //   const offsetHeight = element.offsetHeight;
+  //   const offsetWidth = element.offsetWidth;
+  //   // Do not attempt to divide by 0, otherwise we get `Infinity` as scale
+  //   // Fallback to 1 in case both values are `0`
+  //   if (offsetWidth > 0) {
+  //     scaleX = rect.width / offsetWidth || 1;
+  //   }
+  //   if (offsetHeight > 0) {
+  //     scaleY = rect.height / offsetHeight || 1;
+  //   }
+  // }
+
+  return {
+    width: rect.width / scaleX,
+    height: rect.height / scaleY,
+    top: rect.top / scaleY,
+    right: rect.right / scaleX,
+    bottom: rect.bottom / scaleY,
+    left: rect.left / scaleX,
+    x: rect.left / scaleX,
+    y: rect.top / scaleY
+  };
+}
+
+/***/ }),
+
+/***/ "./node_modules/@popperjs/core/lib/dom-utils/getClippingRect.js":
+/*!**********************************************************************!*\
+  !*** ./node_modules/@popperjs/core/lib/dom-utils/getClippingRect.js ***!
+  \**********************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ getClippingRect)
+/* harmony export */ });
+/* harmony import */ var _enums_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../enums.js */ "./node_modules/@popperjs/core/lib/enums.js");
+/* harmony import */ var _getViewportRect_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./getViewportRect.js */ "./node_modules/@popperjs/core/lib/dom-utils/getViewportRect.js");
+/* harmony import */ var _getDocumentRect_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./getDocumentRect.js */ "./node_modules/@popperjs/core/lib/dom-utils/getDocumentRect.js");
+/* harmony import */ var _listScrollParents_js__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./listScrollParents.js */ "./node_modules/@popperjs/core/lib/dom-utils/listScrollParents.js");
+/* harmony import */ var _getOffsetParent_js__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./getOffsetParent.js */ "./node_modules/@popperjs/core/lib/dom-utils/getOffsetParent.js");
+/* harmony import */ var _getDocumentElement_js__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./getDocumentElement.js */ "./node_modules/@popperjs/core/lib/dom-utils/getDocumentElement.js");
+/* harmony import */ var _getComputedStyle_js__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./getComputedStyle.js */ "./node_modules/@popperjs/core/lib/dom-utils/getComputedStyle.js");
+/* harmony import */ var _instanceOf_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./instanceOf.js */ "./node_modules/@popperjs/core/lib/dom-utils/instanceOf.js");
+/* harmony import */ var _getBoundingClientRect_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./getBoundingClientRect.js */ "./node_modules/@popperjs/core/lib/dom-utils/getBoundingClientRect.js");
+/* harmony import */ var _getParentNode_js__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./getParentNode.js */ "./node_modules/@popperjs/core/lib/dom-utils/getParentNode.js");
+/* harmony import */ var _contains_js__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./contains.js */ "./node_modules/@popperjs/core/lib/dom-utils/contains.js");
+/* harmony import */ var _getNodeName_js__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./getNodeName.js */ "./node_modules/@popperjs/core/lib/dom-utils/getNodeName.js");
+/* harmony import */ var _utils_rectToClientRect_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../utils/rectToClientRect.js */ "./node_modules/@popperjs/core/lib/utils/rectToClientRect.js");
+/* harmony import */ var _utils_math_js__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ../utils/math.js */ "./node_modules/@popperjs/core/lib/utils/math.js");
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function getInnerBoundingClientRect(element) {
+  var rect = (0,_getBoundingClientRect_js__WEBPACK_IMPORTED_MODULE_0__["default"])(element);
+  rect.top = rect.top + element.clientTop;
+  rect.left = rect.left + element.clientLeft;
+  rect.bottom = rect.top + element.clientHeight;
+  rect.right = rect.left + element.clientWidth;
+  rect.width = element.clientWidth;
+  rect.height = element.clientHeight;
+  rect.x = rect.left;
+  rect.y = rect.top;
+  return rect;
+}
+
+function getClientRectFromMixedType(element, clippingParent) {
+  return clippingParent === _enums_js__WEBPACK_IMPORTED_MODULE_1__.viewport ? (0,_utils_rectToClientRect_js__WEBPACK_IMPORTED_MODULE_2__["default"])((0,_getViewportRect_js__WEBPACK_IMPORTED_MODULE_3__["default"])(element)) : (0,_instanceOf_js__WEBPACK_IMPORTED_MODULE_4__.isHTMLElement)(clippingParent) ? getInnerBoundingClientRect(clippingParent) : (0,_utils_rectToClientRect_js__WEBPACK_IMPORTED_MODULE_2__["default"])((0,_getDocumentRect_js__WEBPACK_IMPORTED_MODULE_5__["default"])((0,_getDocumentElement_js__WEBPACK_IMPORTED_MODULE_6__["default"])(element)));
+} // A "clipping parent" is an overflowable container with the characteristic of
+// clipping (or hiding) overflowing elements with a position different from
+// `initial`
+
+
+function getClippingParents(element) {
+  var clippingParents = (0,_listScrollParents_js__WEBPACK_IMPORTED_MODULE_7__["default"])((0,_getParentNode_js__WEBPACK_IMPORTED_MODULE_8__["default"])(element));
+  var canEscapeClipping = ['absolute', 'fixed'].indexOf((0,_getComputedStyle_js__WEBPACK_IMPORTED_MODULE_9__["default"])(element).position) >= 0;
+  var clipperElement = canEscapeClipping && (0,_instanceOf_js__WEBPACK_IMPORTED_MODULE_4__.isHTMLElement)(element) ? (0,_getOffsetParent_js__WEBPACK_IMPORTED_MODULE_10__["default"])(element) : element;
+
+  if (!(0,_instanceOf_js__WEBPACK_IMPORTED_MODULE_4__.isElement)(clipperElement)) {
+    return [];
+  } // $FlowFixMe[incompatible-return]: https://github.com/facebook/flow/issues/1414
+
+
+  return clippingParents.filter(function (clippingParent) {
+    return (0,_instanceOf_js__WEBPACK_IMPORTED_MODULE_4__.isElement)(clippingParent) && (0,_contains_js__WEBPACK_IMPORTED_MODULE_11__["default"])(clippingParent, clipperElement) && (0,_getNodeName_js__WEBPACK_IMPORTED_MODULE_12__["default"])(clippingParent) !== 'body';
+  });
+} // Gets the maximum area that the element is visible in due to any number of
+// clipping parents
+
+
+function getClippingRect(element, boundary, rootBoundary) {
+  var mainClippingParents = boundary === 'clippingParents' ? getClippingParents(element) : [].concat(boundary);
+  var clippingParents = [].concat(mainClippingParents, [rootBoundary]);
+  var firstClippingParent = clippingParents[0];
+  var clippingRect = clippingParents.reduce(function (accRect, clippingParent) {
+    var rect = getClientRectFromMixedType(element, clippingParent);
+    accRect.top = (0,_utils_math_js__WEBPACK_IMPORTED_MODULE_13__.max)(rect.top, accRect.top);
+    accRect.right = (0,_utils_math_js__WEBPACK_IMPORTED_MODULE_13__.min)(rect.right, accRect.right);
+    accRect.bottom = (0,_utils_math_js__WEBPACK_IMPORTED_MODULE_13__.min)(rect.bottom, accRect.bottom);
+    accRect.left = (0,_utils_math_js__WEBPACK_IMPORTED_MODULE_13__.max)(rect.left, accRect.left);
+    return accRect;
+  }, getClientRectFromMixedType(element, firstClippingParent));
+  clippingRect.width = clippingRect.right - clippingRect.left;
+  clippingRect.height = clippingRect.bottom - clippingRect.top;
+  clippingRect.x = clippingRect.left;
+  clippingRect.y = clippingRect.top;
+  return clippingRect;
+}
+
+/***/ }),
+
+/***/ "./node_modules/@popperjs/core/lib/dom-utils/getCompositeRect.js":
+/*!***********************************************************************!*\
+  !*** ./node_modules/@popperjs/core/lib/dom-utils/getCompositeRect.js ***!
+  \***********************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ getCompositeRect)
+/* harmony export */ });
+/* harmony import */ var _getBoundingClientRect_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./getBoundingClientRect.js */ "./node_modules/@popperjs/core/lib/dom-utils/getBoundingClientRect.js");
+/* harmony import */ var _getNodeScroll_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./getNodeScroll.js */ "./node_modules/@popperjs/core/lib/dom-utils/getNodeScroll.js");
+/* harmony import */ var _getNodeName_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./getNodeName.js */ "./node_modules/@popperjs/core/lib/dom-utils/getNodeName.js");
+/* harmony import */ var _instanceOf_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./instanceOf.js */ "./node_modules/@popperjs/core/lib/dom-utils/instanceOf.js");
+/* harmony import */ var _getWindowScrollBarX_js__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./getWindowScrollBarX.js */ "./node_modules/@popperjs/core/lib/dom-utils/getWindowScrollBarX.js");
+/* harmony import */ var _getDocumentElement_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./getDocumentElement.js */ "./node_modules/@popperjs/core/lib/dom-utils/getDocumentElement.js");
+/* harmony import */ var _isScrollParent_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./isScrollParent.js */ "./node_modules/@popperjs/core/lib/dom-utils/isScrollParent.js");
+
+
+
+
+
+
+
+
+function isElementScaled(element) {
+  var rect = element.getBoundingClientRect();
+  var scaleX = rect.width / element.offsetWidth || 1;
+  var scaleY = rect.height / element.offsetHeight || 1;
+  return scaleX !== 1 || scaleY !== 1;
+} // Returns the composite rect of an element relative to its offsetParent.
+// Composite means it takes into account transforms as well as layout.
+
+
+function getCompositeRect(elementOrVirtualElement, offsetParent, isFixed) {
+  if (isFixed === void 0) {
+    isFixed = false;
+  }
+
+  var isOffsetParentAnElement = (0,_instanceOf_js__WEBPACK_IMPORTED_MODULE_0__.isHTMLElement)(offsetParent);
+  var offsetParentIsScaled = (0,_instanceOf_js__WEBPACK_IMPORTED_MODULE_0__.isHTMLElement)(offsetParent) && isElementScaled(offsetParent);
+  var documentElement = (0,_getDocumentElement_js__WEBPACK_IMPORTED_MODULE_1__["default"])(offsetParent);
+  var rect = (0,_getBoundingClientRect_js__WEBPACK_IMPORTED_MODULE_2__["default"])(elementOrVirtualElement, offsetParentIsScaled);
+  var scroll = {
+    scrollLeft: 0,
+    scrollTop: 0
+  };
+  var offsets = {
+    x: 0,
+    y: 0
+  };
+
+  if (isOffsetParentAnElement || !isOffsetParentAnElement && !isFixed) {
+    if ((0,_getNodeName_js__WEBPACK_IMPORTED_MODULE_3__["default"])(offsetParent) !== 'body' || // https://github.com/popperjs/popper-core/issues/1078
+    (0,_isScrollParent_js__WEBPACK_IMPORTED_MODULE_4__["default"])(documentElement)) {
+      scroll = (0,_getNodeScroll_js__WEBPACK_IMPORTED_MODULE_5__["default"])(offsetParent);
+    }
+
+    if ((0,_instanceOf_js__WEBPACK_IMPORTED_MODULE_0__.isHTMLElement)(offsetParent)) {
+      offsets = (0,_getBoundingClientRect_js__WEBPACK_IMPORTED_MODULE_2__["default"])(offsetParent, true);
+      offsets.x += offsetParent.clientLeft;
+      offsets.y += offsetParent.clientTop;
+    } else if (documentElement) {
+      offsets.x = (0,_getWindowScrollBarX_js__WEBPACK_IMPORTED_MODULE_6__["default"])(documentElement);
+    }
+  }
+
+  return {
+    x: rect.left + scroll.scrollLeft - offsets.x,
+    y: rect.top + scroll.scrollTop - offsets.y,
+    width: rect.width,
+    height: rect.height
+  };
+}
+
+/***/ }),
+
+/***/ "./node_modules/@popperjs/core/lib/dom-utils/getComputedStyle.js":
+/*!***********************************************************************!*\
+  !*** ./node_modules/@popperjs/core/lib/dom-utils/getComputedStyle.js ***!
+  \***********************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ getComputedStyle)
+/* harmony export */ });
+/* harmony import */ var _getWindow_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./getWindow.js */ "./node_modules/@popperjs/core/lib/dom-utils/getWindow.js");
+
+function getComputedStyle(element) {
+  return (0,_getWindow_js__WEBPACK_IMPORTED_MODULE_0__["default"])(element).getComputedStyle(element);
+}
+
+/***/ }),
+
+/***/ "./node_modules/@popperjs/core/lib/dom-utils/getDocumentElement.js":
+/*!*************************************************************************!*\
+  !*** ./node_modules/@popperjs/core/lib/dom-utils/getDocumentElement.js ***!
+  \*************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ getDocumentElement)
+/* harmony export */ });
+/* harmony import */ var _instanceOf_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./instanceOf.js */ "./node_modules/@popperjs/core/lib/dom-utils/instanceOf.js");
+
+function getDocumentElement(element) {
+  // $FlowFixMe[incompatible-return]: assume body is always available
+  return (((0,_instanceOf_js__WEBPACK_IMPORTED_MODULE_0__.isElement)(element) ? element.ownerDocument : // $FlowFixMe[prop-missing]
+  element.document) || window.document).documentElement;
+}
+
+/***/ }),
+
+/***/ "./node_modules/@popperjs/core/lib/dom-utils/getDocumentRect.js":
+/*!**********************************************************************!*\
+  !*** ./node_modules/@popperjs/core/lib/dom-utils/getDocumentRect.js ***!
+  \**********************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ getDocumentRect)
+/* harmony export */ });
+/* harmony import */ var _getDocumentElement_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./getDocumentElement.js */ "./node_modules/@popperjs/core/lib/dom-utils/getDocumentElement.js");
+/* harmony import */ var _getComputedStyle_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./getComputedStyle.js */ "./node_modules/@popperjs/core/lib/dom-utils/getComputedStyle.js");
+/* harmony import */ var _getWindowScrollBarX_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./getWindowScrollBarX.js */ "./node_modules/@popperjs/core/lib/dom-utils/getWindowScrollBarX.js");
+/* harmony import */ var _getWindowScroll_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./getWindowScroll.js */ "./node_modules/@popperjs/core/lib/dom-utils/getWindowScroll.js");
+/* harmony import */ var _utils_math_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../utils/math.js */ "./node_modules/@popperjs/core/lib/utils/math.js");
+
+
+
+
+ // Gets the entire size of the scrollable document area, even extending outside
+// of the `<html>` and `<body>` rect bounds if horizontally scrollable
+
+function getDocumentRect(element) {
+  var _element$ownerDocumen;
+
+  var html = (0,_getDocumentElement_js__WEBPACK_IMPORTED_MODULE_0__["default"])(element);
+  var winScroll = (0,_getWindowScroll_js__WEBPACK_IMPORTED_MODULE_1__["default"])(element);
+  var body = (_element$ownerDocumen = element.ownerDocument) == null ? void 0 : _element$ownerDocumen.body;
+  var width = (0,_utils_math_js__WEBPACK_IMPORTED_MODULE_2__.max)(html.scrollWidth, html.clientWidth, body ? body.scrollWidth : 0, body ? body.clientWidth : 0);
+  var height = (0,_utils_math_js__WEBPACK_IMPORTED_MODULE_2__.max)(html.scrollHeight, html.clientHeight, body ? body.scrollHeight : 0, body ? body.clientHeight : 0);
+  var x = -winScroll.scrollLeft + (0,_getWindowScrollBarX_js__WEBPACK_IMPORTED_MODULE_3__["default"])(element);
+  var y = -winScroll.scrollTop;
+
+  if ((0,_getComputedStyle_js__WEBPACK_IMPORTED_MODULE_4__["default"])(body || html).direction === 'rtl') {
+    x += (0,_utils_math_js__WEBPACK_IMPORTED_MODULE_2__.max)(html.clientWidth, body ? body.clientWidth : 0) - width;
+  }
+
+  return {
+    width: width,
+    height: height,
+    x: x,
+    y: y
+  };
+}
+
+/***/ }),
+
+/***/ "./node_modules/@popperjs/core/lib/dom-utils/getHTMLElementScroll.js":
+/*!***************************************************************************!*\
+  !*** ./node_modules/@popperjs/core/lib/dom-utils/getHTMLElementScroll.js ***!
+  \***************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ getHTMLElementScroll)
+/* harmony export */ });
+function getHTMLElementScroll(element) {
+  return {
+    scrollLeft: element.scrollLeft,
+    scrollTop: element.scrollTop
+  };
+}
+
+/***/ }),
+
+/***/ "./node_modules/@popperjs/core/lib/dom-utils/getLayoutRect.js":
+/*!********************************************************************!*\
+  !*** ./node_modules/@popperjs/core/lib/dom-utils/getLayoutRect.js ***!
+  \********************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ getLayoutRect)
+/* harmony export */ });
+/* harmony import */ var _getBoundingClientRect_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./getBoundingClientRect.js */ "./node_modules/@popperjs/core/lib/dom-utils/getBoundingClientRect.js");
+ // Returns the layout rect of an element relative to its offsetParent. Layout
+// means it doesn't take into account transforms.
+
+function getLayoutRect(element) {
+  var clientRect = (0,_getBoundingClientRect_js__WEBPACK_IMPORTED_MODULE_0__["default"])(element); // Use the clientRect sizes if it's not been transformed.
+  // Fixes https://github.com/popperjs/popper-core/issues/1223
+
+  var width = element.offsetWidth;
+  var height = element.offsetHeight;
+
+  if (Math.abs(clientRect.width - width) <= 1) {
+    width = clientRect.width;
+  }
+
+  if (Math.abs(clientRect.height - height) <= 1) {
+    height = clientRect.height;
+  }
+
+  return {
+    x: element.offsetLeft,
+    y: element.offsetTop,
+    width: width,
+    height: height
+  };
+}
+
+/***/ }),
+
+/***/ "./node_modules/@popperjs/core/lib/dom-utils/getNodeName.js":
+/*!******************************************************************!*\
+  !*** ./node_modules/@popperjs/core/lib/dom-utils/getNodeName.js ***!
+  \******************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ getNodeName)
+/* harmony export */ });
+function getNodeName(element) {
+  return element ? (element.nodeName || '').toLowerCase() : null;
+}
+
+/***/ }),
+
+/***/ "./node_modules/@popperjs/core/lib/dom-utils/getNodeScroll.js":
+/*!********************************************************************!*\
+  !*** ./node_modules/@popperjs/core/lib/dom-utils/getNodeScroll.js ***!
+  \********************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ getNodeScroll)
+/* harmony export */ });
+/* harmony import */ var _getWindowScroll_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./getWindowScroll.js */ "./node_modules/@popperjs/core/lib/dom-utils/getWindowScroll.js");
+/* harmony import */ var _getWindow_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./getWindow.js */ "./node_modules/@popperjs/core/lib/dom-utils/getWindow.js");
+/* harmony import */ var _instanceOf_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./instanceOf.js */ "./node_modules/@popperjs/core/lib/dom-utils/instanceOf.js");
+/* harmony import */ var _getHTMLElementScroll_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./getHTMLElementScroll.js */ "./node_modules/@popperjs/core/lib/dom-utils/getHTMLElementScroll.js");
+
+
+
+
+function getNodeScroll(node) {
+  if (node === (0,_getWindow_js__WEBPACK_IMPORTED_MODULE_0__["default"])(node) || !(0,_instanceOf_js__WEBPACK_IMPORTED_MODULE_1__.isHTMLElement)(node)) {
+    return (0,_getWindowScroll_js__WEBPACK_IMPORTED_MODULE_2__["default"])(node);
+  } else {
+    return (0,_getHTMLElementScroll_js__WEBPACK_IMPORTED_MODULE_3__["default"])(node);
+  }
+}
+
+/***/ }),
+
+/***/ "./node_modules/@popperjs/core/lib/dom-utils/getOffsetParent.js":
+/*!**********************************************************************!*\
+  !*** ./node_modules/@popperjs/core/lib/dom-utils/getOffsetParent.js ***!
+  \**********************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ getOffsetParent)
+/* harmony export */ });
+/* harmony import */ var _getWindow_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./getWindow.js */ "./node_modules/@popperjs/core/lib/dom-utils/getWindow.js");
+/* harmony import */ var _getNodeName_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./getNodeName.js */ "./node_modules/@popperjs/core/lib/dom-utils/getNodeName.js");
+/* harmony import */ var _getComputedStyle_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./getComputedStyle.js */ "./node_modules/@popperjs/core/lib/dom-utils/getComputedStyle.js");
+/* harmony import */ var _instanceOf_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./instanceOf.js */ "./node_modules/@popperjs/core/lib/dom-utils/instanceOf.js");
+/* harmony import */ var _isTableElement_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./isTableElement.js */ "./node_modules/@popperjs/core/lib/dom-utils/isTableElement.js");
+/* harmony import */ var _getParentNode_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./getParentNode.js */ "./node_modules/@popperjs/core/lib/dom-utils/getParentNode.js");
+
+
+
+
+
+
+
+function getTrueOffsetParent(element) {
+  if (!(0,_instanceOf_js__WEBPACK_IMPORTED_MODULE_0__.isHTMLElement)(element) || // https://github.com/popperjs/popper-core/issues/837
+  (0,_getComputedStyle_js__WEBPACK_IMPORTED_MODULE_1__["default"])(element).position === 'fixed') {
+    return null;
+  }
+
+  return element.offsetParent;
+} // `.offsetParent` reports `null` for fixed elements, while absolute elements
+// return the containing block
+
+
+function getContainingBlock(element) {
+  var isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') !== -1;
+  var isIE = navigator.userAgent.indexOf('Trident') !== -1;
+
+  if (isIE && (0,_instanceOf_js__WEBPACK_IMPORTED_MODULE_0__.isHTMLElement)(element)) {
+    // In IE 9, 10 and 11 fixed elements containing block is always established by the viewport
+    var elementCss = (0,_getComputedStyle_js__WEBPACK_IMPORTED_MODULE_1__["default"])(element);
+
+    if (elementCss.position === 'fixed') {
+      return null;
+    }
+  }
+
+  var currentNode = (0,_getParentNode_js__WEBPACK_IMPORTED_MODULE_2__["default"])(element);
+
+  while ((0,_instanceOf_js__WEBPACK_IMPORTED_MODULE_0__.isHTMLElement)(currentNode) && ['html', 'body'].indexOf((0,_getNodeName_js__WEBPACK_IMPORTED_MODULE_3__["default"])(currentNode)) < 0) {
+    var css = (0,_getComputedStyle_js__WEBPACK_IMPORTED_MODULE_1__["default"])(currentNode); // This is non-exhaustive but covers the most common CSS properties that
+    // create a containing block.
+    // https://developer.mozilla.org/en-US/docs/Web/CSS/Containing_block#identifying_the_containing_block
+
+    if (css.transform !== 'none' || css.perspective !== 'none' || css.contain === 'paint' || ['transform', 'perspective'].indexOf(css.willChange) !== -1 || isFirefox && css.willChange === 'filter' || isFirefox && css.filter && css.filter !== 'none') {
+      return currentNode;
+    } else {
+      currentNode = currentNode.parentNode;
+    }
+  }
+
+  return null;
+} // Gets the closest ancestor positioned element. Handles some edge cases,
+// such as table ancestors and cross browser bugs.
+
+
+function getOffsetParent(element) {
+  var window = (0,_getWindow_js__WEBPACK_IMPORTED_MODULE_4__["default"])(element);
+  var offsetParent = getTrueOffsetParent(element);
+
+  while (offsetParent && (0,_isTableElement_js__WEBPACK_IMPORTED_MODULE_5__["default"])(offsetParent) && (0,_getComputedStyle_js__WEBPACK_IMPORTED_MODULE_1__["default"])(offsetParent).position === 'static') {
+    offsetParent = getTrueOffsetParent(offsetParent);
+  }
+
+  if (offsetParent && ((0,_getNodeName_js__WEBPACK_IMPORTED_MODULE_3__["default"])(offsetParent) === 'html' || (0,_getNodeName_js__WEBPACK_IMPORTED_MODULE_3__["default"])(offsetParent) === 'body' && (0,_getComputedStyle_js__WEBPACK_IMPORTED_MODULE_1__["default"])(offsetParent).position === 'static')) {
+    return window;
+  }
+
+  return offsetParent || getContainingBlock(element) || window;
+}
+
+/***/ }),
+
+/***/ "./node_modules/@popperjs/core/lib/dom-utils/getParentNode.js":
+/*!********************************************************************!*\
+  !*** ./node_modules/@popperjs/core/lib/dom-utils/getParentNode.js ***!
+  \********************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ getParentNode)
+/* harmony export */ });
+/* harmony import */ var _getNodeName_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./getNodeName.js */ "./node_modules/@popperjs/core/lib/dom-utils/getNodeName.js");
+/* harmony import */ var _getDocumentElement_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./getDocumentElement.js */ "./node_modules/@popperjs/core/lib/dom-utils/getDocumentElement.js");
+/* harmony import */ var _instanceOf_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./instanceOf.js */ "./node_modules/@popperjs/core/lib/dom-utils/instanceOf.js");
+
+
+
+function getParentNode(element) {
+  if ((0,_getNodeName_js__WEBPACK_IMPORTED_MODULE_0__["default"])(element) === 'html') {
+    return element;
+  }
+
+  return (// this is a quicker (but less type safe) way to save quite some bytes from the bundle
+    // $FlowFixMe[incompatible-return]
+    // $FlowFixMe[prop-missing]
+    element.assignedSlot || // step into the shadow DOM of the parent of a slotted node
+    element.parentNode || ( // DOM Element detected
+    (0,_instanceOf_js__WEBPACK_IMPORTED_MODULE_1__.isShadowRoot)(element) ? element.host : null) || // ShadowRoot detected
+    // $FlowFixMe[incompatible-call]: HTMLElement is a Node
+    (0,_getDocumentElement_js__WEBPACK_IMPORTED_MODULE_2__["default"])(element) // fallback
+
+  );
+}
+
+/***/ }),
+
+/***/ "./node_modules/@popperjs/core/lib/dom-utils/getScrollParent.js":
+/*!**********************************************************************!*\
+  !*** ./node_modules/@popperjs/core/lib/dom-utils/getScrollParent.js ***!
+  \**********************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ getScrollParent)
+/* harmony export */ });
+/* harmony import */ var _getParentNode_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./getParentNode.js */ "./node_modules/@popperjs/core/lib/dom-utils/getParentNode.js");
+/* harmony import */ var _isScrollParent_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./isScrollParent.js */ "./node_modules/@popperjs/core/lib/dom-utils/isScrollParent.js");
+/* harmony import */ var _getNodeName_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./getNodeName.js */ "./node_modules/@popperjs/core/lib/dom-utils/getNodeName.js");
+/* harmony import */ var _instanceOf_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./instanceOf.js */ "./node_modules/@popperjs/core/lib/dom-utils/instanceOf.js");
+
+
+
+
+function getScrollParent(node) {
+  if (['html', 'body', '#document'].indexOf((0,_getNodeName_js__WEBPACK_IMPORTED_MODULE_0__["default"])(node)) >= 0) {
+    // $FlowFixMe[incompatible-return]: assume body is always available
+    return node.ownerDocument.body;
+  }
+
+  if ((0,_instanceOf_js__WEBPACK_IMPORTED_MODULE_1__.isHTMLElement)(node) && (0,_isScrollParent_js__WEBPACK_IMPORTED_MODULE_2__["default"])(node)) {
+    return node;
+  }
+
+  return getScrollParent((0,_getParentNode_js__WEBPACK_IMPORTED_MODULE_3__["default"])(node));
+}
+
+/***/ }),
+
+/***/ "./node_modules/@popperjs/core/lib/dom-utils/getViewportRect.js":
+/*!**********************************************************************!*\
+  !*** ./node_modules/@popperjs/core/lib/dom-utils/getViewportRect.js ***!
+  \**********************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ getViewportRect)
+/* harmony export */ });
+/* harmony import */ var _getWindow_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./getWindow.js */ "./node_modules/@popperjs/core/lib/dom-utils/getWindow.js");
+/* harmony import */ var _getDocumentElement_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./getDocumentElement.js */ "./node_modules/@popperjs/core/lib/dom-utils/getDocumentElement.js");
+/* harmony import */ var _getWindowScrollBarX_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./getWindowScrollBarX.js */ "./node_modules/@popperjs/core/lib/dom-utils/getWindowScrollBarX.js");
+
+
+
+function getViewportRect(element) {
+  var win = (0,_getWindow_js__WEBPACK_IMPORTED_MODULE_0__["default"])(element);
+  var html = (0,_getDocumentElement_js__WEBPACK_IMPORTED_MODULE_1__["default"])(element);
+  var visualViewport = win.visualViewport;
+  var width = html.clientWidth;
+  var height = html.clientHeight;
+  var x = 0;
+  var y = 0; // NB: This isn't supported on iOS <= 12. If the keyboard is open, the popper
+  // can be obscured underneath it.
+  // Also, `html.clientHeight` adds the bottom bar height in Safari iOS, even
+  // if it isn't open, so if this isn't available, the popper will be detected
+  // to overflow the bottom of the screen too early.
+
+  if (visualViewport) {
+    width = visualViewport.width;
+    height = visualViewport.height; // Uses Layout Viewport (like Chrome; Safari does not currently)
+    // In Chrome, it returns a value very close to 0 (+/-) but contains rounding
+    // errors due to floating point numbers, so we need to check precision.
+    // Safari returns a number <= 0, usually < -1 when pinch-zoomed
+    // Feature detection fails in mobile emulation mode in Chrome.
+    // Math.abs(win.innerWidth / visualViewport.scale - visualViewport.width) <
+    // 0.001
+    // Fallback here: "Not Safari" userAgent
+
+    if (!/^((?!chrome|android).)*safari/i.test(navigator.userAgent)) {
+      x = visualViewport.offsetLeft;
+      y = visualViewport.offsetTop;
+    }
+  }
+
+  return {
+    width: width,
+    height: height,
+    x: x + (0,_getWindowScrollBarX_js__WEBPACK_IMPORTED_MODULE_2__["default"])(element),
+    y: y
+  };
+}
+
+/***/ }),
+
+/***/ "./node_modules/@popperjs/core/lib/dom-utils/getWindow.js":
+/*!****************************************************************!*\
+  !*** ./node_modules/@popperjs/core/lib/dom-utils/getWindow.js ***!
+  \****************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ getWindow)
+/* harmony export */ });
+function getWindow(node) {
+  if (node == null) {
+    return window;
+  }
+
+  if (node.toString() !== '[object Window]') {
+    var ownerDocument = node.ownerDocument;
+    return ownerDocument ? ownerDocument.defaultView || window : window;
+  }
+
+  return node;
+}
+
+/***/ }),
+
+/***/ "./node_modules/@popperjs/core/lib/dom-utils/getWindowScroll.js":
+/*!**********************************************************************!*\
+  !*** ./node_modules/@popperjs/core/lib/dom-utils/getWindowScroll.js ***!
+  \**********************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ getWindowScroll)
+/* harmony export */ });
+/* harmony import */ var _getWindow_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./getWindow.js */ "./node_modules/@popperjs/core/lib/dom-utils/getWindow.js");
+
+function getWindowScroll(node) {
+  var win = (0,_getWindow_js__WEBPACK_IMPORTED_MODULE_0__["default"])(node);
+  var scrollLeft = win.pageXOffset;
+  var scrollTop = win.pageYOffset;
+  return {
+    scrollLeft: scrollLeft,
+    scrollTop: scrollTop
+  };
+}
+
+/***/ }),
+
+/***/ "./node_modules/@popperjs/core/lib/dom-utils/getWindowScrollBarX.js":
+/*!**************************************************************************!*\
+  !*** ./node_modules/@popperjs/core/lib/dom-utils/getWindowScrollBarX.js ***!
+  \**************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ getWindowScrollBarX)
+/* harmony export */ });
+/* harmony import */ var _getBoundingClientRect_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./getBoundingClientRect.js */ "./node_modules/@popperjs/core/lib/dom-utils/getBoundingClientRect.js");
+/* harmony import */ var _getDocumentElement_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./getDocumentElement.js */ "./node_modules/@popperjs/core/lib/dom-utils/getDocumentElement.js");
+/* harmony import */ var _getWindowScroll_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./getWindowScroll.js */ "./node_modules/@popperjs/core/lib/dom-utils/getWindowScroll.js");
+
+
+
+function getWindowScrollBarX(element) {
+  // If <html> has a CSS width greater than the viewport, then this will be
+  // incorrect for RTL.
+  // Popper 1 is broken in this case and never had a bug report so let's assume
+  // it's not an issue. I don't think anyone ever specifies width on <html>
+  // anyway.
+  // Browsers where the left scrollbar doesn't cause an issue report `0` for
+  // this (e.g. Edge 2019, IE11, Safari)
+  return (0,_getBoundingClientRect_js__WEBPACK_IMPORTED_MODULE_0__["default"])((0,_getDocumentElement_js__WEBPACK_IMPORTED_MODULE_1__["default"])(element)).left + (0,_getWindowScroll_js__WEBPACK_IMPORTED_MODULE_2__["default"])(element).scrollLeft;
+}
+
+/***/ }),
+
+/***/ "./node_modules/@popperjs/core/lib/dom-utils/instanceOf.js":
+/*!*****************************************************************!*\
+  !*** ./node_modules/@popperjs/core/lib/dom-utils/instanceOf.js ***!
+  \*****************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "isElement": () => (/* binding */ isElement),
+/* harmony export */   "isHTMLElement": () => (/* binding */ isHTMLElement),
+/* harmony export */   "isShadowRoot": () => (/* binding */ isShadowRoot)
+/* harmony export */ });
+/* harmony import */ var _getWindow_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./getWindow.js */ "./node_modules/@popperjs/core/lib/dom-utils/getWindow.js");
+
+
+function isElement(node) {
+  var OwnElement = (0,_getWindow_js__WEBPACK_IMPORTED_MODULE_0__["default"])(node).Element;
+  return node instanceof OwnElement || node instanceof Element;
+}
+
+function isHTMLElement(node) {
+  var OwnElement = (0,_getWindow_js__WEBPACK_IMPORTED_MODULE_0__["default"])(node).HTMLElement;
+  return node instanceof OwnElement || node instanceof HTMLElement;
+}
+
+function isShadowRoot(node) {
+  // IE 11 has no ShadowRoot
+  if (typeof ShadowRoot === 'undefined') {
+    return false;
+  }
+
+  var OwnElement = (0,_getWindow_js__WEBPACK_IMPORTED_MODULE_0__["default"])(node).ShadowRoot;
+  return node instanceof OwnElement || node instanceof ShadowRoot;
+}
+
+
+
+/***/ }),
+
+/***/ "./node_modules/@popperjs/core/lib/dom-utils/isScrollParent.js":
+/*!*********************************************************************!*\
+  !*** ./node_modules/@popperjs/core/lib/dom-utils/isScrollParent.js ***!
+  \*********************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ isScrollParent)
+/* harmony export */ });
+/* harmony import */ var _getComputedStyle_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./getComputedStyle.js */ "./node_modules/@popperjs/core/lib/dom-utils/getComputedStyle.js");
+
+function isScrollParent(element) {
+  // Firefox wants us to check `-x` and `-y` variations as well
+  var _getComputedStyle = (0,_getComputedStyle_js__WEBPACK_IMPORTED_MODULE_0__["default"])(element),
+      overflow = _getComputedStyle.overflow,
+      overflowX = _getComputedStyle.overflowX,
+      overflowY = _getComputedStyle.overflowY;
+
+  return /auto|scroll|overlay|hidden/.test(overflow + overflowY + overflowX);
+}
+
+/***/ }),
+
+/***/ "./node_modules/@popperjs/core/lib/dom-utils/isTableElement.js":
+/*!*********************************************************************!*\
+  !*** ./node_modules/@popperjs/core/lib/dom-utils/isTableElement.js ***!
+  \*********************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ isTableElement)
+/* harmony export */ });
+/* harmony import */ var _getNodeName_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./getNodeName.js */ "./node_modules/@popperjs/core/lib/dom-utils/getNodeName.js");
+
+function isTableElement(element) {
+  return ['table', 'td', 'th'].indexOf((0,_getNodeName_js__WEBPACK_IMPORTED_MODULE_0__["default"])(element)) >= 0;
+}
+
+/***/ }),
+
+/***/ "./node_modules/@popperjs/core/lib/dom-utils/listScrollParents.js":
+/*!************************************************************************!*\
+  !*** ./node_modules/@popperjs/core/lib/dom-utils/listScrollParents.js ***!
+  \************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ listScrollParents)
+/* harmony export */ });
+/* harmony import */ var _getScrollParent_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./getScrollParent.js */ "./node_modules/@popperjs/core/lib/dom-utils/getScrollParent.js");
+/* harmony import */ var _getParentNode_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./getParentNode.js */ "./node_modules/@popperjs/core/lib/dom-utils/getParentNode.js");
+/* harmony import */ var _getWindow_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./getWindow.js */ "./node_modules/@popperjs/core/lib/dom-utils/getWindow.js");
+/* harmony import */ var _isScrollParent_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./isScrollParent.js */ "./node_modules/@popperjs/core/lib/dom-utils/isScrollParent.js");
+
+
+
+
+/*
+given a DOM element, return the list of all scroll parents, up the list of ancesors
+until we get to the top window object. This list is what we attach scroll listeners
+to, because if any of these parent elements scroll, we'll need to re-calculate the
+reference element's position.
+*/
+
+function listScrollParents(element, list) {
+  var _element$ownerDocumen;
+
+  if (list === void 0) {
+    list = [];
+  }
+
+  var scrollParent = (0,_getScrollParent_js__WEBPACK_IMPORTED_MODULE_0__["default"])(element);
+  var isBody = scrollParent === ((_element$ownerDocumen = element.ownerDocument) == null ? void 0 : _element$ownerDocumen.body);
+  var win = (0,_getWindow_js__WEBPACK_IMPORTED_MODULE_1__["default"])(scrollParent);
+  var target = isBody ? [win].concat(win.visualViewport || [], (0,_isScrollParent_js__WEBPACK_IMPORTED_MODULE_2__["default"])(scrollParent) ? scrollParent : []) : scrollParent;
+  var updatedList = list.concat(target);
+  return isBody ? updatedList : // $FlowFixMe[incompatible-call]: isBody tells us target will be an HTMLElement here
+  updatedList.concat(listScrollParents((0,_getParentNode_js__WEBPACK_IMPORTED_MODULE_3__["default"])(target)));
+}
+
+/***/ }),
+
+/***/ "./node_modules/@popperjs/core/lib/enums.js":
+/*!**************************************************!*\
+  !*** ./node_modules/@popperjs/core/lib/enums.js ***!
+  \**************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "top": () => (/* binding */ top),
+/* harmony export */   "bottom": () => (/* binding */ bottom),
+/* harmony export */   "right": () => (/* binding */ right),
+/* harmony export */   "left": () => (/* binding */ left),
+/* harmony export */   "auto": () => (/* binding */ auto),
+/* harmony export */   "basePlacements": () => (/* binding */ basePlacements),
+/* harmony export */   "start": () => (/* binding */ start),
+/* harmony export */   "end": () => (/* binding */ end),
+/* harmony export */   "clippingParents": () => (/* binding */ clippingParents),
+/* harmony export */   "viewport": () => (/* binding */ viewport),
+/* harmony export */   "popper": () => (/* binding */ popper),
+/* harmony export */   "reference": () => (/* binding */ reference),
+/* harmony export */   "variationPlacements": () => (/* binding */ variationPlacements),
+/* harmony export */   "placements": () => (/* binding */ placements),
+/* harmony export */   "beforeRead": () => (/* binding */ beforeRead),
+/* harmony export */   "read": () => (/* binding */ read),
+/* harmony export */   "afterRead": () => (/* binding */ afterRead),
+/* harmony export */   "beforeMain": () => (/* binding */ beforeMain),
+/* harmony export */   "main": () => (/* binding */ main),
+/* harmony export */   "afterMain": () => (/* binding */ afterMain),
+/* harmony export */   "beforeWrite": () => (/* binding */ beforeWrite),
+/* harmony export */   "write": () => (/* binding */ write),
+/* harmony export */   "afterWrite": () => (/* binding */ afterWrite),
+/* harmony export */   "modifierPhases": () => (/* binding */ modifierPhases)
+/* harmony export */ });
+var top = 'top';
+var bottom = 'bottom';
+var right = 'right';
+var left = 'left';
+var auto = 'auto';
+var basePlacements = [top, bottom, right, left];
+var start = 'start';
+var end = 'end';
+var clippingParents = 'clippingParents';
+var viewport = 'viewport';
+var popper = 'popper';
+var reference = 'reference';
+var variationPlacements = /*#__PURE__*/basePlacements.reduce(function (acc, placement) {
+  return acc.concat([placement + "-" + start, placement + "-" + end]);
+}, []);
+var placements = /*#__PURE__*/[].concat(basePlacements, [auto]).reduce(function (acc, placement) {
+  return acc.concat([placement, placement + "-" + start, placement + "-" + end]);
+}, []); // modifiers that need to read the DOM
+
+var beforeRead = 'beforeRead';
+var read = 'read';
+var afterRead = 'afterRead'; // pure-logic modifiers
+
+var beforeMain = 'beforeMain';
+var main = 'main';
+var afterMain = 'afterMain'; // modifier with the purpose to write to the DOM (or write into a framework state)
+
+var beforeWrite = 'beforeWrite';
+var write = 'write';
+var afterWrite = 'afterWrite';
+var modifierPhases = [beforeRead, read, afterRead, beforeMain, main, afterMain, beforeWrite, write, afterWrite];
+
+/***/ }),
+
+/***/ "./node_modules/@popperjs/core/lib/modifiers/applyStyles.js":
+/*!******************************************************************!*\
+  !*** ./node_modules/@popperjs/core/lib/modifiers/applyStyles.js ***!
+  \******************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _dom_utils_getNodeName_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../dom-utils/getNodeName.js */ "./node_modules/@popperjs/core/lib/dom-utils/getNodeName.js");
+/* harmony import */ var _dom_utils_instanceOf_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../dom-utils/instanceOf.js */ "./node_modules/@popperjs/core/lib/dom-utils/instanceOf.js");
+
+ // This modifier takes the styles prepared by the `computeStyles` modifier
+// and applies them to the HTMLElements such as popper and arrow
+
+function applyStyles(_ref) {
+  var state = _ref.state;
+  Object.keys(state.elements).forEach(function (name) {
+    var style = state.styles[name] || {};
+    var attributes = state.attributes[name] || {};
+    var element = state.elements[name]; // arrow is optional + virtual elements
+
+    if (!(0,_dom_utils_instanceOf_js__WEBPACK_IMPORTED_MODULE_0__.isHTMLElement)(element) || !(0,_dom_utils_getNodeName_js__WEBPACK_IMPORTED_MODULE_1__["default"])(element)) {
+      return;
+    } // Flow doesn't support to extend this property, but it's the most
+    // effective way to apply styles to an HTMLElement
+    // $FlowFixMe[cannot-write]
+
+
+    Object.assign(element.style, style);
+    Object.keys(attributes).forEach(function (name) {
+      var value = attributes[name];
+
+      if (value === false) {
+        element.removeAttribute(name);
+      } else {
+        element.setAttribute(name, value === true ? '' : value);
+      }
+    });
+  });
+}
+
+function effect(_ref2) {
+  var state = _ref2.state;
+  var initialStyles = {
+    popper: {
+      position: state.options.strategy,
+      left: '0',
+      top: '0',
+      margin: '0'
+    },
+    arrow: {
+      position: 'absolute'
+    },
+    reference: {}
+  };
+  Object.assign(state.elements.popper.style, initialStyles.popper);
+  state.styles = initialStyles;
+
+  if (state.elements.arrow) {
+    Object.assign(state.elements.arrow.style, initialStyles.arrow);
+  }
+
+  return function () {
+    Object.keys(state.elements).forEach(function (name) {
+      var element = state.elements[name];
+      var attributes = state.attributes[name] || {};
+      var styleProperties = Object.keys(state.styles.hasOwnProperty(name) ? state.styles[name] : initialStyles[name]); // Set all values to an empty string to unset them
+
+      var style = styleProperties.reduce(function (style, property) {
+        style[property] = '';
+        return style;
+      }, {}); // arrow is optional + virtual elements
+
+      if (!(0,_dom_utils_instanceOf_js__WEBPACK_IMPORTED_MODULE_0__.isHTMLElement)(element) || !(0,_dom_utils_getNodeName_js__WEBPACK_IMPORTED_MODULE_1__["default"])(element)) {
+        return;
+      }
+
+      Object.assign(element.style, style);
+      Object.keys(attributes).forEach(function (attribute) {
+        element.removeAttribute(attribute);
+      });
+    });
+  };
+} // eslint-disable-next-line import/no-unused-modules
+
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  name: 'applyStyles',
+  enabled: true,
+  phase: 'write',
+  fn: applyStyles,
+  effect: effect,
+  requires: ['computeStyles']
+});
+
+/***/ }),
+
+/***/ "./node_modules/@popperjs/core/lib/modifiers/arrow.js":
+/*!************************************************************!*\
+  !*** ./node_modules/@popperjs/core/lib/modifiers/arrow.js ***!
+  \************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _utils_getBasePlacement_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../utils/getBasePlacement.js */ "./node_modules/@popperjs/core/lib/utils/getBasePlacement.js");
+/* harmony import */ var _dom_utils_getLayoutRect_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../dom-utils/getLayoutRect.js */ "./node_modules/@popperjs/core/lib/dom-utils/getLayoutRect.js");
+/* harmony import */ var _dom_utils_contains_js__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../dom-utils/contains.js */ "./node_modules/@popperjs/core/lib/dom-utils/contains.js");
+/* harmony import */ var _dom_utils_getOffsetParent_js__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../dom-utils/getOffsetParent.js */ "./node_modules/@popperjs/core/lib/dom-utils/getOffsetParent.js");
+/* harmony import */ var _utils_getMainAxisFromPlacement_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../utils/getMainAxisFromPlacement.js */ "./node_modules/@popperjs/core/lib/utils/getMainAxisFromPlacement.js");
+/* harmony import */ var _utils_within_js__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../utils/within.js */ "./node_modules/@popperjs/core/lib/utils/within.js");
+/* harmony import */ var _utils_mergePaddingObject_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../utils/mergePaddingObject.js */ "./node_modules/@popperjs/core/lib/utils/mergePaddingObject.js");
+/* harmony import */ var _utils_expandToHashMap_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../utils/expandToHashMap.js */ "./node_modules/@popperjs/core/lib/utils/expandToHashMap.js");
+/* harmony import */ var _enums_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../enums.js */ "./node_modules/@popperjs/core/lib/enums.js");
+/* harmony import */ var _dom_utils_instanceOf_js__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../dom-utils/instanceOf.js */ "./node_modules/@popperjs/core/lib/dom-utils/instanceOf.js");
+
+
+
+
+
+
+
+
+
+ // eslint-disable-next-line import/no-unused-modules
+
+var toPaddingObject = function toPaddingObject(padding, state) {
+  padding = typeof padding === 'function' ? padding(Object.assign({}, state.rects, {
+    placement: state.placement
+  })) : padding;
+  return (0,_utils_mergePaddingObject_js__WEBPACK_IMPORTED_MODULE_0__["default"])(typeof padding !== 'number' ? padding : (0,_utils_expandToHashMap_js__WEBPACK_IMPORTED_MODULE_1__["default"])(padding, _enums_js__WEBPACK_IMPORTED_MODULE_2__.basePlacements));
+};
+
+function arrow(_ref) {
+  var _state$modifiersData$;
+
+  var state = _ref.state,
+      name = _ref.name,
+      options = _ref.options;
+  var arrowElement = state.elements.arrow;
+  var popperOffsets = state.modifiersData.popperOffsets;
+  var basePlacement = (0,_utils_getBasePlacement_js__WEBPACK_IMPORTED_MODULE_3__["default"])(state.placement);
+  var axis = (0,_utils_getMainAxisFromPlacement_js__WEBPACK_IMPORTED_MODULE_4__["default"])(basePlacement);
+  var isVertical = [_enums_js__WEBPACK_IMPORTED_MODULE_2__.left, _enums_js__WEBPACK_IMPORTED_MODULE_2__.right].indexOf(basePlacement) >= 0;
+  var len = isVertical ? 'height' : 'width';
+
+  if (!arrowElement || !popperOffsets) {
+    return;
+  }
+
+  var paddingObject = toPaddingObject(options.padding, state);
+  var arrowRect = (0,_dom_utils_getLayoutRect_js__WEBPACK_IMPORTED_MODULE_5__["default"])(arrowElement);
+  var minProp = axis === 'y' ? _enums_js__WEBPACK_IMPORTED_MODULE_2__.top : _enums_js__WEBPACK_IMPORTED_MODULE_2__.left;
+  var maxProp = axis === 'y' ? _enums_js__WEBPACK_IMPORTED_MODULE_2__.bottom : _enums_js__WEBPACK_IMPORTED_MODULE_2__.right;
+  var endDiff = state.rects.reference[len] + state.rects.reference[axis] - popperOffsets[axis] - state.rects.popper[len];
+  var startDiff = popperOffsets[axis] - state.rects.reference[axis];
+  var arrowOffsetParent = (0,_dom_utils_getOffsetParent_js__WEBPACK_IMPORTED_MODULE_6__["default"])(arrowElement);
+  var clientSize = arrowOffsetParent ? axis === 'y' ? arrowOffsetParent.clientHeight || 0 : arrowOffsetParent.clientWidth || 0 : 0;
+  var centerToReference = endDiff / 2 - startDiff / 2; // Make sure the arrow doesn't overflow the popper if the center point is
+  // outside of the popper bounds
+
+  var min = paddingObject[minProp];
+  var max = clientSize - arrowRect[len] - paddingObject[maxProp];
+  var center = clientSize / 2 - arrowRect[len] / 2 + centerToReference;
+  var offset = (0,_utils_within_js__WEBPACK_IMPORTED_MODULE_7__["default"])(min, center, max); // Prevents breaking syntax highlighting...
+
+  var axisProp = axis;
+  state.modifiersData[name] = (_state$modifiersData$ = {}, _state$modifiersData$[axisProp] = offset, _state$modifiersData$.centerOffset = offset - center, _state$modifiersData$);
+}
+
+function effect(_ref2) {
+  var state = _ref2.state,
+      options = _ref2.options;
+  var _options$element = options.element,
+      arrowElement = _options$element === void 0 ? '[data-popper-arrow]' : _options$element;
+
+  if (arrowElement == null) {
+    return;
+  } // CSS selector
+
+
+  if (typeof arrowElement === 'string') {
+    arrowElement = state.elements.popper.querySelector(arrowElement);
+
+    if (!arrowElement) {
+      return;
+    }
+  }
+
+  if (true) {
+    if (!(0,_dom_utils_instanceOf_js__WEBPACK_IMPORTED_MODULE_8__.isHTMLElement)(arrowElement)) {
+      console.error(['Popper: "arrow" element must be an HTMLElement (not an SVGElement).', 'To use an SVG arrow, wrap it in an HTMLElement that will be used as', 'the arrow.'].join(' '));
+    }
+  }
+
+  if (!(0,_dom_utils_contains_js__WEBPACK_IMPORTED_MODULE_9__["default"])(state.elements.popper, arrowElement)) {
+    if (true) {
+      console.error(['Popper: "arrow" modifier\'s `element` must be a child of the popper', 'element.'].join(' '));
+    }
+
+    return;
+  }
+
+  state.elements.arrow = arrowElement;
+} // eslint-disable-next-line import/no-unused-modules
+
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  name: 'arrow',
+  enabled: true,
+  phase: 'main',
+  fn: arrow,
+  effect: effect,
+  requires: ['popperOffsets'],
+  requiresIfExists: ['preventOverflow']
+});
+
+/***/ }),
+
+/***/ "./node_modules/@popperjs/core/lib/modifiers/computeStyles.js":
+/*!********************************************************************!*\
+  !*** ./node_modules/@popperjs/core/lib/modifiers/computeStyles.js ***!
+  \********************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "mapToStyles": () => (/* binding */ mapToStyles),
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _enums_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../enums.js */ "./node_modules/@popperjs/core/lib/enums.js");
+/* harmony import */ var _dom_utils_getOffsetParent_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../dom-utils/getOffsetParent.js */ "./node_modules/@popperjs/core/lib/dom-utils/getOffsetParent.js");
+/* harmony import */ var _dom_utils_getWindow_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../dom-utils/getWindow.js */ "./node_modules/@popperjs/core/lib/dom-utils/getWindow.js");
+/* harmony import */ var _dom_utils_getDocumentElement_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../dom-utils/getDocumentElement.js */ "./node_modules/@popperjs/core/lib/dom-utils/getDocumentElement.js");
+/* harmony import */ var _dom_utils_getComputedStyle_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../dom-utils/getComputedStyle.js */ "./node_modules/@popperjs/core/lib/dom-utils/getComputedStyle.js");
+/* harmony import */ var _utils_getBasePlacement_js__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../utils/getBasePlacement.js */ "./node_modules/@popperjs/core/lib/utils/getBasePlacement.js");
+/* harmony import */ var _utils_getVariation_js__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../utils/getVariation.js */ "./node_modules/@popperjs/core/lib/utils/getVariation.js");
+/* harmony import */ var _utils_math_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../utils/math.js */ "./node_modules/@popperjs/core/lib/utils/math.js");
+
+
+
+
+
+
+
+ // eslint-disable-next-line import/no-unused-modules
+
+var unsetSides = {
+  top: 'auto',
+  right: 'auto',
+  bottom: 'auto',
+  left: 'auto'
+}; // Round the offsets to the nearest suitable subpixel based on the DPR.
+// Zooming can change the DPR, but it seems to report a value that will
+// cleanly divide the values into the appropriate subpixels.
+
+function roundOffsetsByDPR(_ref) {
+  var x = _ref.x,
+      y = _ref.y;
+  var win = window;
+  var dpr = win.devicePixelRatio || 1;
+  return {
+    x: (0,_utils_math_js__WEBPACK_IMPORTED_MODULE_0__.round)((0,_utils_math_js__WEBPACK_IMPORTED_MODULE_0__.round)(x * dpr) / dpr) || 0,
+    y: (0,_utils_math_js__WEBPACK_IMPORTED_MODULE_0__.round)((0,_utils_math_js__WEBPACK_IMPORTED_MODULE_0__.round)(y * dpr) / dpr) || 0
+  };
+}
+
+function mapToStyles(_ref2) {
+  var _Object$assign2;
+
+  var popper = _ref2.popper,
+      popperRect = _ref2.popperRect,
+      placement = _ref2.placement,
+      variation = _ref2.variation,
+      offsets = _ref2.offsets,
+      position = _ref2.position,
+      gpuAcceleration = _ref2.gpuAcceleration,
+      adaptive = _ref2.adaptive,
+      roundOffsets = _ref2.roundOffsets;
+
+  var _ref3 = roundOffsets === true ? roundOffsetsByDPR(offsets) : typeof roundOffsets === 'function' ? roundOffsets(offsets) : offsets,
+      _ref3$x = _ref3.x,
+      x = _ref3$x === void 0 ? 0 : _ref3$x,
+      _ref3$y = _ref3.y,
+      y = _ref3$y === void 0 ? 0 : _ref3$y;
+
+  var hasX = offsets.hasOwnProperty('x');
+  var hasY = offsets.hasOwnProperty('y');
+  var sideX = _enums_js__WEBPACK_IMPORTED_MODULE_1__.left;
+  var sideY = _enums_js__WEBPACK_IMPORTED_MODULE_1__.top;
+  var win = window;
+
+  if (adaptive) {
+    var offsetParent = (0,_dom_utils_getOffsetParent_js__WEBPACK_IMPORTED_MODULE_2__["default"])(popper);
+    var heightProp = 'clientHeight';
+    var widthProp = 'clientWidth';
+
+    if (offsetParent === (0,_dom_utils_getWindow_js__WEBPACK_IMPORTED_MODULE_3__["default"])(popper)) {
+      offsetParent = (0,_dom_utils_getDocumentElement_js__WEBPACK_IMPORTED_MODULE_4__["default"])(popper);
+
+      if ((0,_dom_utils_getComputedStyle_js__WEBPACK_IMPORTED_MODULE_5__["default"])(offsetParent).position !== 'static' && position === 'absolute') {
+        heightProp = 'scrollHeight';
+        widthProp = 'scrollWidth';
+      }
+    } // $FlowFixMe[incompatible-cast]: force type refinement, we compare offsetParent with window above, but Flow doesn't detect it
+
+
+    offsetParent = offsetParent;
+
+    if (placement === _enums_js__WEBPACK_IMPORTED_MODULE_1__.top || (placement === _enums_js__WEBPACK_IMPORTED_MODULE_1__.left || placement === _enums_js__WEBPACK_IMPORTED_MODULE_1__.right) && variation === _enums_js__WEBPACK_IMPORTED_MODULE_1__.end) {
+      sideY = _enums_js__WEBPACK_IMPORTED_MODULE_1__.bottom; // $FlowFixMe[prop-missing]
+
+      y -= offsetParent[heightProp] - popperRect.height;
+      y *= gpuAcceleration ? 1 : -1;
+    }
+
+    if (placement === _enums_js__WEBPACK_IMPORTED_MODULE_1__.left || (placement === _enums_js__WEBPACK_IMPORTED_MODULE_1__.top || placement === _enums_js__WEBPACK_IMPORTED_MODULE_1__.bottom) && variation === _enums_js__WEBPACK_IMPORTED_MODULE_1__.end) {
+      sideX = _enums_js__WEBPACK_IMPORTED_MODULE_1__.right; // $FlowFixMe[prop-missing]
+
+      x -= offsetParent[widthProp] - popperRect.width;
+      x *= gpuAcceleration ? 1 : -1;
+    }
+  }
+
+  var commonStyles = Object.assign({
+    position: position
+  }, adaptive && unsetSides);
+
+  if (gpuAcceleration) {
+    var _Object$assign;
+
+    return Object.assign({}, commonStyles, (_Object$assign = {}, _Object$assign[sideY] = hasY ? '0' : '', _Object$assign[sideX] = hasX ? '0' : '', _Object$assign.transform = (win.devicePixelRatio || 1) <= 1 ? "translate(" + x + "px, " + y + "px)" : "translate3d(" + x + "px, " + y + "px, 0)", _Object$assign));
+  }
+
+  return Object.assign({}, commonStyles, (_Object$assign2 = {}, _Object$assign2[sideY] = hasY ? y + "px" : '', _Object$assign2[sideX] = hasX ? x + "px" : '', _Object$assign2.transform = '', _Object$assign2));
+}
+
+function computeStyles(_ref4) {
+  var state = _ref4.state,
+      options = _ref4.options;
+  var _options$gpuAccelerat = options.gpuAcceleration,
+      gpuAcceleration = _options$gpuAccelerat === void 0 ? true : _options$gpuAccelerat,
+      _options$adaptive = options.adaptive,
+      adaptive = _options$adaptive === void 0 ? true : _options$adaptive,
+      _options$roundOffsets = options.roundOffsets,
+      roundOffsets = _options$roundOffsets === void 0 ? true : _options$roundOffsets;
+
+  if (true) {
+    var transitionProperty = (0,_dom_utils_getComputedStyle_js__WEBPACK_IMPORTED_MODULE_5__["default"])(state.elements.popper).transitionProperty || '';
+
+    if (adaptive && ['transform', 'top', 'right', 'bottom', 'left'].some(function (property) {
+      return transitionProperty.indexOf(property) >= 0;
+    })) {
+      console.warn(['Popper: Detected CSS transitions on at least one of the following', 'CSS properties: "transform", "top", "right", "bottom", "left".', '\n\n', 'Disable the "computeStyles" modifier\'s `adaptive` option to allow', 'for smooth transitions, or remove these properties from the CSS', 'transition declaration on the popper element if only transitioning', 'opacity or background-color for example.', '\n\n', 'We recommend using the popper element as a wrapper around an inner', 'element that can have any CSS property transitioned for animations.'].join(' '));
+    }
+  }
+
+  var commonStyles = {
+    placement: (0,_utils_getBasePlacement_js__WEBPACK_IMPORTED_MODULE_6__["default"])(state.placement),
+    variation: (0,_utils_getVariation_js__WEBPACK_IMPORTED_MODULE_7__["default"])(state.placement),
+    popper: state.elements.popper,
+    popperRect: state.rects.popper,
+    gpuAcceleration: gpuAcceleration
+  };
+
+  if (state.modifiersData.popperOffsets != null) {
+    state.styles.popper = Object.assign({}, state.styles.popper, mapToStyles(Object.assign({}, commonStyles, {
+      offsets: state.modifiersData.popperOffsets,
+      position: state.options.strategy,
+      adaptive: adaptive,
+      roundOffsets: roundOffsets
+    })));
+  }
+
+  if (state.modifiersData.arrow != null) {
+    state.styles.arrow = Object.assign({}, state.styles.arrow, mapToStyles(Object.assign({}, commonStyles, {
+      offsets: state.modifiersData.arrow,
+      position: 'absolute',
+      adaptive: false,
+      roundOffsets: roundOffsets
+    })));
+  }
+
+  state.attributes.popper = Object.assign({}, state.attributes.popper, {
+    'data-popper-placement': state.placement
+  });
+} // eslint-disable-next-line import/no-unused-modules
+
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  name: 'computeStyles',
+  enabled: true,
+  phase: 'beforeWrite',
+  fn: computeStyles,
+  data: {}
+});
+
+/***/ }),
+
+/***/ "./node_modules/@popperjs/core/lib/modifiers/eventListeners.js":
+/*!*********************************************************************!*\
+  !*** ./node_modules/@popperjs/core/lib/modifiers/eventListeners.js ***!
+  \*********************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _dom_utils_getWindow_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../dom-utils/getWindow.js */ "./node_modules/@popperjs/core/lib/dom-utils/getWindow.js");
+ // eslint-disable-next-line import/no-unused-modules
+
+var passive = {
+  passive: true
+};
+
+function effect(_ref) {
+  var state = _ref.state,
+      instance = _ref.instance,
+      options = _ref.options;
+  var _options$scroll = options.scroll,
+      scroll = _options$scroll === void 0 ? true : _options$scroll,
+      _options$resize = options.resize,
+      resize = _options$resize === void 0 ? true : _options$resize;
+  var window = (0,_dom_utils_getWindow_js__WEBPACK_IMPORTED_MODULE_0__["default"])(state.elements.popper);
+  var scrollParents = [].concat(state.scrollParents.reference, state.scrollParents.popper);
+
+  if (scroll) {
+    scrollParents.forEach(function (scrollParent) {
+      scrollParent.addEventListener('scroll', instance.update, passive);
+    });
+  }
+
+  if (resize) {
+    window.addEventListener('resize', instance.update, passive);
+  }
+
+  return function () {
+    if (scroll) {
+      scrollParents.forEach(function (scrollParent) {
+        scrollParent.removeEventListener('scroll', instance.update, passive);
+      });
+    }
+
+    if (resize) {
+      window.removeEventListener('resize', instance.update, passive);
+    }
+  };
+} // eslint-disable-next-line import/no-unused-modules
+
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  name: 'eventListeners',
+  enabled: true,
+  phase: 'write',
+  fn: function fn() {},
+  effect: effect,
+  data: {}
+});
+
+/***/ }),
+
+/***/ "./node_modules/@popperjs/core/lib/modifiers/flip.js":
+/*!***********************************************************!*\
+  !*** ./node_modules/@popperjs/core/lib/modifiers/flip.js ***!
+  \***********************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _utils_getOppositePlacement_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../utils/getOppositePlacement.js */ "./node_modules/@popperjs/core/lib/utils/getOppositePlacement.js");
+/* harmony import */ var _utils_getBasePlacement_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../utils/getBasePlacement.js */ "./node_modules/@popperjs/core/lib/utils/getBasePlacement.js");
+/* harmony import */ var _utils_getOppositeVariationPlacement_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../utils/getOppositeVariationPlacement.js */ "./node_modules/@popperjs/core/lib/utils/getOppositeVariationPlacement.js");
+/* harmony import */ var _utils_detectOverflow_js__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../utils/detectOverflow.js */ "./node_modules/@popperjs/core/lib/utils/detectOverflow.js");
+/* harmony import */ var _utils_computeAutoPlacement_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../utils/computeAutoPlacement.js */ "./node_modules/@popperjs/core/lib/utils/computeAutoPlacement.js");
+/* harmony import */ var _enums_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../enums.js */ "./node_modules/@popperjs/core/lib/enums.js");
+/* harmony import */ var _utils_getVariation_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../utils/getVariation.js */ "./node_modules/@popperjs/core/lib/utils/getVariation.js");
+
+
+
+
+
+
+ // eslint-disable-next-line import/no-unused-modules
+
+function getExpandedFallbackPlacements(placement) {
+  if ((0,_utils_getBasePlacement_js__WEBPACK_IMPORTED_MODULE_0__["default"])(placement) === _enums_js__WEBPACK_IMPORTED_MODULE_1__.auto) {
+    return [];
+  }
+
+  var oppositePlacement = (0,_utils_getOppositePlacement_js__WEBPACK_IMPORTED_MODULE_2__["default"])(placement);
+  return [(0,_utils_getOppositeVariationPlacement_js__WEBPACK_IMPORTED_MODULE_3__["default"])(placement), oppositePlacement, (0,_utils_getOppositeVariationPlacement_js__WEBPACK_IMPORTED_MODULE_3__["default"])(oppositePlacement)];
+}
+
+function flip(_ref) {
+  var state = _ref.state,
+      options = _ref.options,
+      name = _ref.name;
+
+  if (state.modifiersData[name]._skip) {
+    return;
+  }
+
+  var _options$mainAxis = options.mainAxis,
+      checkMainAxis = _options$mainAxis === void 0 ? true : _options$mainAxis,
+      _options$altAxis = options.altAxis,
+      checkAltAxis = _options$altAxis === void 0 ? true : _options$altAxis,
+      specifiedFallbackPlacements = options.fallbackPlacements,
+      padding = options.padding,
+      boundary = options.boundary,
+      rootBoundary = options.rootBoundary,
+      altBoundary = options.altBoundary,
+      _options$flipVariatio = options.flipVariations,
+      flipVariations = _options$flipVariatio === void 0 ? true : _options$flipVariatio,
+      allowedAutoPlacements = options.allowedAutoPlacements;
+  var preferredPlacement = state.options.placement;
+  var basePlacement = (0,_utils_getBasePlacement_js__WEBPACK_IMPORTED_MODULE_0__["default"])(preferredPlacement);
+  var isBasePlacement = basePlacement === preferredPlacement;
+  var fallbackPlacements = specifiedFallbackPlacements || (isBasePlacement || !flipVariations ? [(0,_utils_getOppositePlacement_js__WEBPACK_IMPORTED_MODULE_2__["default"])(preferredPlacement)] : getExpandedFallbackPlacements(preferredPlacement));
+  var placements = [preferredPlacement].concat(fallbackPlacements).reduce(function (acc, placement) {
+    return acc.concat((0,_utils_getBasePlacement_js__WEBPACK_IMPORTED_MODULE_0__["default"])(placement) === _enums_js__WEBPACK_IMPORTED_MODULE_1__.auto ? (0,_utils_computeAutoPlacement_js__WEBPACK_IMPORTED_MODULE_4__["default"])(state, {
+      placement: placement,
+      boundary: boundary,
+      rootBoundary: rootBoundary,
+      padding: padding,
+      flipVariations: flipVariations,
+      allowedAutoPlacements: allowedAutoPlacements
+    }) : placement);
+  }, []);
+  var referenceRect = state.rects.reference;
+  var popperRect = state.rects.popper;
+  var checksMap = new Map();
+  var makeFallbackChecks = true;
+  var firstFittingPlacement = placements[0];
+
+  for (var i = 0; i < placements.length; i++) {
+    var placement = placements[i];
+
+    var _basePlacement = (0,_utils_getBasePlacement_js__WEBPACK_IMPORTED_MODULE_0__["default"])(placement);
+
+    var isStartVariation = (0,_utils_getVariation_js__WEBPACK_IMPORTED_MODULE_5__["default"])(placement) === _enums_js__WEBPACK_IMPORTED_MODULE_1__.start;
+    var isVertical = [_enums_js__WEBPACK_IMPORTED_MODULE_1__.top, _enums_js__WEBPACK_IMPORTED_MODULE_1__.bottom].indexOf(_basePlacement) >= 0;
+    var len = isVertical ? 'width' : 'height';
+    var overflow = (0,_utils_detectOverflow_js__WEBPACK_IMPORTED_MODULE_6__["default"])(state, {
+      placement: placement,
+      boundary: boundary,
+      rootBoundary: rootBoundary,
+      altBoundary: altBoundary,
+      padding: padding
+    });
+    var mainVariationSide = isVertical ? isStartVariation ? _enums_js__WEBPACK_IMPORTED_MODULE_1__.right : _enums_js__WEBPACK_IMPORTED_MODULE_1__.left : isStartVariation ? _enums_js__WEBPACK_IMPORTED_MODULE_1__.bottom : _enums_js__WEBPACK_IMPORTED_MODULE_1__.top;
+
+    if (referenceRect[len] > popperRect[len]) {
+      mainVariationSide = (0,_utils_getOppositePlacement_js__WEBPACK_IMPORTED_MODULE_2__["default"])(mainVariationSide);
+    }
+
+    var altVariationSide = (0,_utils_getOppositePlacement_js__WEBPACK_IMPORTED_MODULE_2__["default"])(mainVariationSide);
+    var checks = [];
+
+    if (checkMainAxis) {
+      checks.push(overflow[_basePlacement] <= 0);
+    }
+
+    if (checkAltAxis) {
+      checks.push(overflow[mainVariationSide] <= 0, overflow[altVariationSide] <= 0);
+    }
+
+    if (checks.every(function (check) {
+      return check;
+    })) {
+      firstFittingPlacement = placement;
+      makeFallbackChecks = false;
+      break;
+    }
+
+    checksMap.set(placement, checks);
+  }
+
+  if (makeFallbackChecks) {
+    // `2` may be desired in some cases – research later
+    var numberOfChecks = flipVariations ? 3 : 1;
+
+    var _loop = function _loop(_i) {
+      var fittingPlacement = placements.find(function (placement) {
+        var checks = checksMap.get(placement);
+
+        if (checks) {
+          return checks.slice(0, _i).every(function (check) {
+            return check;
+          });
+        }
+      });
+
+      if (fittingPlacement) {
+        firstFittingPlacement = fittingPlacement;
+        return "break";
+      }
+    };
+
+    for (var _i = numberOfChecks; _i > 0; _i--) {
+      var _ret = _loop(_i);
+
+      if (_ret === "break") break;
+    }
+  }
+
+  if (state.placement !== firstFittingPlacement) {
+    state.modifiersData[name]._skip = true;
+    state.placement = firstFittingPlacement;
+    state.reset = true;
+  }
+} // eslint-disable-next-line import/no-unused-modules
+
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  name: 'flip',
+  enabled: true,
+  phase: 'main',
+  fn: flip,
+  requiresIfExists: ['offset'],
+  data: {
+    _skip: false
+  }
+});
+
+/***/ }),
+
+/***/ "./node_modules/@popperjs/core/lib/modifiers/hide.js":
+/*!***********************************************************!*\
+  !*** ./node_modules/@popperjs/core/lib/modifiers/hide.js ***!
+  \***********************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _enums_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../enums.js */ "./node_modules/@popperjs/core/lib/enums.js");
+/* harmony import */ var _utils_detectOverflow_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../utils/detectOverflow.js */ "./node_modules/@popperjs/core/lib/utils/detectOverflow.js");
+
+
+
+function getSideOffsets(overflow, rect, preventedOffsets) {
+  if (preventedOffsets === void 0) {
+    preventedOffsets = {
+      x: 0,
+      y: 0
+    };
+  }
+
+  return {
+    top: overflow.top - rect.height - preventedOffsets.y,
+    right: overflow.right - rect.width + preventedOffsets.x,
+    bottom: overflow.bottom - rect.height + preventedOffsets.y,
+    left: overflow.left - rect.width - preventedOffsets.x
+  };
+}
+
+function isAnySideFullyClipped(overflow) {
+  return [_enums_js__WEBPACK_IMPORTED_MODULE_0__.top, _enums_js__WEBPACK_IMPORTED_MODULE_0__.right, _enums_js__WEBPACK_IMPORTED_MODULE_0__.bottom, _enums_js__WEBPACK_IMPORTED_MODULE_0__.left].some(function (side) {
+    return overflow[side] >= 0;
+  });
+}
+
+function hide(_ref) {
+  var state = _ref.state,
+      name = _ref.name;
+  var referenceRect = state.rects.reference;
+  var popperRect = state.rects.popper;
+  var preventedOffsets = state.modifiersData.preventOverflow;
+  var referenceOverflow = (0,_utils_detectOverflow_js__WEBPACK_IMPORTED_MODULE_1__["default"])(state, {
+    elementContext: 'reference'
+  });
+  var popperAltOverflow = (0,_utils_detectOverflow_js__WEBPACK_IMPORTED_MODULE_1__["default"])(state, {
+    altBoundary: true
+  });
+  var referenceClippingOffsets = getSideOffsets(referenceOverflow, referenceRect);
+  var popperEscapeOffsets = getSideOffsets(popperAltOverflow, popperRect, preventedOffsets);
+  var isReferenceHidden = isAnySideFullyClipped(referenceClippingOffsets);
+  var hasPopperEscaped = isAnySideFullyClipped(popperEscapeOffsets);
+  state.modifiersData[name] = {
+    referenceClippingOffsets: referenceClippingOffsets,
+    popperEscapeOffsets: popperEscapeOffsets,
+    isReferenceHidden: isReferenceHidden,
+    hasPopperEscaped: hasPopperEscaped
+  };
+  state.attributes.popper = Object.assign({}, state.attributes.popper, {
+    'data-popper-reference-hidden': isReferenceHidden,
+    'data-popper-escaped': hasPopperEscaped
+  });
+} // eslint-disable-next-line import/no-unused-modules
+
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  name: 'hide',
+  enabled: true,
+  phase: 'main',
+  requiresIfExists: ['preventOverflow'],
+  fn: hide
+});
+
+/***/ }),
+
+/***/ "./node_modules/@popperjs/core/lib/modifiers/index.js":
+/*!************************************************************!*\
+  !*** ./node_modules/@popperjs/core/lib/modifiers/index.js ***!
+  \************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "applyStyles": () => (/* reexport safe */ _applyStyles_js__WEBPACK_IMPORTED_MODULE_0__["default"]),
+/* harmony export */   "arrow": () => (/* reexport safe */ _arrow_js__WEBPACK_IMPORTED_MODULE_1__["default"]),
+/* harmony export */   "computeStyles": () => (/* reexport safe */ _computeStyles_js__WEBPACK_IMPORTED_MODULE_2__["default"]),
+/* harmony export */   "eventListeners": () => (/* reexport safe */ _eventListeners_js__WEBPACK_IMPORTED_MODULE_3__["default"]),
+/* harmony export */   "flip": () => (/* reexport safe */ _flip_js__WEBPACK_IMPORTED_MODULE_4__["default"]),
+/* harmony export */   "hide": () => (/* reexport safe */ _hide_js__WEBPACK_IMPORTED_MODULE_5__["default"]),
+/* harmony export */   "offset": () => (/* reexport safe */ _offset_js__WEBPACK_IMPORTED_MODULE_6__["default"]),
+/* harmony export */   "popperOffsets": () => (/* reexport safe */ _popperOffsets_js__WEBPACK_IMPORTED_MODULE_7__["default"]),
+/* harmony export */   "preventOverflow": () => (/* reexport safe */ _preventOverflow_js__WEBPACK_IMPORTED_MODULE_8__["default"])
+/* harmony export */ });
+/* harmony import */ var _applyStyles_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./applyStyles.js */ "./node_modules/@popperjs/core/lib/modifiers/applyStyles.js");
+/* harmony import */ var _arrow_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./arrow.js */ "./node_modules/@popperjs/core/lib/modifiers/arrow.js");
+/* harmony import */ var _computeStyles_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./computeStyles.js */ "./node_modules/@popperjs/core/lib/modifiers/computeStyles.js");
+/* harmony import */ var _eventListeners_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./eventListeners.js */ "./node_modules/@popperjs/core/lib/modifiers/eventListeners.js");
+/* harmony import */ var _flip_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./flip.js */ "./node_modules/@popperjs/core/lib/modifiers/flip.js");
+/* harmony import */ var _hide_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./hide.js */ "./node_modules/@popperjs/core/lib/modifiers/hide.js");
+/* harmony import */ var _offset_js__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./offset.js */ "./node_modules/@popperjs/core/lib/modifiers/offset.js");
+/* harmony import */ var _popperOffsets_js__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./popperOffsets.js */ "./node_modules/@popperjs/core/lib/modifiers/popperOffsets.js");
+/* harmony import */ var _preventOverflow_js__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./preventOverflow.js */ "./node_modules/@popperjs/core/lib/modifiers/preventOverflow.js");
+
+
+
+
+
+
+
+
+
+
+/***/ }),
+
+/***/ "./node_modules/@popperjs/core/lib/modifiers/offset.js":
+/*!*************************************************************!*\
+  !*** ./node_modules/@popperjs/core/lib/modifiers/offset.js ***!
+  \*************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "distanceAndSkiddingToXY": () => (/* binding */ distanceAndSkiddingToXY),
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _utils_getBasePlacement_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../utils/getBasePlacement.js */ "./node_modules/@popperjs/core/lib/utils/getBasePlacement.js");
+/* harmony import */ var _enums_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../enums.js */ "./node_modules/@popperjs/core/lib/enums.js");
+
+
+function distanceAndSkiddingToXY(placement, rects, offset) {
+  var basePlacement = (0,_utils_getBasePlacement_js__WEBPACK_IMPORTED_MODULE_0__["default"])(placement);
+  var invertDistance = [_enums_js__WEBPACK_IMPORTED_MODULE_1__.left, _enums_js__WEBPACK_IMPORTED_MODULE_1__.top].indexOf(basePlacement) >= 0 ? -1 : 1;
+
+  var _ref = typeof offset === 'function' ? offset(Object.assign({}, rects, {
+    placement: placement
+  })) : offset,
+      skidding = _ref[0],
+      distance = _ref[1];
+
+  skidding = skidding || 0;
+  distance = (distance || 0) * invertDistance;
+  return [_enums_js__WEBPACK_IMPORTED_MODULE_1__.left, _enums_js__WEBPACK_IMPORTED_MODULE_1__.right].indexOf(basePlacement) >= 0 ? {
+    x: distance,
+    y: skidding
+  } : {
+    x: skidding,
+    y: distance
+  };
+}
+
+function offset(_ref2) {
+  var state = _ref2.state,
+      options = _ref2.options,
+      name = _ref2.name;
+  var _options$offset = options.offset,
+      offset = _options$offset === void 0 ? [0, 0] : _options$offset;
+  var data = _enums_js__WEBPACK_IMPORTED_MODULE_1__.placements.reduce(function (acc, placement) {
+    acc[placement] = distanceAndSkiddingToXY(placement, state.rects, offset);
+    return acc;
+  }, {});
+  var _data$state$placement = data[state.placement],
+      x = _data$state$placement.x,
+      y = _data$state$placement.y;
+
+  if (state.modifiersData.popperOffsets != null) {
+    state.modifiersData.popperOffsets.x += x;
+    state.modifiersData.popperOffsets.y += y;
+  }
+
+  state.modifiersData[name] = data;
+} // eslint-disable-next-line import/no-unused-modules
+
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  name: 'offset',
+  enabled: true,
+  phase: 'main',
+  requires: ['popperOffsets'],
+  fn: offset
+});
+
+/***/ }),
+
+/***/ "./node_modules/@popperjs/core/lib/modifiers/popperOffsets.js":
+/*!********************************************************************!*\
+  !*** ./node_modules/@popperjs/core/lib/modifiers/popperOffsets.js ***!
+  \********************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _utils_computeOffsets_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../utils/computeOffsets.js */ "./node_modules/@popperjs/core/lib/utils/computeOffsets.js");
+
+
+function popperOffsets(_ref) {
+  var state = _ref.state,
+      name = _ref.name;
+  // Offsets are the actual position the popper needs to have to be
+  // properly positioned near its reference element
+  // This is the most basic placement, and will be adjusted by
+  // the modifiers in the next step
+  state.modifiersData[name] = (0,_utils_computeOffsets_js__WEBPACK_IMPORTED_MODULE_0__["default"])({
+    reference: state.rects.reference,
+    element: state.rects.popper,
+    strategy: 'absolute',
+    placement: state.placement
+  });
+} // eslint-disable-next-line import/no-unused-modules
+
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  name: 'popperOffsets',
+  enabled: true,
+  phase: 'read',
+  fn: popperOffsets,
+  data: {}
+});
+
+/***/ }),
+
+/***/ "./node_modules/@popperjs/core/lib/modifiers/preventOverflow.js":
+/*!**********************************************************************!*\
+  !*** ./node_modules/@popperjs/core/lib/modifiers/preventOverflow.js ***!
+  \**********************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _enums_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../enums.js */ "./node_modules/@popperjs/core/lib/enums.js");
+/* harmony import */ var _utils_getBasePlacement_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../utils/getBasePlacement.js */ "./node_modules/@popperjs/core/lib/utils/getBasePlacement.js");
+/* harmony import */ var _utils_getMainAxisFromPlacement_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../utils/getMainAxisFromPlacement.js */ "./node_modules/@popperjs/core/lib/utils/getMainAxisFromPlacement.js");
+/* harmony import */ var _utils_getAltAxis_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../utils/getAltAxis.js */ "./node_modules/@popperjs/core/lib/utils/getAltAxis.js");
+/* harmony import */ var _utils_within_js__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../utils/within.js */ "./node_modules/@popperjs/core/lib/utils/within.js");
+/* harmony import */ var _dom_utils_getLayoutRect_js__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../dom-utils/getLayoutRect.js */ "./node_modules/@popperjs/core/lib/dom-utils/getLayoutRect.js");
+/* harmony import */ var _dom_utils_getOffsetParent_js__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../dom-utils/getOffsetParent.js */ "./node_modules/@popperjs/core/lib/dom-utils/getOffsetParent.js");
+/* harmony import */ var _utils_detectOverflow_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../utils/detectOverflow.js */ "./node_modules/@popperjs/core/lib/utils/detectOverflow.js");
+/* harmony import */ var _utils_getVariation_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../utils/getVariation.js */ "./node_modules/@popperjs/core/lib/utils/getVariation.js");
+/* harmony import */ var _utils_getFreshSideObject_js__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../utils/getFreshSideObject.js */ "./node_modules/@popperjs/core/lib/utils/getFreshSideObject.js");
+/* harmony import */ var _utils_math_js__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ../utils/math.js */ "./node_modules/@popperjs/core/lib/utils/math.js");
+
+
+
+
+
+
+
+
+
+
+
+
+function preventOverflow(_ref) {
+  var state = _ref.state,
+      options = _ref.options,
+      name = _ref.name;
+  var _options$mainAxis = options.mainAxis,
+      checkMainAxis = _options$mainAxis === void 0 ? true : _options$mainAxis,
+      _options$altAxis = options.altAxis,
+      checkAltAxis = _options$altAxis === void 0 ? false : _options$altAxis,
+      boundary = options.boundary,
+      rootBoundary = options.rootBoundary,
+      altBoundary = options.altBoundary,
+      padding = options.padding,
+      _options$tether = options.tether,
+      tether = _options$tether === void 0 ? true : _options$tether,
+      _options$tetherOffset = options.tetherOffset,
+      tetherOffset = _options$tetherOffset === void 0 ? 0 : _options$tetherOffset;
+  var overflow = (0,_utils_detectOverflow_js__WEBPACK_IMPORTED_MODULE_0__["default"])(state, {
+    boundary: boundary,
+    rootBoundary: rootBoundary,
+    padding: padding,
+    altBoundary: altBoundary
+  });
+  var basePlacement = (0,_utils_getBasePlacement_js__WEBPACK_IMPORTED_MODULE_1__["default"])(state.placement);
+  var variation = (0,_utils_getVariation_js__WEBPACK_IMPORTED_MODULE_2__["default"])(state.placement);
+  var isBasePlacement = !variation;
+  var mainAxis = (0,_utils_getMainAxisFromPlacement_js__WEBPACK_IMPORTED_MODULE_3__["default"])(basePlacement);
+  var altAxis = (0,_utils_getAltAxis_js__WEBPACK_IMPORTED_MODULE_4__["default"])(mainAxis);
+  var popperOffsets = state.modifiersData.popperOffsets;
+  var referenceRect = state.rects.reference;
+  var popperRect = state.rects.popper;
+  var tetherOffsetValue = typeof tetherOffset === 'function' ? tetherOffset(Object.assign({}, state.rects, {
+    placement: state.placement
+  })) : tetherOffset;
+  var data = {
+    x: 0,
+    y: 0
+  };
+
+  if (!popperOffsets) {
+    return;
+  }
+
+  if (checkMainAxis || checkAltAxis) {
+    var mainSide = mainAxis === 'y' ? _enums_js__WEBPACK_IMPORTED_MODULE_5__.top : _enums_js__WEBPACK_IMPORTED_MODULE_5__.left;
+    var altSide = mainAxis === 'y' ? _enums_js__WEBPACK_IMPORTED_MODULE_5__.bottom : _enums_js__WEBPACK_IMPORTED_MODULE_5__.right;
+    var len = mainAxis === 'y' ? 'height' : 'width';
+    var offset = popperOffsets[mainAxis];
+    var min = popperOffsets[mainAxis] + overflow[mainSide];
+    var max = popperOffsets[mainAxis] - overflow[altSide];
+    var additive = tether ? -popperRect[len] / 2 : 0;
+    var minLen = variation === _enums_js__WEBPACK_IMPORTED_MODULE_5__.start ? referenceRect[len] : popperRect[len];
+    var maxLen = variation === _enums_js__WEBPACK_IMPORTED_MODULE_5__.start ? -popperRect[len] : -referenceRect[len]; // We need to include the arrow in the calculation so the arrow doesn't go
+    // outside the reference bounds
+
+    var arrowElement = state.elements.arrow;
+    var arrowRect = tether && arrowElement ? (0,_dom_utils_getLayoutRect_js__WEBPACK_IMPORTED_MODULE_6__["default"])(arrowElement) : {
+      width: 0,
+      height: 0
+    };
+    var arrowPaddingObject = state.modifiersData['arrow#persistent'] ? state.modifiersData['arrow#persistent'].padding : (0,_utils_getFreshSideObject_js__WEBPACK_IMPORTED_MODULE_7__["default"])();
+    var arrowPaddingMin = arrowPaddingObject[mainSide];
+    var arrowPaddingMax = arrowPaddingObject[altSide]; // If the reference length is smaller than the arrow length, we don't want
+    // to include its full size in the calculation. If the reference is small
+    // and near the edge of a boundary, the popper can overflow even if the
+    // reference is not overflowing as well (e.g. virtual elements with no
+    // width or height)
+
+    var arrowLen = (0,_utils_within_js__WEBPACK_IMPORTED_MODULE_8__["default"])(0, referenceRect[len], arrowRect[len]);
+    var minOffset = isBasePlacement ? referenceRect[len] / 2 - additive - arrowLen - arrowPaddingMin - tetherOffsetValue : minLen - arrowLen - arrowPaddingMin - tetherOffsetValue;
+    var maxOffset = isBasePlacement ? -referenceRect[len] / 2 + additive + arrowLen + arrowPaddingMax + tetherOffsetValue : maxLen + arrowLen + arrowPaddingMax + tetherOffsetValue;
+    var arrowOffsetParent = state.elements.arrow && (0,_dom_utils_getOffsetParent_js__WEBPACK_IMPORTED_MODULE_9__["default"])(state.elements.arrow);
+    var clientOffset = arrowOffsetParent ? mainAxis === 'y' ? arrowOffsetParent.clientTop || 0 : arrowOffsetParent.clientLeft || 0 : 0;
+    var offsetModifierValue = state.modifiersData.offset ? state.modifiersData.offset[state.placement][mainAxis] : 0;
+    var tetherMin = popperOffsets[mainAxis] + minOffset - offsetModifierValue - clientOffset;
+    var tetherMax = popperOffsets[mainAxis] + maxOffset - offsetModifierValue;
+
+    if (checkMainAxis) {
+      var preventedOffset = (0,_utils_within_js__WEBPACK_IMPORTED_MODULE_8__["default"])(tether ? (0,_utils_math_js__WEBPACK_IMPORTED_MODULE_10__.min)(min, tetherMin) : min, offset, tether ? (0,_utils_math_js__WEBPACK_IMPORTED_MODULE_10__.max)(max, tetherMax) : max);
+      popperOffsets[mainAxis] = preventedOffset;
+      data[mainAxis] = preventedOffset - offset;
+    }
+
+    if (checkAltAxis) {
+      var _mainSide = mainAxis === 'x' ? _enums_js__WEBPACK_IMPORTED_MODULE_5__.top : _enums_js__WEBPACK_IMPORTED_MODULE_5__.left;
+
+      var _altSide = mainAxis === 'x' ? _enums_js__WEBPACK_IMPORTED_MODULE_5__.bottom : _enums_js__WEBPACK_IMPORTED_MODULE_5__.right;
+
+      var _offset = popperOffsets[altAxis];
+
+      var _min = _offset + overflow[_mainSide];
+
+      var _max = _offset - overflow[_altSide];
+
+      var _preventedOffset = (0,_utils_within_js__WEBPACK_IMPORTED_MODULE_8__["default"])(tether ? (0,_utils_math_js__WEBPACK_IMPORTED_MODULE_10__.min)(_min, tetherMin) : _min, _offset, tether ? (0,_utils_math_js__WEBPACK_IMPORTED_MODULE_10__.max)(_max, tetherMax) : _max);
+
+      popperOffsets[altAxis] = _preventedOffset;
+      data[altAxis] = _preventedOffset - _offset;
+    }
+  }
+
+  state.modifiersData[name] = data;
+} // eslint-disable-next-line import/no-unused-modules
+
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  name: 'preventOverflow',
+  enabled: true,
+  phase: 'main',
+  fn: preventOverflow,
+  requiresIfExists: ['offset']
+});
+
+/***/ }),
+
+/***/ "./node_modules/@popperjs/core/lib/popper-lite.js":
+/*!********************************************************!*\
+  !*** ./node_modules/@popperjs/core/lib/popper-lite.js ***!
+  \********************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "createPopper": () => (/* binding */ createPopper),
+/* harmony export */   "popperGenerator": () => (/* reexport safe */ _createPopper_js__WEBPACK_IMPORTED_MODULE_4__.popperGenerator),
+/* harmony export */   "defaultModifiers": () => (/* binding */ defaultModifiers),
+/* harmony export */   "detectOverflow": () => (/* reexport safe */ _createPopper_js__WEBPACK_IMPORTED_MODULE_5__["default"])
+/* harmony export */ });
+/* harmony import */ var _createPopper_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./createPopper.js */ "./node_modules/@popperjs/core/lib/createPopper.js");
+/* harmony import */ var _createPopper_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./createPopper.js */ "./node_modules/@popperjs/core/lib/utils/detectOverflow.js");
+/* harmony import */ var _modifiers_eventListeners_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./modifiers/eventListeners.js */ "./node_modules/@popperjs/core/lib/modifiers/eventListeners.js");
+/* harmony import */ var _modifiers_popperOffsets_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./modifiers/popperOffsets.js */ "./node_modules/@popperjs/core/lib/modifiers/popperOffsets.js");
+/* harmony import */ var _modifiers_computeStyles_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./modifiers/computeStyles.js */ "./node_modules/@popperjs/core/lib/modifiers/computeStyles.js");
+/* harmony import */ var _modifiers_applyStyles_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./modifiers/applyStyles.js */ "./node_modules/@popperjs/core/lib/modifiers/applyStyles.js");
+
+
+
+
+
+var defaultModifiers = [_modifiers_eventListeners_js__WEBPACK_IMPORTED_MODULE_0__["default"], _modifiers_popperOffsets_js__WEBPACK_IMPORTED_MODULE_1__["default"], _modifiers_computeStyles_js__WEBPACK_IMPORTED_MODULE_2__["default"], _modifiers_applyStyles_js__WEBPACK_IMPORTED_MODULE_3__["default"]];
+var createPopper = /*#__PURE__*/(0,_createPopper_js__WEBPACK_IMPORTED_MODULE_4__.popperGenerator)({
+  defaultModifiers: defaultModifiers
+}); // eslint-disable-next-line import/no-unused-modules
+
+
+
+/***/ }),
+
+/***/ "./node_modules/@popperjs/core/lib/popper.js":
+/*!***************************************************!*\
+  !*** ./node_modules/@popperjs/core/lib/popper.js ***!
+  \***************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "createPopper": () => (/* binding */ createPopper),
+/* harmony export */   "popperGenerator": () => (/* reexport safe */ _createPopper_js__WEBPACK_IMPORTED_MODULE_9__.popperGenerator),
+/* harmony export */   "defaultModifiers": () => (/* binding */ defaultModifiers),
+/* harmony export */   "detectOverflow": () => (/* reexport safe */ _createPopper_js__WEBPACK_IMPORTED_MODULE_10__["default"]),
+/* harmony export */   "createPopperLite": () => (/* reexport safe */ _popper_lite_js__WEBPACK_IMPORTED_MODULE_11__.createPopper),
+/* harmony export */   "applyStyles": () => (/* reexport safe */ _modifiers_index_js__WEBPACK_IMPORTED_MODULE_12__.applyStyles),
+/* harmony export */   "arrow": () => (/* reexport safe */ _modifiers_index_js__WEBPACK_IMPORTED_MODULE_12__.arrow),
+/* harmony export */   "computeStyles": () => (/* reexport safe */ _modifiers_index_js__WEBPACK_IMPORTED_MODULE_12__.computeStyles),
+/* harmony export */   "eventListeners": () => (/* reexport safe */ _modifiers_index_js__WEBPACK_IMPORTED_MODULE_12__.eventListeners),
+/* harmony export */   "flip": () => (/* reexport safe */ _modifiers_index_js__WEBPACK_IMPORTED_MODULE_12__.flip),
+/* harmony export */   "hide": () => (/* reexport safe */ _modifiers_index_js__WEBPACK_IMPORTED_MODULE_12__.hide),
+/* harmony export */   "offset": () => (/* reexport safe */ _modifiers_index_js__WEBPACK_IMPORTED_MODULE_12__.offset),
+/* harmony export */   "popperOffsets": () => (/* reexport safe */ _modifiers_index_js__WEBPACK_IMPORTED_MODULE_12__.popperOffsets),
+/* harmony export */   "preventOverflow": () => (/* reexport safe */ _modifiers_index_js__WEBPACK_IMPORTED_MODULE_12__.preventOverflow)
+/* harmony export */ });
+/* harmony import */ var _createPopper_js__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./createPopper.js */ "./node_modules/@popperjs/core/lib/createPopper.js");
+/* harmony import */ var _createPopper_js__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./createPopper.js */ "./node_modules/@popperjs/core/lib/utils/detectOverflow.js");
+/* harmony import */ var _modifiers_eventListeners_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./modifiers/eventListeners.js */ "./node_modules/@popperjs/core/lib/modifiers/eventListeners.js");
+/* harmony import */ var _modifiers_popperOffsets_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./modifiers/popperOffsets.js */ "./node_modules/@popperjs/core/lib/modifiers/popperOffsets.js");
+/* harmony import */ var _modifiers_computeStyles_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./modifiers/computeStyles.js */ "./node_modules/@popperjs/core/lib/modifiers/computeStyles.js");
+/* harmony import */ var _modifiers_applyStyles_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./modifiers/applyStyles.js */ "./node_modules/@popperjs/core/lib/modifiers/applyStyles.js");
+/* harmony import */ var _modifiers_offset_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./modifiers/offset.js */ "./node_modules/@popperjs/core/lib/modifiers/offset.js");
+/* harmony import */ var _modifiers_flip_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./modifiers/flip.js */ "./node_modules/@popperjs/core/lib/modifiers/flip.js");
+/* harmony import */ var _modifiers_preventOverflow_js__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./modifiers/preventOverflow.js */ "./node_modules/@popperjs/core/lib/modifiers/preventOverflow.js");
+/* harmony import */ var _modifiers_arrow_js__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./modifiers/arrow.js */ "./node_modules/@popperjs/core/lib/modifiers/arrow.js");
+/* harmony import */ var _modifiers_hide_js__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./modifiers/hide.js */ "./node_modules/@popperjs/core/lib/modifiers/hide.js");
+/* harmony import */ var _popper_lite_js__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./popper-lite.js */ "./node_modules/@popperjs/core/lib/popper-lite.js");
+/* harmony import */ var _modifiers_index_js__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./modifiers/index.js */ "./node_modules/@popperjs/core/lib/modifiers/index.js");
+
+
+
+
+
+
+
+
+
+
+var defaultModifiers = [_modifiers_eventListeners_js__WEBPACK_IMPORTED_MODULE_0__["default"], _modifiers_popperOffsets_js__WEBPACK_IMPORTED_MODULE_1__["default"], _modifiers_computeStyles_js__WEBPACK_IMPORTED_MODULE_2__["default"], _modifiers_applyStyles_js__WEBPACK_IMPORTED_MODULE_3__["default"], _modifiers_offset_js__WEBPACK_IMPORTED_MODULE_4__["default"], _modifiers_flip_js__WEBPACK_IMPORTED_MODULE_5__["default"], _modifiers_preventOverflow_js__WEBPACK_IMPORTED_MODULE_6__["default"], _modifiers_arrow_js__WEBPACK_IMPORTED_MODULE_7__["default"], _modifiers_hide_js__WEBPACK_IMPORTED_MODULE_8__["default"]];
+var createPopper = /*#__PURE__*/(0,_createPopper_js__WEBPACK_IMPORTED_MODULE_9__.popperGenerator)({
+  defaultModifiers: defaultModifiers
+}); // eslint-disable-next-line import/no-unused-modules
+
+ // eslint-disable-next-line import/no-unused-modules
+
+ // eslint-disable-next-line import/no-unused-modules
+
+
+
+/***/ }),
+
+/***/ "./node_modules/@popperjs/core/lib/utils/computeAutoPlacement.js":
+/*!***********************************************************************!*\
+  !*** ./node_modules/@popperjs/core/lib/utils/computeAutoPlacement.js ***!
+  \***********************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ computeAutoPlacement)
+/* harmony export */ });
+/* harmony import */ var _getVariation_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./getVariation.js */ "./node_modules/@popperjs/core/lib/utils/getVariation.js");
+/* harmony import */ var _enums_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../enums.js */ "./node_modules/@popperjs/core/lib/enums.js");
+/* harmony import */ var _detectOverflow_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./detectOverflow.js */ "./node_modules/@popperjs/core/lib/utils/detectOverflow.js");
+/* harmony import */ var _getBasePlacement_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./getBasePlacement.js */ "./node_modules/@popperjs/core/lib/utils/getBasePlacement.js");
+
+
+
+
+function computeAutoPlacement(state, options) {
+  if (options === void 0) {
+    options = {};
+  }
+
+  var _options = options,
+      placement = _options.placement,
+      boundary = _options.boundary,
+      rootBoundary = _options.rootBoundary,
+      padding = _options.padding,
+      flipVariations = _options.flipVariations,
+      _options$allowedAutoP = _options.allowedAutoPlacements,
+      allowedAutoPlacements = _options$allowedAutoP === void 0 ? _enums_js__WEBPACK_IMPORTED_MODULE_0__.placements : _options$allowedAutoP;
+  var variation = (0,_getVariation_js__WEBPACK_IMPORTED_MODULE_1__["default"])(placement);
+  var placements = variation ? flipVariations ? _enums_js__WEBPACK_IMPORTED_MODULE_0__.variationPlacements : _enums_js__WEBPACK_IMPORTED_MODULE_0__.variationPlacements.filter(function (placement) {
+    return (0,_getVariation_js__WEBPACK_IMPORTED_MODULE_1__["default"])(placement) === variation;
+  }) : _enums_js__WEBPACK_IMPORTED_MODULE_0__.basePlacements;
+  var allowedPlacements = placements.filter(function (placement) {
+    return allowedAutoPlacements.indexOf(placement) >= 0;
+  });
+
+  if (allowedPlacements.length === 0) {
+    allowedPlacements = placements;
+
+    if (true) {
+      console.error(['Popper: The `allowedAutoPlacements` option did not allow any', 'placements. Ensure the `placement` option matches the variation', 'of the allowed placements.', 'For example, "auto" cannot be used to allow "bottom-start".', 'Use "auto-start" instead.'].join(' '));
+    }
+  } // $FlowFixMe[incompatible-type]: Flow seems to have problems with two array unions...
+
+
+  var overflows = allowedPlacements.reduce(function (acc, placement) {
+    acc[placement] = (0,_detectOverflow_js__WEBPACK_IMPORTED_MODULE_2__["default"])(state, {
+      placement: placement,
+      boundary: boundary,
+      rootBoundary: rootBoundary,
+      padding: padding
+    })[(0,_getBasePlacement_js__WEBPACK_IMPORTED_MODULE_3__["default"])(placement)];
+    return acc;
+  }, {});
+  return Object.keys(overflows).sort(function (a, b) {
+    return overflows[a] - overflows[b];
+  });
+}
+
+/***/ }),
+
+/***/ "./node_modules/@popperjs/core/lib/utils/computeOffsets.js":
+/*!*****************************************************************!*\
+  !*** ./node_modules/@popperjs/core/lib/utils/computeOffsets.js ***!
+  \*****************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ computeOffsets)
+/* harmony export */ });
+/* harmony import */ var _getBasePlacement_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./getBasePlacement.js */ "./node_modules/@popperjs/core/lib/utils/getBasePlacement.js");
+/* harmony import */ var _getVariation_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./getVariation.js */ "./node_modules/@popperjs/core/lib/utils/getVariation.js");
+/* harmony import */ var _getMainAxisFromPlacement_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./getMainAxisFromPlacement.js */ "./node_modules/@popperjs/core/lib/utils/getMainAxisFromPlacement.js");
+/* harmony import */ var _enums_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../enums.js */ "./node_modules/@popperjs/core/lib/enums.js");
+
+
+
+
+function computeOffsets(_ref) {
+  var reference = _ref.reference,
+      element = _ref.element,
+      placement = _ref.placement;
+  var basePlacement = placement ? (0,_getBasePlacement_js__WEBPACK_IMPORTED_MODULE_0__["default"])(placement) : null;
+  var variation = placement ? (0,_getVariation_js__WEBPACK_IMPORTED_MODULE_1__["default"])(placement) : null;
+  var commonX = reference.x + reference.width / 2 - element.width / 2;
+  var commonY = reference.y + reference.height / 2 - element.height / 2;
+  var offsets;
+
+  switch (basePlacement) {
+    case _enums_js__WEBPACK_IMPORTED_MODULE_2__.top:
+      offsets = {
+        x: commonX,
+        y: reference.y - element.height
+      };
+      break;
+
+    case _enums_js__WEBPACK_IMPORTED_MODULE_2__.bottom:
+      offsets = {
+        x: commonX,
+        y: reference.y + reference.height
+      };
+      break;
+
+    case _enums_js__WEBPACK_IMPORTED_MODULE_2__.right:
+      offsets = {
+        x: reference.x + reference.width,
+        y: commonY
+      };
+      break;
+
+    case _enums_js__WEBPACK_IMPORTED_MODULE_2__.left:
+      offsets = {
+        x: reference.x - element.width,
+        y: commonY
+      };
+      break;
+
+    default:
+      offsets = {
+        x: reference.x,
+        y: reference.y
+      };
+  }
+
+  var mainAxis = basePlacement ? (0,_getMainAxisFromPlacement_js__WEBPACK_IMPORTED_MODULE_3__["default"])(basePlacement) : null;
+
+  if (mainAxis != null) {
+    var len = mainAxis === 'y' ? 'height' : 'width';
+
+    switch (variation) {
+      case _enums_js__WEBPACK_IMPORTED_MODULE_2__.start:
+        offsets[mainAxis] = offsets[mainAxis] - (reference[len] / 2 - element[len] / 2);
+        break;
+
+      case _enums_js__WEBPACK_IMPORTED_MODULE_2__.end:
+        offsets[mainAxis] = offsets[mainAxis] + (reference[len] / 2 - element[len] / 2);
+        break;
+
+      default:
+    }
+  }
+
+  return offsets;
+}
+
+/***/ }),
+
+/***/ "./node_modules/@popperjs/core/lib/utils/debounce.js":
+/*!***********************************************************!*\
+  !*** ./node_modules/@popperjs/core/lib/utils/debounce.js ***!
+  \***********************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ debounce)
+/* harmony export */ });
+function debounce(fn) {
+  var pending;
+  return function () {
+    if (!pending) {
+      pending = new Promise(function (resolve) {
+        Promise.resolve().then(function () {
+          pending = undefined;
+          resolve(fn());
+        });
+      });
+    }
+
+    return pending;
+  };
+}
+
+/***/ }),
+
+/***/ "./node_modules/@popperjs/core/lib/utils/detectOverflow.js":
+/*!*****************************************************************!*\
+  !*** ./node_modules/@popperjs/core/lib/utils/detectOverflow.js ***!
+  \*****************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ detectOverflow)
+/* harmony export */ });
+/* harmony import */ var _dom_utils_getClippingRect_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../dom-utils/getClippingRect.js */ "./node_modules/@popperjs/core/lib/dom-utils/getClippingRect.js");
+/* harmony import */ var _dom_utils_getDocumentElement_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../dom-utils/getDocumentElement.js */ "./node_modules/@popperjs/core/lib/dom-utils/getDocumentElement.js");
+/* harmony import */ var _dom_utils_getBoundingClientRect_js__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../dom-utils/getBoundingClientRect.js */ "./node_modules/@popperjs/core/lib/dom-utils/getBoundingClientRect.js");
+/* harmony import */ var _computeOffsets_js__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./computeOffsets.js */ "./node_modules/@popperjs/core/lib/utils/computeOffsets.js");
+/* harmony import */ var _rectToClientRect_js__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./rectToClientRect.js */ "./node_modules/@popperjs/core/lib/utils/rectToClientRect.js");
+/* harmony import */ var _enums_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../enums.js */ "./node_modules/@popperjs/core/lib/enums.js");
+/* harmony import */ var _dom_utils_instanceOf_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../dom-utils/instanceOf.js */ "./node_modules/@popperjs/core/lib/dom-utils/instanceOf.js");
+/* harmony import */ var _mergePaddingObject_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./mergePaddingObject.js */ "./node_modules/@popperjs/core/lib/utils/mergePaddingObject.js");
+/* harmony import */ var _expandToHashMap_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./expandToHashMap.js */ "./node_modules/@popperjs/core/lib/utils/expandToHashMap.js");
+
+
+
+
+
+
+
+
+ // eslint-disable-next-line import/no-unused-modules
+
+function detectOverflow(state, options) {
+  if (options === void 0) {
+    options = {};
+  }
+
+  var _options = options,
+      _options$placement = _options.placement,
+      placement = _options$placement === void 0 ? state.placement : _options$placement,
+      _options$boundary = _options.boundary,
+      boundary = _options$boundary === void 0 ? _enums_js__WEBPACK_IMPORTED_MODULE_0__.clippingParents : _options$boundary,
+      _options$rootBoundary = _options.rootBoundary,
+      rootBoundary = _options$rootBoundary === void 0 ? _enums_js__WEBPACK_IMPORTED_MODULE_0__.viewport : _options$rootBoundary,
+      _options$elementConte = _options.elementContext,
+      elementContext = _options$elementConte === void 0 ? _enums_js__WEBPACK_IMPORTED_MODULE_0__.popper : _options$elementConte,
+      _options$altBoundary = _options.altBoundary,
+      altBoundary = _options$altBoundary === void 0 ? false : _options$altBoundary,
+      _options$padding = _options.padding,
+      padding = _options$padding === void 0 ? 0 : _options$padding;
+  var paddingObject = (0,_mergePaddingObject_js__WEBPACK_IMPORTED_MODULE_1__["default"])(typeof padding !== 'number' ? padding : (0,_expandToHashMap_js__WEBPACK_IMPORTED_MODULE_2__["default"])(padding, _enums_js__WEBPACK_IMPORTED_MODULE_0__.basePlacements));
+  var altContext = elementContext === _enums_js__WEBPACK_IMPORTED_MODULE_0__.popper ? _enums_js__WEBPACK_IMPORTED_MODULE_0__.reference : _enums_js__WEBPACK_IMPORTED_MODULE_0__.popper;
+  var popperRect = state.rects.popper;
+  var element = state.elements[altBoundary ? altContext : elementContext];
+  var clippingClientRect = (0,_dom_utils_getClippingRect_js__WEBPACK_IMPORTED_MODULE_3__["default"])((0,_dom_utils_instanceOf_js__WEBPACK_IMPORTED_MODULE_4__.isElement)(element) ? element : element.contextElement || (0,_dom_utils_getDocumentElement_js__WEBPACK_IMPORTED_MODULE_5__["default"])(state.elements.popper), boundary, rootBoundary);
+  var referenceClientRect = (0,_dom_utils_getBoundingClientRect_js__WEBPACK_IMPORTED_MODULE_6__["default"])(state.elements.reference);
+  var popperOffsets = (0,_computeOffsets_js__WEBPACK_IMPORTED_MODULE_7__["default"])({
+    reference: referenceClientRect,
+    element: popperRect,
+    strategy: 'absolute',
+    placement: placement
+  });
+  var popperClientRect = (0,_rectToClientRect_js__WEBPACK_IMPORTED_MODULE_8__["default"])(Object.assign({}, popperRect, popperOffsets));
+  var elementClientRect = elementContext === _enums_js__WEBPACK_IMPORTED_MODULE_0__.popper ? popperClientRect : referenceClientRect; // positive = overflowing the clipping rect
+  // 0 or negative = within the clipping rect
+
+  var overflowOffsets = {
+    top: clippingClientRect.top - elementClientRect.top + paddingObject.top,
+    bottom: elementClientRect.bottom - clippingClientRect.bottom + paddingObject.bottom,
+    left: clippingClientRect.left - elementClientRect.left + paddingObject.left,
+    right: elementClientRect.right - clippingClientRect.right + paddingObject.right
+  };
+  var offsetData = state.modifiersData.offset; // Offsets can be applied only to the popper element
+
+  if (elementContext === _enums_js__WEBPACK_IMPORTED_MODULE_0__.popper && offsetData) {
+    var offset = offsetData[placement];
+    Object.keys(overflowOffsets).forEach(function (key) {
+      var multiply = [_enums_js__WEBPACK_IMPORTED_MODULE_0__.right, _enums_js__WEBPACK_IMPORTED_MODULE_0__.bottom].indexOf(key) >= 0 ? 1 : -1;
+      var axis = [_enums_js__WEBPACK_IMPORTED_MODULE_0__.top, _enums_js__WEBPACK_IMPORTED_MODULE_0__.bottom].indexOf(key) >= 0 ? 'y' : 'x';
+      overflowOffsets[key] += offset[axis] * multiply;
+    });
+  }
+
+  return overflowOffsets;
+}
+
+/***/ }),
+
+/***/ "./node_modules/@popperjs/core/lib/utils/expandToHashMap.js":
+/*!******************************************************************!*\
+  !*** ./node_modules/@popperjs/core/lib/utils/expandToHashMap.js ***!
+  \******************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ expandToHashMap)
+/* harmony export */ });
+function expandToHashMap(value, keys) {
+  return keys.reduce(function (hashMap, key) {
+    hashMap[key] = value;
+    return hashMap;
+  }, {});
+}
+
+/***/ }),
+
+/***/ "./node_modules/@popperjs/core/lib/utils/format.js":
+/*!*********************************************************!*\
+  !*** ./node_modules/@popperjs/core/lib/utils/format.js ***!
+  \*********************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ format)
+/* harmony export */ });
+function format(str) {
+  for (var _len = arguments.length, args = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+    args[_key - 1] = arguments[_key];
+  }
+
+  return [].concat(args).reduce(function (p, c) {
+    return p.replace(/%s/, c);
+  }, str);
+}
+
+/***/ }),
+
+/***/ "./node_modules/@popperjs/core/lib/utils/getAltAxis.js":
+/*!*************************************************************!*\
+  !*** ./node_modules/@popperjs/core/lib/utils/getAltAxis.js ***!
+  \*************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ getAltAxis)
+/* harmony export */ });
+function getAltAxis(axis) {
+  return axis === 'x' ? 'y' : 'x';
+}
+
+/***/ }),
+
+/***/ "./node_modules/@popperjs/core/lib/utils/getBasePlacement.js":
+/*!*******************************************************************!*\
+  !*** ./node_modules/@popperjs/core/lib/utils/getBasePlacement.js ***!
+  \*******************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ getBasePlacement)
+/* harmony export */ });
+
+function getBasePlacement(placement) {
+  return placement.split('-')[0];
+}
+
+/***/ }),
+
+/***/ "./node_modules/@popperjs/core/lib/utils/getFreshSideObject.js":
+/*!*********************************************************************!*\
+  !*** ./node_modules/@popperjs/core/lib/utils/getFreshSideObject.js ***!
+  \*********************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ getFreshSideObject)
+/* harmony export */ });
+function getFreshSideObject() {
+  return {
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0
+  };
+}
+
+/***/ }),
+
+/***/ "./node_modules/@popperjs/core/lib/utils/getMainAxisFromPlacement.js":
+/*!***************************************************************************!*\
+  !*** ./node_modules/@popperjs/core/lib/utils/getMainAxisFromPlacement.js ***!
+  \***************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ getMainAxisFromPlacement)
+/* harmony export */ });
+function getMainAxisFromPlacement(placement) {
+  return ['top', 'bottom'].indexOf(placement) >= 0 ? 'x' : 'y';
+}
+
+/***/ }),
+
+/***/ "./node_modules/@popperjs/core/lib/utils/getOppositePlacement.js":
+/*!***********************************************************************!*\
+  !*** ./node_modules/@popperjs/core/lib/utils/getOppositePlacement.js ***!
+  \***********************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ getOppositePlacement)
+/* harmony export */ });
+var hash = {
+  left: 'right',
+  right: 'left',
+  bottom: 'top',
+  top: 'bottom'
+};
+function getOppositePlacement(placement) {
+  return placement.replace(/left|right|bottom|top/g, function (matched) {
+    return hash[matched];
+  });
+}
+
+/***/ }),
+
+/***/ "./node_modules/@popperjs/core/lib/utils/getOppositeVariationPlacement.js":
+/*!********************************************************************************!*\
+  !*** ./node_modules/@popperjs/core/lib/utils/getOppositeVariationPlacement.js ***!
+  \********************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ getOppositeVariationPlacement)
+/* harmony export */ });
+var hash = {
+  start: 'end',
+  end: 'start'
+};
+function getOppositeVariationPlacement(placement) {
+  return placement.replace(/start|end/g, function (matched) {
+    return hash[matched];
+  });
+}
+
+/***/ }),
+
+/***/ "./node_modules/@popperjs/core/lib/utils/getVariation.js":
+/*!***************************************************************!*\
+  !*** ./node_modules/@popperjs/core/lib/utils/getVariation.js ***!
+  \***************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ getVariation)
+/* harmony export */ });
+function getVariation(placement) {
+  return placement.split('-')[1];
+}
+
+/***/ }),
+
+/***/ "./node_modules/@popperjs/core/lib/utils/math.js":
+/*!*******************************************************!*\
+  !*** ./node_modules/@popperjs/core/lib/utils/math.js ***!
+  \*******************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "max": () => (/* binding */ max),
+/* harmony export */   "min": () => (/* binding */ min),
+/* harmony export */   "round": () => (/* binding */ round)
+/* harmony export */ });
+var max = Math.max;
+var min = Math.min;
+var round = Math.round;
+
+/***/ }),
+
+/***/ "./node_modules/@popperjs/core/lib/utils/mergeByName.js":
+/*!**************************************************************!*\
+  !*** ./node_modules/@popperjs/core/lib/utils/mergeByName.js ***!
+  \**************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ mergeByName)
+/* harmony export */ });
+function mergeByName(modifiers) {
+  var merged = modifiers.reduce(function (merged, current) {
+    var existing = merged[current.name];
+    merged[current.name] = existing ? Object.assign({}, existing, current, {
+      options: Object.assign({}, existing.options, current.options),
+      data: Object.assign({}, existing.data, current.data)
+    }) : current;
+    return merged;
+  }, {}); // IE11 does not support Object.values
+
+  return Object.keys(merged).map(function (key) {
+    return merged[key];
+  });
+}
+
+/***/ }),
+
+/***/ "./node_modules/@popperjs/core/lib/utils/mergePaddingObject.js":
+/*!*********************************************************************!*\
+  !*** ./node_modules/@popperjs/core/lib/utils/mergePaddingObject.js ***!
+  \*********************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ mergePaddingObject)
+/* harmony export */ });
+/* harmony import */ var _getFreshSideObject_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./getFreshSideObject.js */ "./node_modules/@popperjs/core/lib/utils/getFreshSideObject.js");
+
+function mergePaddingObject(paddingObject) {
+  return Object.assign({}, (0,_getFreshSideObject_js__WEBPACK_IMPORTED_MODULE_0__["default"])(), paddingObject);
+}
+
+/***/ }),
+
+/***/ "./node_modules/@popperjs/core/lib/utils/orderModifiers.js":
+/*!*****************************************************************!*\
+  !*** ./node_modules/@popperjs/core/lib/utils/orderModifiers.js ***!
+  \*****************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ orderModifiers)
+/* harmony export */ });
+/* harmony import */ var _enums_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../enums.js */ "./node_modules/@popperjs/core/lib/enums.js");
+ // source: https://stackoverflow.com/questions/49875255
+
+function order(modifiers) {
+  var map = new Map();
+  var visited = new Set();
+  var result = [];
+  modifiers.forEach(function (modifier) {
+    map.set(modifier.name, modifier);
+  }); // On visiting object, check for its dependencies and visit them recursively
+
+  function sort(modifier) {
+    visited.add(modifier.name);
+    var requires = [].concat(modifier.requires || [], modifier.requiresIfExists || []);
+    requires.forEach(function (dep) {
+      if (!visited.has(dep)) {
+        var depModifier = map.get(dep);
+
+        if (depModifier) {
+          sort(depModifier);
+        }
+      }
+    });
+    result.push(modifier);
+  }
+
+  modifiers.forEach(function (modifier) {
+    if (!visited.has(modifier.name)) {
+      // check for visited object
+      sort(modifier);
+    }
+  });
+  return result;
+}
+
+function orderModifiers(modifiers) {
+  // order based on dependencies
+  var orderedModifiers = order(modifiers); // order based on phase
+
+  return _enums_js__WEBPACK_IMPORTED_MODULE_0__.modifierPhases.reduce(function (acc, phase) {
+    return acc.concat(orderedModifiers.filter(function (modifier) {
+      return modifier.phase === phase;
+    }));
+  }, []);
+}
+
+/***/ }),
+
+/***/ "./node_modules/@popperjs/core/lib/utils/rectToClientRect.js":
+/*!*******************************************************************!*\
+  !*** ./node_modules/@popperjs/core/lib/utils/rectToClientRect.js ***!
+  \*******************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ rectToClientRect)
+/* harmony export */ });
+function rectToClientRect(rect) {
+  return Object.assign({}, rect, {
+    left: rect.x,
+    top: rect.y,
+    right: rect.x + rect.width,
+    bottom: rect.y + rect.height
+  });
+}
+
+/***/ }),
+
+/***/ "./node_modules/@popperjs/core/lib/utils/uniqueBy.js":
+/*!***********************************************************!*\
+  !*** ./node_modules/@popperjs/core/lib/utils/uniqueBy.js ***!
+  \***********************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ uniqueBy)
+/* harmony export */ });
+function uniqueBy(arr, fn) {
+  var identifiers = new Set();
+  return arr.filter(function (item) {
+    var identifier = fn(item);
+
+    if (!identifiers.has(identifier)) {
+      identifiers.add(identifier);
+      return true;
+    }
+  });
+}
+
+/***/ }),
+
+/***/ "./node_modules/@popperjs/core/lib/utils/validateModifiers.js":
+/*!********************************************************************!*\
+  !*** ./node_modules/@popperjs/core/lib/utils/validateModifiers.js ***!
+  \********************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ validateModifiers)
+/* harmony export */ });
+/* harmony import */ var _format_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./format.js */ "./node_modules/@popperjs/core/lib/utils/format.js");
+/* harmony import */ var _enums_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../enums.js */ "./node_modules/@popperjs/core/lib/enums.js");
+
+
+var INVALID_MODIFIER_ERROR = 'Popper: modifier "%s" provided an invalid %s property, expected %s but got %s';
+var MISSING_DEPENDENCY_ERROR = 'Popper: modifier "%s" requires "%s", but "%s" modifier is not available';
+var VALID_PROPERTIES = ['name', 'enabled', 'phase', 'fn', 'effect', 'requires', 'options'];
+function validateModifiers(modifiers) {
+  modifiers.forEach(function (modifier) {
+    [].concat(Object.keys(modifier), VALID_PROPERTIES) // IE11-compatible replacement for `new Set(iterable)`
+    .filter(function (value, index, self) {
+      return self.indexOf(value) === index;
+    }).forEach(function (key) {
+      switch (key) {
+        case 'name':
+          if (typeof modifier.name !== 'string') {
+            console.error((0,_format_js__WEBPACK_IMPORTED_MODULE_0__["default"])(INVALID_MODIFIER_ERROR, String(modifier.name), '"name"', '"string"', "\"" + String(modifier.name) + "\""));
+          }
+
+          break;
+
+        case 'enabled':
+          if (typeof modifier.enabled !== 'boolean') {
+            console.error((0,_format_js__WEBPACK_IMPORTED_MODULE_0__["default"])(INVALID_MODIFIER_ERROR, modifier.name, '"enabled"', '"boolean"', "\"" + String(modifier.enabled) + "\""));
+          }
+
+          break;
+
+        case 'phase':
+          if (_enums_js__WEBPACK_IMPORTED_MODULE_1__.modifierPhases.indexOf(modifier.phase) < 0) {
+            console.error((0,_format_js__WEBPACK_IMPORTED_MODULE_0__["default"])(INVALID_MODIFIER_ERROR, modifier.name, '"phase"', "either " + _enums_js__WEBPACK_IMPORTED_MODULE_1__.modifierPhases.join(', '), "\"" + String(modifier.phase) + "\""));
+          }
+
+          break;
+
+        case 'fn':
+          if (typeof modifier.fn !== 'function') {
+            console.error((0,_format_js__WEBPACK_IMPORTED_MODULE_0__["default"])(INVALID_MODIFIER_ERROR, modifier.name, '"fn"', '"function"', "\"" + String(modifier.fn) + "\""));
+          }
+
+          break;
+
+        case 'effect':
+          if (modifier.effect != null && typeof modifier.effect !== 'function') {
+            console.error((0,_format_js__WEBPACK_IMPORTED_MODULE_0__["default"])(INVALID_MODIFIER_ERROR, modifier.name, '"effect"', '"function"', "\"" + String(modifier.fn) + "\""));
+          }
+
+          break;
+
+        case 'requires':
+          if (modifier.requires != null && !Array.isArray(modifier.requires)) {
+            console.error((0,_format_js__WEBPACK_IMPORTED_MODULE_0__["default"])(INVALID_MODIFIER_ERROR, modifier.name, '"requires"', '"array"', "\"" + String(modifier.requires) + "\""));
+          }
+
+          break;
+
+        case 'requiresIfExists':
+          if (!Array.isArray(modifier.requiresIfExists)) {
+            console.error((0,_format_js__WEBPACK_IMPORTED_MODULE_0__["default"])(INVALID_MODIFIER_ERROR, modifier.name, '"requiresIfExists"', '"array"', "\"" + String(modifier.requiresIfExists) + "\""));
+          }
+
+          break;
+
+        case 'options':
+        case 'data':
+          break;
+
+        default:
+          console.error("PopperJS: an invalid property has been provided to the \"" + modifier.name + "\" modifier, valid properties are " + VALID_PROPERTIES.map(function (s) {
+            return "\"" + s + "\"";
+          }).join(', ') + "; but \"" + key + "\" was provided.");
+      }
+
+      modifier.requires && modifier.requires.forEach(function (requirement) {
+        if (modifiers.find(function (mod) {
+          return mod.name === requirement;
+        }) == null) {
+          console.error((0,_format_js__WEBPACK_IMPORTED_MODULE_0__["default"])(MISSING_DEPENDENCY_ERROR, String(modifier.name), requirement, requirement));
+        }
+      });
+    });
+  });
+}
+
+/***/ }),
+
+/***/ "./node_modules/@popperjs/core/lib/utils/within.js":
+/*!*********************************************************!*\
+  !*** ./node_modules/@popperjs/core/lib/utils/within.js ***!
+  \*********************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ within)
+/* harmony export */ });
+/* harmony import */ var _math_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./math.js */ "./node_modules/@popperjs/core/lib/utils/math.js");
+
+function within(min, value, max) {
+  return (0,_math_js__WEBPACK_IMPORTED_MODULE_0__.max)(min, (0,_math_js__WEBPACK_IMPORTED_MODULE_0__.min)(value, max));
+}
+
+/***/ }),
+
 /***/ "./node_modules/css-loader/dist/cjs.js!./node_modules/sass-loader/dist/cjs.js!./src/scss/main.scss":
 /*!*********************************************************************************************************!*\
   !*** ./node_modules/css-loader/dist/cjs.js!./node_modules/sass-loader/dist/cjs.js!./src/scss/main.scss ***!
@@ -21,7 +3103,34 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_sourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "@font-face {\n  font-family: \"Almendra\";\n  font-style: italic;\n  font-weight: 400;\n  font-display: swap;\n  src: url(\"https://fonts.gstatic.com/s/almendra/v15/H4ciBXKAlMnTn0CskxY4yLs.ttf\") format(\"truetype\");\n}\n@font-face {\n  font-family: \"Almendra\";\n  font-style: italic;\n  font-weight: 700;\n  font-display: swap;\n  src: url(\"https://fonts.gstatic.com/s/almendra/v15/H4chBXKAlMnTn0CskxY48Ae9oqY.ttf\") format(\"truetype\");\n}\n@font-face {\n  font-family: \"Material Icons Round\";\n  font-style: normal;\n  font-weight: 400;\n  src: url(\"https://fonts.gstatic.com/s/materialiconsround/v79/LDItaoyNOAY6Uewc665JcIzCKsKc_M9flwmM.otf\") format(\"opentype\");\n}\n@font-face {\n  font-family: \"Noto Sans JP\";\n  font-style: normal;\n  font-weight: 300;\n  font-display: swap;\n  src: url(\"https://fonts.gstatic.com/s/notosansjp/v36/-F6pfjtqLzI2JPCgQBnw7HFQaioq1A.otf\") format(\"opentype\");\n}\n@font-face {\n  font-family: \"Noto Sans JP\";\n  font-style: normal;\n  font-weight: 400;\n  font-display: swap;\n  src: url(\"https://fonts.gstatic.com/s/notosansjp/v36/-F62fjtqLzI2JPCgQBnw7HFowA.otf\") format(\"opentype\");\n}\n@font-face {\n  font-family: \"Noto Sans JP\";\n  font-style: normal;\n  font-weight: 700;\n  font-display: swap;\n  src: url(\"https://fonts.gstatic.com/s/notosansjp/v36/-F6pfjtqLzI2JPCgQBnw7HFQei0q1A.otf\") format(\"opentype\");\n}\n.material-icons-round {\n  font-family: \"Material Icons Round\";\n  font-weight: 400;\n  font-style: normal;\n  font-size: 24px;\n  line-height: 1;\n  letter-spacing: normal;\n  text-transform: none;\n  display: inline-block;\n  white-space: nowrap;\n  word-wrap: normal;\n  direction: ltr;\n}\n\n[character],\n.minitalk,\n.toolbar {\n  -webkit-touch-callout: none;\n  -webkit-user-select: none;\n  -khtml-user-select: none;\n  -moz-user-select: none;\n  -ms-user-select: none;\n  user-select: none;\n}\n\n.note.location, .note.narration, .note.cw {\n  -webkit-touch-callout: none;\n  -webkit-user-select: none;\n  -khtml-user-select: none;\n  -moz-user-select: none;\n  -ms-user-select: none;\n  user-select: none;\n}\n\n:root {\n  --msr-icon-border: 12px 4px;\n  --msr-icon-size: 50px;\n  --msr-icon-size__small: 45px;\n  --msr-name-case: uppercase;\n  /* --msr-line-filter: drop-shadow(0 1px 1.5px rgba(0, 0, 0, 0.05))\n      drop-shadow(0 1px 1px rgba(0, 0, 0, 0.06)); */\n  --msr-line-border: 8px;\n  --msr-line-size: 1em;\n}\n\n[character=Anzu] {\n  --color: #ffb6da;\n  --hue: 330.4;\n  --name: \"Anzu\";\n}\n\n[character=Adonis] {\n  --color: #915da3;\n  --hue: 284.6;\n  --name: \"Adonis\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/adonis.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/adonis.png\");\n}\n\n[character=Aira] {\n  --color: #fff1cf;\n  --hue: 42.5;\n  --name: \"Aira\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/aira.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/aira.png\");\n}\n\n[character=Akiomi] {\n  --color: #915c8b;\n  --hue: 306.8;\n  --name: \"Akiomi\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/akiomi.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/akiomi.png\");\n}\n\n[character=Arashi] {\n  --color: #edde7b;\n  --hue: 52.1;\n  --name: \"Arashi\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/arashi.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/arashi.png\");\n}\n\n[character=Chiaki] {\n  --color: #e60033;\n  --hue: 346.7;\n  --name: \"Chiaki\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/chiaki.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/chiaki.png\");\n}\n\n[character=Eichi] {\n  --color: #fff3b8;\n  --hue: 49.9;\n  --name: \"Eichi\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/eichi.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/eichi.png\");\n}\n\n[character=Gatekeeper] {\n  --color: #7e6407;\n  --hue: 46.9;\n  --name: \"Gatekeeper\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/gatekeeper.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/gatekeeper.png\");\n}\n\n[character=Hajime] {\n  --color: #cab8d9;\n  --hue: 272.7;\n  --name: \"Hajime\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/hajime.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/hajime.png\");\n}\n\n[character=Hiiro] {\n  --color: #ba2636;\n  --hue: 353.5;\n  --name: \"Hiiro\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/hiiro.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/hiiro.png\");\n}\n\n[character=HiMERU] {\n  --color: #89c3eb;\n  --hue: 204.5;\n  --name: \"HiMERU\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/himeru.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/himeru.png\");\n}\n\n[character=Hinata] {\n  --color: #eb6ea0;\n  --hue: 336;\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/hinata.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/hinata.png\");\n}\n\n[character=Hiyori] {\n  --color: #b8d200;\n  --hue: 67.4;\n  --name: \"Hiyori\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/hiyori.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/hiyori.png\");\n}\n\n[character=Hokuto] {\n  --color: #0068b7;\n  --hue: 205.9;\n  --name: \"Hokuto\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/hokuto.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/hokuto.png\");\n}\n\n[character=Ibara] {\n  --color: #74325c;\n  --hue: 321.8;\n  --name: \"Ibara\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/ibara.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/ibara.png\");\n}\n\n[character=Izumi] {\n  --color: #bbdbf3;\n  --hue: 205.7;\n  --name: \"Izumi\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/izumi.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/izumi.png\");\n}\n\n[character=Jin] {\n  --color: #8da0b6;\n  --hue: 212.2;\n  --name: \"Jin\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/jin.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/jin.png\");\n}\n\n[character=Jun] {\n  --color: #192f60;\n  --hue: 221.4;\n  --name: \"Jun\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/jun.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/jun.png\");\n}\n\n[character=Kanata] {\n  --color: #008db7;\n  --hue: 193.8;\n  --name: \"Kanata\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/kanata.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/kanata.png\");\n}\n\n[character=Kaoru] {\n  --color: #fdd35c;\n  --hue: 44.3;\n  --name: \"Kaoru\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/kaoru.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/kaoru.png\");\n}\n\n[character=Keito] {\n  --color: #316745;\n  --hue: 142.2;\n  --name: \"Keito\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/keito.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/keito.png\");\n}\n\n[character=Koga] {\n  --color: #c9caca;\n  --hue: 180;\n  --name: \"Koga\";\n  --light-mode: hsl(180, 9%, 92%) !important;\n  --dark-mode: hsl(180, 5%, 25%) !important;\n  --fill-mode: hsl(180, 5%, 45%) !important;\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/koga.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/koga.png\");\n}\n\n[character=Kohaku] {\n  --color: #f4b3c2;\n  --hue: 346.2;\n  --name: \"Kohaku\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/kohaku.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/kohaku.png\");\n}\n\n[character=Kuro] {\n  --color: #e83929;\n  --hue: 5;\n  --name: \"Kuro\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/kuro.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/kuro.png\");\n}\n\n[character=Leo] {\n  --color: #ec6d51;\n  --hue: 10.8;\n  --name: \"Leo\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/leo.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/leo.png\");\n}\n\n[character=Madara] {\n  --color: #622d18;\n  --hue: 17;\n  --name: \"Madara\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/madara.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/madara.png\");\n}\n\n[character=Makoto] {\n  --color: #65ab31;\n  --hue: 94.4;\n  --name: \"Makoto\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/makoto.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/makoto.png\");\n}\n\n[character=Mao] {\n  --color: #941f57;\n  --hue: 331.3;\n  --name: \"Mao\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/mao.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/mao.png\");\n}\n\n[character=Mayoi] {\n  --color: #522f60;\n  --hue: 282.9;\n  --name: \"Mayoi\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/mayoi.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/mayoi.png\");\n}\n\n[character=Midori] {\n  --color: #00533f;\n  --hue: 165.5;\n  --name: \"Midori\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/midori.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/midori.png\");\n}\n\n[character=Mika] {\n  --color: #006a6c;\n  --hue: 181.1;\n  --name: \"Mika\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/mika.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/mika.png\");\n}\n\n[character=Mitsuru] {\n  --color: #ed6d35;\n  --hue: 18.3;\n  --name: \"Mitsuru\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/mitsuru.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/mitsuru.png\");\n}\n\n[character=Nagisa] {\n  --color: #a73836;\n  --hue: 1.1;\n  --name: \"Nagisa\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/nagisa.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/nagisa.png\");\n}\n\n[character=Natsume] {\n  --color: #d70035;\n  --hue: 345.2;\n  --name: \"Natsume\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/natsume.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/natsume.png\");\n}\n\n[character=Nazuna] {\n  --color: #ffec47;\n  --hue: 53.8;\n  --name: \"Nazuna\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/nazuna.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/nazuna.png\");\n}\n\n[character=Niki] {\n  --color: #507ea4;\n  --hue: 207.1;\n  --name: \"Niki\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/niki.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/niki.png\");\n}\n\n[character=Rei] {\n  --color: #47266e;\n  --hue: 267.5;\n  --name: \"Rei\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/rei.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/rei.png\");\n}\n\n[character=Rinne] {\n  --color: #b7282e;\n  --hue: 357.5;\n  --name: \"Rinne\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/rinne.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/rinne.png\");\n}\n\n[character=Ritsu] {\n  --color: #001e43;\n  --hue: 213.1;\n  --name: \"Ritsu\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/ritsu.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/ritsu.png\");\n}\n\n[character=Seiya] {\n  --color: #07467f;\n  --hue: 208.5;\n  --name: \"Seiya\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/seiya.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/seiya.png\");\n}\n\n[character=Shinobu] {\n  --color: #ffdc00;\n  --hue: 51.8;\n  --name: \"Shinobu\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/shinobu.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/shinobu.png\");\n}\n\n[character=Shu] {\n  --color: #e3acae;\n  --hue: 357.8;\n  --name: \"Shu\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/shu.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/shu.png\");\n}\n\n[character=Sora] {\n  --color: #fff352;\n  --hue: 55.8;\n  --name: \"Sora\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/sora.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/sora.png\");\n}\n\n[character=Souma] {\n  --color: #5654a2;\n  --hue: 241.5;\n  --name: \"Souma\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/souma.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/souma.png\");\n}\n\n[character=Subaru] {\n  --color: #f3981d;\n  --hue: 34.5;\n  --name: \"Subaru\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/subaru.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/subaru.png\");\n}\n\n[character=Tatsumi] {\n  --color: #7ebea5;\n  --hue: 156.6;\n  --name: \"Tatsumi\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/tatsumi.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/tatsumi.png\");\n}\n\n[character=Tetora] {\n  --color: #302833;\n  --hue: 283.6;\n  --name: \"Tetora\";\n  --light-mode: hsl(283.6, 9%, 92%) !important;\n  --dark-mode: hsl(283.6, 5%, 25%) !important;\n  --fill-mode: hsl(283.6, 5%, 45%) !important;\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/tetora.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/tetora.png\");\n}\n\n[character=Tomoya] {\n  --color: #eedcb3;\n  --hue: 41.7;\n  --name: \"Tomoya\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/tomoya.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/tomoya.png\");\n}\n\n[character=Tori] {\n  --color: #f5b2b2;\n  --hue: 0;\n  --name: \"Tori\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/tori.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/tori.png\");\n}\n\n[character=Tsukasa] {\n  --color: #942343;\n  --hue: 343;\n  --name: \"Tsukasa\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/tsukasa.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/tsukasa.png\");\n}\n\n[character=Tsumugi] {\n  --color: #00608d;\n  --hue: 199.1;\n  --name: \"Tsumugi\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/tsumugi.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/tsumugi.png\");\n}\n\n[character=Wataru] {\n  --color: #a1d8e2;\n  --hue: 189.2;\n  --name: \"Wataru\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/wataru.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/wataru.png\");\n}\n\n[character=Yuta] {\n  --color: #00a1e9;\n  --hue: 198.5;\n  --name: \"Yuta\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/yuta.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/yuta.png\");\n}\n\n[character=Yuzuru] {\n  --color: #3e62ad;\n  --hue: 220.5;\n  --name: \"Yuzuru\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/yuzuru.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/yuzuru.png\");\n}\n\n.msr-unit {\n  display: grid;\n  grid-template-columns: auto 1fr;\n  column-gap: 12px;\n  row-gap: 2px;\n  margin-bottom: 0.95em;\n  font-size: 1em;\n  --light-mode: hsl(var(--hue), 54%, 93%);\n  --dark-mode: hsl(var(--hue), 12%, 25%);\n  --fill-mode: hsl(var(--hue), 30%, 45%);\n}\n.msr-unit * {\n  transition: all 0.2s ease;\n}\n\n.msr-icon {\n  grid-row: 1/3;\n}\n\n.msr-icon__wrapper {\n  border-radius: var(--msr-icon-border);\n  position: relative;\n  overflow: hidden;\n  width: var(--msr-icon-size);\n  height: var(--msr-icon-size);\n}\n\n.msr-icon__base {\n  display: block;\n  background: 100%/100% var(--icon, url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/unknown.png\")), var(--color, #b3b3b3);\n  width: 100%;\n  height: 100%;\n}\n\n.msr-name {\n  font-size: 0.85em;\n  line-height: 1;\n  font-weight: 700;\n  text-transform: var(--msr-name-case);\n}\n.msr-name::before {\n  content: var(--name, \"???\");\n}\n\n.msr-line {\n  display: flex;\n  flex-direction: column;\n  grid-column: 2;\n  row-gap: 5px;\n}\n.msr-line p {\n  align-self: flex-start;\n  font-size: var(--msr-line-size);\n  background: var(--light-mode, #f1f1f1);\n  color: #222;\n  padding: 0.6em;\n  border-radius: var(--msr-line-border);\n  position: relative;\n  filter: var(--msr-line-filter, 0);\n}\n.msr-line p:hover {\n  transform: translate(2px, 0px);\n}\n.msr-line p:first-child {\n  border-top-left-radius: 0;\n}\n.msr-line p:first-child::before {\n  background: transparent;\n  content: \"\";\n  position: absolute;\n  left: -30px;\n  top: 0px;\n  height: 10px;\n  width: 30px;\n  border-top-right-radius: 25px;\n  box-shadow: 23px 0 0 0 var(--light-mode, #f1f1f1);\n}\n\n[unknown] .msr-icon__base {\n  background: #b3b3b3;\n}\n[unknown] .msr-icon__wrapper::after {\n  content: \"\";\n  display: block;\n  position: absolute;\n  background: #000;\n  -webkit-mask-image: var(--icon, url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/unknown.png\"));\n  -webkit-mask-size: 100%;\n  -webkit-mask-position: 100%;\n  mask-image: var(--icon, url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/unknown.png\"));\n  mask-size: 100%;\n  mask-position: 100%;\n  top: 0;\n  width: 100%;\n  height: 100%;\n}\n[unknown] .msr-name::before {\n  content: \"???\";\n}\n[unknown] .msr-line p {\n  background: #f1f1f1;\n}\n[unknown] .msr-line p:first-child::before {\n  box-shadow: 20px 0 0 0 #f1f1f1;\n}\n\n[hidden] .msr-icon__wrapper::after {\n  content: \"\";\n  display: block;\n  position: absolute;\n  background: #000;\n  -webkit-mask-image: var(--icon, url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/unknown.png\"));\n  -webkit-mask-size: 100%;\n  -webkit-mask-position: 100%;\n  mask-image: var(--icon, url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/unknown.png\"));\n  mask-size: 100%;\n  mask-position: 100%;\n  top: 0;\n  width: 100%;\n  height: 100%;\n}\n\n.hold {\n  display: inline-block;\n}\n\n.thought {\n  color: #5555c0;\n}\n\n.spell {\n  font-family: \"Almendra\", serif;\n  letter-spacing: 0.015em;\n  font-size: 1.1em;\n  line-height: 1.3;\n}\n\n[character].dark .msr-line p {\n  background: var(--dark-mode, #0e0e0e);\n  color: #eee;\n}\n[character].dark .msr-line p:first-child::before {\n  box-shadow: 20px 0 0 0 var(--dark-mode, #0e0e0e);\n}\n[character].dark .msr-line[unknown] p {\n  background: #0e0e0e;\n}\n[character].dark .msr-line[unknown]:first-child::before {\n  box-shadow: 20px 0 0 0 #0e0e0e;\n}\n\n.dark .thought {\n  color: #d4d4fa;\n}\n\n[character].fill .msr-line p {\n  background: var(--fill-mode, #737373);\n  color: #fff;\n}\n[character].fill .msr-line p:first-child::before {\n  box-shadow: 20px 0 0 0 var(--fill-mode, #737373);\n}\n[character].fill .msr-line[unknown] p {\n  background: #737373;\n}\n[character].fill .msr-line[unknown]:first-child::before {\n  box-shadow: 20px 0 0 0 #737373;\n}\n\n.fill .thought {\n  color: #e9efff;\n}\n\n[character].smallest .msr-line p {\n  font-size: 0.8em;\n}\n\n[character].smaller .msr-line p {\n  font-size: 0.9em;\n}\n\n[character].bigger .msr-line p {\n  font-size: 1.1em;\n}\n\n[character].biggest .msr-line p {\n  font-size: 1.2em;\n}\n\n@media (min-width: 1200px) {\n  .spell {\n    font-size: 1.15em;\n  }\n}\n@media (max-width: 650px) {\n  .msr-unit {\n    margin-bottom: 0.75em;\n  }\n\n  .msr-icon__wrapper {\n    width: var(--msr-icon-size__small);\n    height: var(--msr-icon-size__small);\n  }\n}\n.story-wrapper,\n.preview-wrapper,\n.lightbox__dim,\n.three-wrapper,\n.two-wrapper {\n  width: 100%;\n  font-size: 0.92em;\n  --storyColor-dark-l: calc(var(--storyColor-l) - 20%);\n  --storyColor-dark: hsl(\n      var(--storyColor-h),\n      var(--storyColor-s),\n      var(--storyColor-dark-l)\n  );\n}\n\n.story-wrapper img,\n.lightbox__dim img,\n.preview-wrapper img,\n.three-wrapper img,\n.two-wrapper img {\n  margin-bottom: 0;\n  border-radius: 0;\n}\n\n.grid-wrapper {\n  display: grid;\n}\n\n.chapter-area ul,\n.lightbox ul {\n  list-style: none;\n  padding: 0;\n  margin: 0;\n}\n\n.story-background {\n  border-radius: 5px 5px 0 0;\n  width: 100%;\n  height: 400px;\n  background: var(--background) no-repeat;\n  background-size: cover;\n  background-position: top;\n  mask-image: linear-gradient(to bottom, #000 70%, transparent 100%);\n  -webkit-mask-image: linear-gradient(to bottom, #000 70%, transparent 100%);\n}\n\n.story-box {\n  border-radius: 15px 5px;\n  background: #fff;\n  box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.1), 0 0 15px 5px rgba(0, 0, 0, 0.05);\n  margin: -200px 15px 0;\n  padding: 20px;\n  z-index: 1;\n  display: grid;\n  grid-template-columns: 120px 1fr 200px;\n  grid-template-rows: auto 1fr;\n  grid-gap: 15px;\n}\n\n.story-cover {\n  display: flex;\n  flex-direction: column;\n  justify-content: flex-end;\n}\n.story-cover > div {\n  height: 0;\n}\n.story-cover img {\n  height: 150px;\n  width: 120px;\n  object-fit: cover;\n  border-radius: 3px;\n  box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.5);\n  transform: translate(0, -100%);\n  margin-bottom: 0 !important;\n}\n\n.preview-wrapper .grid-wrapper {\n  width: 100%;\n  grid-template-columns: 22% 10% 2fr 1fr;\n}\n.preview-wrapper .title-area {\n  line-height: 1.25;\n  display: grid;\n  grid-template-columns: auto 1fr;\n  gap: 5px;\n  margin-bottom: 10px;\n  align-items: center;\n}\n.preview-wrapper .title-area__title {\n  font-size: 1.35em;\n  grid-column: 1/3;\n}\n.preview-wrapper .title-area__subtitle {\n  line-height: 0;\n}\n.preview-wrapper .title-area__start a {\n  font-size: 0.88em;\n}\n\n.preview-background,\n.preview-box {\n  grid-row-start: 1;\n  grid-column-end: span 3;\n}\n\n.preview-background {\n  width: 100%;\n  background-repeat: no-repeat;\n  background-size: cover;\n  grid-column: 1/3;\n  border-radius: 5px 0 0 5px;\n  mask-image: linear-gradient(to right, #000 70%, transparent 100%);\n  -webkit-mask-image: linear-gradient(to right, #000 70%, transparent 100%);\n  background-position: top 35% right 50%;\n}\n\n.preview-box {\n  border-radius: 15px 5px;\n  background: #fff;\n  box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.1), 0 0 15px 5px rgba(0, 0, 0, 0.05);\n  padding: 20px;\n  grid-column-start: 2;\n  z-index: 1;\n  margin: 10px;\n}\n\n.title-area {\n  line-height: 1.25;\n  display: flex;\n  flex-direction: column;\n  gap: 5px;\n}\n\n.title-area__title,\n.title-area__subtitle,\n.tab-header__name,\n.card__name,\n.card__jp {\n  font: inherit;\n  margin: 0;\n  border: 0;\n}\n\n.title-area__subtitle,\n.card__jp {\n  font-family: \"Noto Sans JP\";\n}\n\n.title-area__title,\n.card__name {\n  font-weight: 700;\n}\n\n.title-area__title {\n  font-size: 1.35em;\n}\n\n.title-area__start a {\n  background: rgba(var(--storyColor-rgb), 0.1);\n  color: rgba(var(--storyColor-rgb), 1);\n  padding: 5px 10px;\n  display: inline-block;\n  border-radius: 5px;\n  transition: all 0.2s ease;\n  border: none;\n}\n.title-area__start a:hover {\n  background: rgba(var(--storyColor-rgb), 1);\n  color: #fff;\n}\n\n.preview-wrapper .title-area__start a:hover {\n  background: rgba(var(--storyColor-rgb), 1);\n  color: #fff;\n}\n\n.info-area {\n  grid-column: 1/3;\n  display: flex;\n  flex-direction: column;\n  gap: 10px;\n}\n.info-area a {\n  color: var(--storyColor);\n  transition: 0.2s ease-in-out;\n  border-bottom: none;\n}\n.info-area a:hover {\n  color: var(--storyColor-dark);\n}\n.info-area .synopsis {\n  margin-bottom: 5px;\n}\n.info-area ol,\n.info-area li {\n  margin-block-start: 0;\n  margin-block-end: 0;\n  margin-inline-start: 0;\n  margin-inline-end: 0;\n  padding-inline-start: 0;\n}\n\n.info {\n  display: grid;\n  grid-template-columns: 2fr 1fr 1fr 2fr;\n  gap: 5px;\n}\n\n.info-item {\n  border-radius: 5px;\n  padding: 5px 10px;\n  border: solid 2px rgba(var(--storyColor-rgb), 0.2);\n}\n.info-item.season {\n  grid-column: 1/2;\n  grid-row: 1/2;\n}\n.info-item.chapters {\n  grid-column: 2/4;\n  grid-row: 1/2;\n}\n.info-item.writer {\n  grid-column: 4/5;\n  grid-row: 1/2;\n}\n.info-item.characters {\n  grid-column: 1/5;\n  padding: 5px 10px 0;\n}\n.info-item.tl {\n  grid-column: 1/3;\n}\n.info-item.pr {\n  grid-column: 3/5;\n}\n.info-item > .label {\n  padding: 0;\n  font-weight: 700;\n  font-size: 0.82em;\n}\n.info-item > .value {\n  flex-grow: 1;\n  font-size: 0.9em;\n}\n\n.three-wrapper .info-item.one {\n  grid-column: 1/2;\n  grid-row: 2/3;\n}\n.three-wrapper .info-item.two {\n  grid-column: 2/4;\n}\n.three-wrapper .info-item.three {\n  grid-column: 4/5;\n}\n\n.two-wrapper .info-item.one {\n  grid-column: 1/3;\n}\n.two-wrapper .info-item.two {\n  grid-column: 3/5;\n}\n\n.three-wrapper,\n.two-wrapper {\n  margin-bottom: 20px;\n}\n\n.characters > .value a {\n  display: inline-block;\n  background: var(--charahead) 0 0/cover;\n  height: 40px;\n  width: 40px;\n  margin: 0 -3px;\n}\n\n.value > [character]::before, .value > [character]::after {\n  content: none;\n}\n\n.chapter-area {\n  grid-column: 3/3;\n  grid-row: 1/3;\n  font-size: 0.9em;\n}\n.chapter-area > .chapters:not(:only-child) {\n  margin-bottom: 15px;\n}\n.chapter-area > .chapters span {\n  grid-row: 1;\n  grid-column: 1/5;\n}\n.chapter-area li {\n  display: grid;\n  margin-bottom: 5px;\n  gap: 5px;\n}\n.chapter-area > .mini-talks {\n  border-top: solid 1px #eff0f4;\n}\n.chapter-area > .mini-talks::before {\n  content: \"Mini Talks\";\n  display: flex;\n  align-items: center;\n  font-weight: 700;\n  margin-top: 5px;\n}\n.chapter-area > .mini-talks .mt-content {\n  display: none;\n}\n.chapter-area > .mini-talks .mt-content > .item {\n  display: grid;\n  grid-template-columns: 1fr 1fr;\n  gap: 5px;\n}\n.chapter-area > .mini-talks .mt-header {\n  margin-bottom: 5px;\n  cursor: pointer;\n}\n.chapter-area > .mini-talks .mt-header::after {\n  content: \"\\e5cf\";\n  display: inline-block;\n  font-family: \"Material Icons Round\";\n  font-size: 1.1em;\n  transition: transform 0.4s ease;\n  position: relative;\n  top: 1px;\n  left: 3px;\n}\n.chapter-area a {\n  border-bottom: 0;\n  display: block;\n  border-radius: 3px;\n  transition: all 0.2s ease;\n  background: rgba(var(--storyColor-rgb), 0.1);\n  padding: 5px;\n  text-align: center;\n}\n.chapter-area a:hover {\n  background: rgba(var(--storyColor-rgb), 0.2);\n}\n\n#none {\n  background: rgba(225, 227, 234, 0.4);\n}\n#none:hover {\n  background: rgba(225, 227, 234, 0.8);\n}\n\n.tab-content .source {\n  text-align: right;\n  font-size: 0.9em;\n}\n\n.story-wrapper .tab-content,\n.tab-header {\n  font-size: 0.9em;\n}\n\n.chapter-area > .mini-talk__open:after,\n.tab-header__open:first-child:after {\n  transform: rotate(180deg);\n}\n\n.story-wrapper .tab-header {\n  background: rgba(var(--storyColor-rgb), 0.1);\n  font-weight: 700;\n  border-radius: 5px;\n  cursor: pointer;\n  padding: 8px;\n  display: flex;\n  justify-content: space-between;\n}\n.story-wrapper .tab-content {\n  display: none;\n  padding: 10px 10px 0;\n}\n.story-wrapper .tab-content > .tab-item:first-child {\n  padding: 0 0 8px 0;\n}\n.story-wrapper .tab-content > .tab-item:not(:first-child) {\n  border-top: solid 1px #eff0f4;\n  padding: 8px 0;\n}\n.story-wrapper .tab-content > .tab-item:last-child {\n  padding: 8px 0 0 0;\n}\n.story-wrapper .tab-header:first-child:after {\n  content: \"\\e5cf\";\n  display: inline-block;\n  font-family: \"Material Icons Round\";\n  font-size: 1.5em;\n  line-height: 1;\n  transition: transform 0.4s ease;\n}\n.story-wrapper .tab-item > .label {\n  font-weight: 700;\n  font-size: 0.89em;\n}\n.story-wrapper .tab-item > .value {\n  margin-left: 10px;\n}\n\n.cg-gallery > .tab-content > .gallery {\n  display: grid;\n  grid-template-columns: repeat(auto-fit, minmax(200px, 2fr));\n  gap: 8px;\n}\n\n.gallery-item {\n  overflow: hidden;\n  border-radius: 5px;\n  position: relative;\n  width: 100%;\n  height: auto;\n}\n.gallery-item img {\n  transition: 0.2s ease;\n  margin-bottom: 0 !important;\n}\n.gallery-item:hover img {\n  transform: scale(1.02);\n}\n.gallery-item:hover .caption {\n  transform: translateY(0);\n}\n.gallery-item .caption {\n  position: absolute;\n  bottom: 0;\n  width: calc(100% - 24px);\n  color: #fff;\n  background: linear-gradient(to bottom, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.8));\n  padding: 40px 12px 12px;\n  transition: 0.2s ease;\n  transform: translateY(100%);\n}\n\n.story-cards > .tab-content > .cards {\n  display: grid;\n  grid-template-columns: repeat(5, minmax(auto, 1fr));\n  gap: 0 8px;\n}\n\n.single {\n  transition: transform 0.2s ease;\n  position: relative;\n  display: inline-block;\n  filter: drop-shadow(0px 0px 4px rgba(0, 0, 0, 0.6));\n}\n.single img {\n  object-fit: contain;\n  width: 100%;\n  margin-bottom: 0 !important;\n}\n\n.image {\n  position: relative;\n}\n.image .single.unbloomed {\n  z-index: 2;\n  transform: scale(1);\n  filter: brightness(100%);\n}\n.image .single.bloomed {\n  z-index: 1;\n  top: 0;\n  left: 0;\n  transform: translateX(5%) scale(0.95) rotate(2deg);\n  filter: brightness(70%);\n  position: absolute;\n  width: 100%;\n  height: 100%;\n}\n.image:hover .single.bloomed {\n  z-index: 2;\n  transform: translateX(0%) scale(1) rotate(0deg);\n  filter: brightness(100%);\n}\n.image:hover .single.unbloomed {\n  z-index: 1;\n  transform: translateX(-5%) scale(0.95) rotate(-2deg);\n  filter: brightness(70%);\n}\n.image:hover .quotes {\n  transform: translate(0, calc(-1 * var(--quote-height)));\n}\n.image .quotes__wrapper {\n  display: none;\n}\n.image .quotes {\n  display: grid;\n  grid-template-rows: var(--quote-height) var(--quote-height);\n  transition: 0.2s ease;\n}\n.image .quotes > * {\n  display: flex;\n  justify-content: center;\n  align-items: center;\n  text-align: center;\n  line-height: 1.2;\n}\n\n.cards-item > .image {\n  cursor: zoom-in;\n}\n\n.lightbox-content {\n  background: #fff;\n  width: 90vw;\n  max-width: 600px;\n  max-height: 100vh;\n  overflow: auto;\n  display: grid;\n  grid-template-columns: 1fr 2fr;\n  gap: 20px;\n  padding: 20px;\n  border-radius: 5px;\n  box-shadow: 0 5px 10px 0 rgba(0, 0, 0, 0.2), 0 0 40px 0 rgba(0, 0, 0, 0.1);\n  box-sizing: border-box;\n}\n.lightbox-content .image .quotes__wrapper {\n  display: block;\n  --quote-height: 2.5em;\n  height: var(--quote-height);\n  overflow: hidden;\n}\n\n.lightbox__dim {\n  position: fixed;\n  z-index: 99999999;\n  height: 100vh;\n  width: 100vw;\n  top: 0;\n  left: 0;\n  background: rgba(0, 0, 0, 0.7);\n  display: flex;\n  align-items: center;\n  justify-content: center;\n}\n\n.lightbox > .tlnote {\n  font-size: smaller;\n}\n\nbody.lightbox-visible {\n  overflow: hidden;\n}\n\n.cards-item .lightbox {\n  display: none;\n}\n\n.card__name {\n  font-size: 1.1em;\n}\n\n.skills li {\n  display: grid;\n  grid-template-columns: 63px 1fr;\n  gap: 0 5px;\n  margin: 10px 0;\n}\n.skills li::before {\n  color: #fff;\n  background-color: #0c195c;\n  padding: 2px 6px;\n  grid-row-start: 1;\n  grid-column-start: 1;\n  grid-column-end: 2;\n  text-align: center;\n  font-weight: 700;\n  font-size: 0.8em;\n  display: flex;\n  justify-content: center;\n  align-items: center;\n  height: 1.6em;\n  content: attr(id);\n  text-transform: uppercase;\n}\n.skills .name {\n  font-weight: 700;\n}\n.skills .desc {\n  grid-column-start: 2;\n}\n\n.reverse .grid-wrapper {\n  grid-template-columns: 2fr 1fr 10% 22%;\n}\n.reverse .preview-background {\n  grid-column: 3/5;\n  border-radius: 0 5px 5px 0;\n  mask-image: linear-gradient(to left, #000 70%, transparent 100%);\n  -webkit-mask-image: linear-gradient(to left, #000 70%, transparent 100%);\n  background-position: top 35% left 50%;\n}\n.reverse .preview-box {\n  grid-column: 1/4;\n}\n\n.reverse .preview-background,\n.reverse .preview-box {\n  grid-column-end: 3 span;\n}\n\n@media only screen and (max-width: 812px) {\n  .story-box {\n    grid-template-columns: auto [col-start] 1fr [last];\n    grid-template-rows: auto;\n    margin: -245px 15px 0;\n  }\n\n  .story-cover {\n    grid-column: 1/2;\n    grid-row: 1/2;\n  }\n\n  .title-area {\n    grid-column: 2/3;\n    grid-row: 1/2;\n    line-height: 1.25;\n    display: flex;\n    flex-direction: column;\n    gap: 5px;\n  }\n\n  .mobile-reverse .story-box {\n    grid-template-columns: 1fr [col-start] auto [last];\n  }\n  .mobile-reverse .story-cover {\n    grid-column: 2/2;\n  }\n  .mobile-reverse .title-area {\n    grid-column: 1/2;\n  }\n\n  .info-area {\n    grid-column: 1/3;\n  }\n\n  .chapter-area {\n    grid-column: 1/3;\n    grid-row: 3;\n    font-size: 0.9em;\n  }\n\n  .characters > .value a {\n    height: 35px;\n    width: 35px;\n    margin-bottom: -3px;\n  }\n\n  .lightbox__dim {\n    font-size: 0.9em;\n  }\n\n  .lightbox-content {\n    padding: 15px;\n    gap: 15px;\n  }\n\n  .lightbox__dim .skills li {\n    grid-template-columns: 50px 1fr;\n  }\n\n  .card__name {\n    font-size: 1em;\n  }\n\n  .card__jp {\n    font-size: 0.9em;\n  }\n\n  .skills li:before {\n    font-size: 0.7em;\n  }\n  .skills .name,\n.skills .desc {\n    font-size: 0.88em;\n  }\n\n  .quotes {\n    font-size: 0.83em;\n  }\n}\n@media only screen and (max-width: 567px) {\n  .preview-background {\n    display: none;\n  }\n\n  .preview-wrapper .grid-wrapper {\n    grid-template-columns: unset;\n  }\n\n  .preview-box {\n    padding: 0;\n    margin: 0;\n    background: none;\n    box-shadow: none;\n  }\n\n  .characters > .value a {\n    height: 35px;\n    width: 35px;\n    margin-bottom: -3px;\n  }\n}\n@media only screen and (max-width: 400px) {\n  .story-cover {\n    display: none;\n  }\n\n  .title-area {\n    grid-column: 1/3;\n  }\n}\n.minitalk {\n  display: flex;\n  flex-direction: column;\n  gap: 10px;\n  transition: 0.15s all ease;\n}\n.minitalk [character] p:last-of-type {\n  margin-bottom: unset;\n}\n.minitalk ul {\n  margin-block-start: 0;\n  margin-block-end: 0;\n  margin-inline-start: 0;\n  margin-inline-end: 0;\n  padding-inline-start: 0;\n  list-style: none;\n  padding: 0;\n  margin-bottom: 15px;\n  display: grid;\n  grid-template-columns: 1fr 1fr;\n  border-bottom: solid 3px;\n  border-color: var(--light-mode, #f1f1f1);\n  gap: 5px;\n}\n.minitalk li {\n  border-radius: 10px 10px 0 0;\n  border: solid 3px;\n  border-color: var(--light-mode, #f1f1f1);\n  border-bottom: 0;\n  padding: 0;\n  margin-bottom: -2px;\n}\n.minitalk li > a {\n  color: #222;\n  border: 0;\n  display: block;\n  padding: 3px;\n  text-align: center;\n}\n.minitalk li.active {\n  background: var(--light-mode, #f1f1f1);\n  font-weight: 700;\n}\n\n.minitalk-option_header {\n  background: var(--light-mode, #f1f1f1);\n  border-radius: 5px;\n  cursor: pointer;\n  padding: 8px;\n  display: grid;\n  grid-template-columns: 40px 1fr 40px;\n  text-align: center;\n  align-items: center;\n  gap: 10px;\n  color: #222;\n  transition: 0.15s all ease;\n}\n.minitalk-option_header::after {\n  content: \"\\e5cf\";\n  display: inline-block;\n  font-family: \"Material Icons Round\";\n  font-size: 1.5em;\n  font-weight: 700;\n  line-height: 1;\n  transition: transform 0.4s ease;\n  justify-self: end;\n  align-self: center;\n}\n.minitalk-option_header::before {\n  content: \"\";\n  background: var(--charahead) 0 0/cover;\n  height: 40px;\n  width: 40px;\n  display: inline-block;\n}\n\n.minitalk-option_content {\n  display: none;\n  padding: 15px 0 5px;\n}\n\n.minitalk[character]::before, .minitalk[character]::after {\n  content: none;\n}\n\n.dark .minitalk-option_header {\n  color: #eee;\n  background: var(--dark-mode, #0e0e0e);\n}\n\n.dark.minitalk ul {\n  border-color: var(--dark-mode, #0e0e0e);\n}\n.dark.minitalk li {\n  border-color: var(--dark-mode, #0e0e0e);\n}\n.dark.minitalk li.active {\n  background: var(--dark-mode, #0e0e0e);\n}\n.dark.minitalk li.active > a {\n  color: #eee;\n}\n\n.fill .minitalk-option_header {\n  color: #fff;\n  background: var(--fill-mode, #737373);\n}\n\n.fill.minitalk ul {\n  border-color: var(--fill-mode, #737373);\n}\n.fill.minitalk li {\n  border-color: var(--fill-mode, #737373);\n}\n.fill.minitalk li.active {\n  background: var(--fill-mode, #737373);\n}\n.fill.minitalk li.active > a {\n  color: #fff;\n}\n\n.smallest .minitalk-option_header {\n  font-size: 0.8em;\n}\n.smallest .minitalk-option_header::after {\n  font-size: 1.7em;\n}\n\n.smaller .minitalk-option_header {\n  font-size: 0.9em;\n}\n.smaller .minitalk-option_header::after {\n  font-size: 1.6em;\n}\n\n.smallest .minitalk-option_header,\n.smaller .minitalk-option_header {\n  padding: 6px;\n  grid-template-columns: 35px 1fr 35px;\n}\n.smallest .minitalk-option_header::before,\n.smaller .minitalk-option_header::before {\n  height: 35px;\n  width: 35px;\n}\n\n.bigger .minitalk-option_header {\n  font-size: 1.1em;\n}\n.bigger .minitalk-option_header::after {\n  font-size: 1.4em;\n}\n\n.biggest .minitalk-option_header {\n  font-size: 1.2em;\n}\n.biggest .minitalk-option_header::after {\n  font-size: 1.3em;\n}\n\n.bigger .minitalk-option_header,\n.biggest .minitalk-option_header {\n  grid-template-columns: 45px 1fr 45px;\n}\n.bigger .minitalk-option_header::before,\n.biggest .minitalk-option_header::before {\n  height: 45px;\n  width: 45px;\n}\n\n[mt=normal],\n[mt=rare] {\n  display: inline-block;\n  width: 25px;\n  height: 29.28px;\n  margin: 0 10px -8px 0 !important;\n  background-size: cover;\n}\n\n[mt=normal] {\n  background-image: url(\"https://cdn.jsdelivr.net/gh/enstars/img/talkevent_normal.png\");\n}\n\n[mt=rare] {\n  background-image: url(\"https://cdn.jsdelivr.net/gh/enstars/img/talkevent_rare.png\");\n}\n\n.toolbar-wrapper {\n  position: sticky;\n  display: flex;\n  flex-direction: column;\n  align-items: center;\n  gap: 4px;\n  top: 5px;\n  z-index: 2;\n  margin-bottom: 20px;\n}\n\n.toolbar {\n  display: grid;\n  grid-auto-flow: column;\n  gap: 23px;\n  background: #fff;\n  justify-content: center;\n  align-items: center;\n  width: auto;\n  border-radius: 15px;\n  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.2);\n  padding: 2px 35px;\n  z-index: 3;\n}\n.toolbar a {\n  color: #555;\n  border-bottom: none;\n  transition: 0.2s ease-in-out;\n  line-height: 0;\n  border-radius: 5px;\n  padding: 2px;\n}\n.toolbar a:hover {\n  color: #000;\n  background-color: #e0e0e0;\n}\n.toolbar .material-icons-round {\n  font-size: 1.35em;\n  font-weight: 700;\n}\n\n.toolbar__section {\n  display: flex;\n}\n\n.slider-container {\n  position: absolute;\n  background: #fff;\n  justify-content: center;\n  align-items: center;\n  width: auto;\n  padding: 0 8px 5px;\n  border-radius: 15px;\n  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.2);\n  transition: transform 0.3s ease, max-height 0s 0.3s step-end;\n}\n\n.toolbar-wrapper.showSlider .slider-container {\n  transition: transform 0.3s ease, max-height 0s 0.3s step-end;\n  transform: translateY(calc(100% + 5px));\n}\n\n.slider {\n  -webkit-appearance: none;\n  appearance: none;\n  width: 100px;\n  height: 6px;\n  border-radius: 5px;\n  background: #d3d3d3;\n  outline: 0;\n  opacity: 0.7;\n  transition: opacity 0.2s;\n}\n.slider:hover {\n  opacity: 1;\n}\n.slider::-webkit-slider-thumb {\n  -webkit-appearance: none;\n  appearance: none;\n  width: 15px;\n  height: 15px;\n  border-radius: 50%;\n  background: var(--storyColor, #222);\n  cursor: pointer;\n}\n.slider::-moz-range-thumb {\n  width: 15px;\n  height: 15px;\n  border-radius: 50%;\n  background: var(--storyColor, #222);\n  cursor: pointer;\n}\n\na.inline-note {\n  display: inline-block;\n  vertical-align: middle;\n  margin: 0 2px;\n  font-weight: 700;\n  font-size: 0.7em;\n  border-radius: 3px;\n  border: solid 1px #ababab;\n  padding: 0 3px;\n  background: rgba(255, 255, 255, 0.5);\n  color: var(--storyColor);\n  --storyColor-dark-l: calc(var(--storyColor-l) - 20%);\n  --storyColor-dark: hsl(\n      var(--storyColor-h),\n      var(--storyColor-s),\n      var(--storyColor-dark-l)\n  );\n}\n\na.inline-note:hover {\n  color: var(--storyColor-dark);\n}", "",{"version":3,"sources":["webpack://./src/scss/_font.scss","webpack://./src/scss/main.scss","webpack://./src/scss/_general.scss","webpack://./src/scss/_mixins.scss","webpack://./src/scss/bubble/components/_variables.scss","webpack://./src/scss/bubble/components/enst.scss","webpack://./src/scss/bubble/components/_main.scss","webpack://./src/scss/bubble/components/attributes.scss","webpack://./src/scss/bubble/components/extra.scss","webpack://./src/scss/bubble/components/dark.scss","webpack://./src/scss/bubble/components/fill.scss","webpack://./src/scss/bubble/components/sizes.scss","webpack://./src/scss/bubble/components/_media.scss","webpack://./src/scss/story-cover/components/_main.scss","webpack://./src/scss/story-cover/components/story.scss","webpack://./src/scss/story-cover/components/preview.scss","webpack://./src/scss/story-cover/components/title.scss","webpack://./src/scss/story-cover/components/info.scss","webpack://./src/scss/story-cover/components/chapter.scss","webpack://./src/scss/story-cover/components/tab.scss","webpack://./src/scss/story-cover/components/gallery.scss","webpack://./src/scss/story-cover/components/cards.scss","webpack://./src/scss/story-cover/components/lightbox.scss","webpack://./src/scss/story-cover/components/reverse.scss","webpack://./src/scss/story-cover/components/_media.scss","webpack://./src/scss/mini-talk/components/_main.scss","webpack://./src/scss/mini-talk/components/dark.scss","webpack://./src/scss/mini-talk/components/fill.scss","webpack://./src/scss/mini-talk/components/sizes.scss","webpack://./src/scss/mini-talk/components/type.scss","webpack://./src/scss/toolbar/components/_main.scss","webpack://./src/scss/toolbar/components/_mixins.scss","webpack://./src/scss/toolbar/components/slider.scss","webpack://./src/scss/footnote/index.scss"],"names":[],"mappings":"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","sourcesContent":["@font-face {\n    font-family: \"Almendra\";\n    font-style: italic;\n    font-weight: 400;\n    font-display: swap;\n    src: url(\"https://fonts.gstatic.com/s/almendra/v15/H4ciBXKAlMnTn0CskxY4yLs.ttf\")\n        format(\"truetype\");\n}\n\n@font-face {\n    font-family: \"Almendra\";\n    font-style: italic;\n    font-weight: 700;\n    font-display: swap;\n    src: url(\"https://fonts.gstatic.com/s/almendra/v15/H4chBXKAlMnTn0CskxY48Ae9oqY.ttf\")\n        format(\"truetype\");\n}\n\n@font-face {\n    font-family: \"Material Icons Round\";\n    font-style: normal;\n    font-weight: 400;\n    src: url(\"https://fonts.gstatic.com/s/materialiconsround/v79/LDItaoyNOAY6Uewc665JcIzCKsKc_M9flwmM.otf\")\n        format(\"opentype\");\n}\n\n@font-face {\n    font-family: \"Noto Sans JP\";\n    font-style: normal;\n    font-weight: 300;\n    font-display: swap;\n    src: url(\"https://fonts.gstatic.com/s/notosansjp/v36/-F6pfjtqLzI2JPCgQBnw7HFQaioq1A.otf\")\n        format(\"opentype\");\n}\n\n@font-face {\n    font-family: \"Noto Sans JP\";\n    font-style: normal;\n    font-weight: 400;\n    font-display: swap;\n    src: url(\"https://fonts.gstatic.com/s/notosansjp/v36/-F62fjtqLzI2JPCgQBnw7HFowA.otf\")\n        format(\"opentype\");\n}\n\n@font-face {\n    font-family: \"Noto Sans JP\";\n    font-style: normal;\n    font-weight: 700;\n    font-display: swap;\n    src: url(\"https://fonts.gstatic.com/s/notosansjp/v36/-F6pfjtqLzI2JPCgQBnw7HFQei0q1A.otf\")\n        format(\"opentype\");\n}\n\n.material-icons-round {\n    font-family: \"Material Icons Round\";\n    font-weight: 400;\n    font-style: normal;\n    font-size: 24px;\n    line-height: 1;\n    letter-spacing: normal;\n    text-transform: none;\n    display: inline-block;\n    white-space: nowrap;\n    word-wrap: normal;\n    direction: ltr;\n}\n","@font-face {\n  font-family: \"Almendra\";\n  font-style: italic;\n  font-weight: 400;\n  font-display: swap;\n  src: url(\"https://fonts.gstatic.com/s/almendra/v15/H4ciBXKAlMnTn0CskxY4yLs.ttf\") format(\"truetype\");\n}\n@font-face {\n  font-family: \"Almendra\";\n  font-style: italic;\n  font-weight: 700;\n  font-display: swap;\n  src: url(\"https://fonts.gstatic.com/s/almendra/v15/H4chBXKAlMnTn0CskxY48Ae9oqY.ttf\") format(\"truetype\");\n}\n@font-face {\n  font-family: \"Material Icons Round\";\n  font-style: normal;\n  font-weight: 400;\n  src: url(\"https://fonts.gstatic.com/s/materialiconsround/v79/LDItaoyNOAY6Uewc665JcIzCKsKc_M9flwmM.otf\") format(\"opentype\");\n}\n@font-face {\n  font-family: \"Noto Sans JP\";\n  font-style: normal;\n  font-weight: 300;\n  font-display: swap;\n  src: url(\"https://fonts.gstatic.com/s/notosansjp/v36/-F6pfjtqLzI2JPCgQBnw7HFQaioq1A.otf\") format(\"opentype\");\n}\n@font-face {\n  font-family: \"Noto Sans JP\";\n  font-style: normal;\n  font-weight: 400;\n  font-display: swap;\n  src: url(\"https://fonts.gstatic.com/s/notosansjp/v36/-F62fjtqLzI2JPCgQBnw7HFowA.otf\") format(\"opentype\");\n}\n@font-face {\n  font-family: \"Noto Sans JP\";\n  font-style: normal;\n  font-weight: 700;\n  font-display: swap;\n  src: url(\"https://fonts.gstatic.com/s/notosansjp/v36/-F6pfjtqLzI2JPCgQBnw7HFQei0q1A.otf\") format(\"opentype\");\n}\n.material-icons-round {\n  font-family: \"Material Icons Round\";\n  font-weight: 400;\n  font-style: normal;\n  font-size: 24px;\n  line-height: 1;\n  letter-spacing: normal;\n  text-transform: none;\n  display: inline-block;\n  white-space: nowrap;\n  word-wrap: normal;\n  direction: ltr;\n}\n\n[character],\n.minitalk,\n.toolbar {\n  -webkit-touch-callout: none;\n  -webkit-user-select: none;\n  -khtml-user-select: none;\n  -moz-user-select: none;\n  -ms-user-select: none;\n  user-select: none;\n}\n\n.note.location, .note.narration, .note.cw {\n  -webkit-touch-callout: none;\n  -webkit-user-select: none;\n  -khtml-user-select: none;\n  -moz-user-select: none;\n  -ms-user-select: none;\n  user-select: none;\n}\n\n:root {\n  --msr-icon-border: 12px 4px;\n  --msr-icon-size: 50px;\n  --msr-icon-size__small: 45px;\n  --msr-name-case: uppercase;\n  /* --msr-line-filter: drop-shadow(0 1px 1.5px rgba(0, 0, 0, 0.05))\n      drop-shadow(0 1px 1px rgba(0, 0, 0, 0.06)); */\n  --msr-line-border: 8px;\n  --msr-line-size: 1em;\n}\n\n[character=Anzu] {\n  --color: #ffb6da;\n  --hue: 330.4;\n  --name: \"Anzu\";\n}\n\n[character=Adonis] {\n  --color: #915da3;\n  --hue: 284.6;\n  --name: \"Adonis\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/adonis.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/adonis.png\");\n}\n\n[character=Aira] {\n  --color: #fff1cf;\n  --hue: 42.5;\n  --name: \"Aira\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/aira.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/aira.png\");\n}\n\n[character=Akiomi] {\n  --color: #915c8b;\n  --hue: 306.8;\n  --name: \"Akiomi\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/akiomi.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/akiomi.png\");\n}\n\n[character=Arashi] {\n  --color: #edde7b;\n  --hue: 52.1;\n  --name: \"Arashi\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/arashi.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/arashi.png\");\n}\n\n[character=Chiaki] {\n  --color: #e60033;\n  --hue: 346.7;\n  --name: \"Chiaki\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/chiaki.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/chiaki.png\");\n}\n\n[character=Eichi] {\n  --color: #fff3b8;\n  --hue: 49.9;\n  --name: \"Eichi\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/eichi.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/eichi.png\");\n}\n\n[character=Gatekeeper] {\n  --color: #7e6407;\n  --hue: 46.9;\n  --name: \"Gatekeeper\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/gatekeeper.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/gatekeeper.png\");\n}\n\n[character=Hajime] {\n  --color: #cab8d9;\n  --hue: 272.7;\n  --name: \"Hajime\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/hajime.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/hajime.png\");\n}\n\n[character=Hiiro] {\n  --color: #ba2636;\n  --hue: 353.5;\n  --name: \"Hiiro\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/hiiro.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/hiiro.png\");\n}\n\n[character=HiMERU] {\n  --color: #89c3eb;\n  --hue: 204.5;\n  --name: \"HiMERU\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/himeru.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/himeru.png\");\n}\n\n[character=Hinata] {\n  --color: #eb6ea0;\n  --hue: 336;\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/hinata.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/hinata.png\");\n}\n\n[character=Hiyori] {\n  --color: #b8d200;\n  --hue: 67.4;\n  --name: \"Hiyori\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/hiyori.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/hiyori.png\");\n}\n\n[character=Hokuto] {\n  --color: #0068b7;\n  --hue: 205.9;\n  --name: \"Hokuto\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/hokuto.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/hokuto.png\");\n}\n\n[character=Ibara] {\n  --color: #74325c;\n  --hue: 321.8;\n  --name: \"Ibara\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/ibara.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/ibara.png\");\n}\n\n[character=Izumi] {\n  --color: #bbdbf3;\n  --hue: 205.7;\n  --name: \"Izumi\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/izumi.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/izumi.png\");\n}\n\n[character=Jin] {\n  --color: #8da0b6;\n  --hue: 212.2;\n  --name: \"Jin\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/jin.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/jin.png\");\n}\n\n[character=Jun] {\n  --color: #192f60;\n  --hue: 221.4;\n  --name: \"Jun\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/jun.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/jun.png\");\n}\n\n[character=Kanata] {\n  --color: #008db7;\n  --hue: 193.8;\n  --name: \"Kanata\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/kanata.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/kanata.png\");\n}\n\n[character=Kaoru] {\n  --color: #fdd35c;\n  --hue: 44.3;\n  --name: \"Kaoru\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/kaoru.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/kaoru.png\");\n}\n\n[character=Keito] {\n  --color: #316745;\n  --hue: 142.2;\n  --name: \"Keito\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/keito.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/keito.png\");\n}\n\n[character=Koga] {\n  --color: #c9caca;\n  --hue: 180;\n  --name: \"Koga\";\n  --light-mode: hsl(180, 9%, 92%) !important;\n  --dark-mode: hsl(180, 5%, 25%) !important;\n  --fill-mode: hsl(180, 5%, 45%) !important;\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/koga.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/koga.png\");\n}\n\n[character=Kohaku] {\n  --color: #f4b3c2;\n  --hue: 346.2;\n  --name: \"Kohaku\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/kohaku.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/kohaku.png\");\n}\n\n[character=Kuro] {\n  --color: #e83929;\n  --hue: 5;\n  --name: \"Kuro\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/kuro.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/kuro.png\");\n}\n\n[character=Leo] {\n  --color: #ec6d51;\n  --hue: 10.8;\n  --name: \"Leo\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/leo.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/leo.png\");\n}\n\n[character=Madara] {\n  --color: #622d18;\n  --hue: 17;\n  --name: \"Madara\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/madara.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/madara.png\");\n}\n\n[character=Makoto] {\n  --color: #65ab31;\n  --hue: 94.4;\n  --name: \"Makoto\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/makoto.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/makoto.png\");\n}\n\n[character=Mao] {\n  --color: #941f57;\n  --hue: 331.3;\n  --name: \"Mao\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/mao.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/mao.png\");\n}\n\n[character=Mayoi] {\n  --color: #522f60;\n  --hue: 282.9;\n  --name: \"Mayoi\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/mayoi.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/mayoi.png\");\n}\n\n[character=Midori] {\n  --color: #00533f;\n  --hue: 165.5;\n  --name: \"Midori\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/midori.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/midori.png\");\n}\n\n[character=Mika] {\n  --color: #006a6c;\n  --hue: 181.1;\n  --name: \"Mika\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/mika.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/mika.png\");\n}\n\n[character=Mitsuru] {\n  --color: #ed6d35;\n  --hue: 18.3;\n  --name: \"Mitsuru\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/mitsuru.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/mitsuru.png\");\n}\n\n[character=Nagisa] {\n  --color: #a73836;\n  --hue: 1.1;\n  --name: \"Nagisa\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/nagisa.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/nagisa.png\");\n}\n\n[character=Natsume] {\n  --color: #d70035;\n  --hue: 345.2;\n  --name: \"Natsume\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/natsume.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/natsume.png\");\n}\n\n[character=Nazuna] {\n  --color: #ffec47;\n  --hue: 53.8;\n  --name: \"Nazuna\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/nazuna.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/nazuna.png\");\n}\n\n[character=Niki] {\n  --color: #507ea4;\n  --hue: 207.1;\n  --name: \"Niki\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/niki.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/niki.png\");\n}\n\n[character=Rei] {\n  --color: #47266e;\n  --hue: 267.5;\n  --name: \"Rei\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/rei.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/rei.png\");\n}\n\n[character=Rinne] {\n  --color: #b7282e;\n  --hue: 357.5;\n  --name: \"Rinne\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/rinne.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/rinne.png\");\n}\n\n[character=Ritsu] {\n  --color: #001e43;\n  --hue: 213.1;\n  --name: \"Ritsu\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/ritsu.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/ritsu.png\");\n}\n\n[character=Seiya] {\n  --color: #07467f;\n  --hue: 208.5;\n  --name: \"Seiya\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/seiya.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/seiya.png\");\n}\n\n[character=Shinobu] {\n  --color: #ffdc00;\n  --hue: 51.8;\n  --name: \"Shinobu\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/shinobu.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/shinobu.png\");\n}\n\n[character=Shu] {\n  --color: #e3acae;\n  --hue: 357.8;\n  --name: \"Shu\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/shu.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/shu.png\");\n}\n\n[character=Sora] {\n  --color: #fff352;\n  --hue: 55.8;\n  --name: \"Sora\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/sora.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/sora.png\");\n}\n\n[character=Souma] {\n  --color: #5654a2;\n  --hue: 241.5;\n  --name: \"Souma\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/souma.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/souma.png\");\n}\n\n[character=Subaru] {\n  --color: #f3981d;\n  --hue: 34.5;\n  --name: \"Subaru\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/subaru.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/subaru.png\");\n}\n\n[character=Tatsumi] {\n  --color: #7ebea5;\n  --hue: 156.6;\n  --name: \"Tatsumi\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/tatsumi.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/tatsumi.png\");\n}\n\n[character=Tetora] {\n  --color: #302833;\n  --hue: 283.6;\n  --name: \"Tetora\";\n  --light-mode: hsl(283.6, 9%, 92%) !important;\n  --dark-mode: hsl(283.6, 5%, 25%) !important;\n  --fill-mode: hsl(283.6, 5%, 45%) !important;\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/tetora.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/tetora.png\");\n}\n\n[character=Tomoya] {\n  --color: #eedcb3;\n  --hue: 41.7;\n  --name: \"Tomoya\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/tomoya.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/tomoya.png\");\n}\n\n[character=Tori] {\n  --color: #f5b2b2;\n  --hue: 0;\n  --name: \"Tori\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/tori.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/tori.png\");\n}\n\n[character=Tsukasa] {\n  --color: #942343;\n  --hue: 343;\n  --name: \"Tsukasa\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/tsukasa.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/tsukasa.png\");\n}\n\n[character=Tsumugi] {\n  --color: #00608d;\n  --hue: 199.1;\n  --name: \"Tsumugi\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/tsumugi.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/tsumugi.png\");\n}\n\n[character=Wataru] {\n  --color: #a1d8e2;\n  --hue: 189.2;\n  --name: \"Wataru\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/wataru.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/wataru.png\");\n}\n\n[character=Yuta] {\n  --color: #00a1e9;\n  --hue: 198.5;\n  --name: \"Yuta\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/yuta.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/yuta.png\");\n}\n\n[character=Yuzuru] {\n  --color: #3e62ad;\n  --hue: 220.5;\n  --name: \"Yuzuru\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/yuzuru.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/yuzuru.png\");\n}\n\n.msr-unit {\n  display: grid;\n  grid-template-columns: auto 1fr;\n  column-gap: 12px;\n  row-gap: 2px;\n  margin-bottom: 0.95em;\n  font-size: 1em;\n  --light-mode: hsl(var(--hue), 54%, 93%);\n  --dark-mode: hsl(var(--hue), 12%, 25%);\n  --fill-mode: hsl(var(--hue), 30%, 45%);\n}\n.msr-unit * {\n  transition: all 0.2s ease;\n}\n\n.msr-icon {\n  grid-row: 1/3;\n}\n\n.msr-icon__wrapper {\n  border-radius: var(--msr-icon-border);\n  position: relative;\n  overflow: hidden;\n  width: var(--msr-icon-size);\n  height: var(--msr-icon-size);\n}\n\n.msr-icon__base {\n  display: block;\n  background: 100%/100% var(--icon, url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/unknown.png\")), var(--color, #b3b3b3);\n  width: 100%;\n  height: 100%;\n}\n\n.msr-name {\n  font-size: 0.85em;\n  line-height: 1;\n  font-weight: 700;\n  text-transform: var(--msr-name-case);\n}\n.msr-name::before {\n  content: var(--name, \"???\");\n}\n\n.msr-line {\n  display: flex;\n  flex-direction: column;\n  grid-column: 2;\n  row-gap: 5px;\n}\n.msr-line p {\n  align-self: flex-start;\n  font-size: var(--msr-line-size);\n  background: var(--light-mode, #f1f1f1);\n  color: #222;\n  padding: 0.6em;\n  border-radius: var(--msr-line-border);\n  position: relative;\n  filter: var(--msr-line-filter, 0);\n}\n.msr-line p:hover {\n  transform: translate(2px, 0px);\n}\n.msr-line p:first-child {\n  border-top-left-radius: 0;\n}\n.msr-line p:first-child::before {\n  background: transparent;\n  content: \"\";\n  position: absolute;\n  left: -30px;\n  top: 0px;\n  height: 10px;\n  width: 30px;\n  border-top-right-radius: 25px;\n  box-shadow: 23px 0 0 0 var(--light-mode, #f1f1f1);\n}\n\n[unknown] .msr-icon__base {\n  background: #b3b3b3;\n}\n[unknown] .msr-icon__wrapper::after {\n  content: \"\";\n  display: block;\n  position: absolute;\n  background: #000;\n  -webkit-mask-image: var(--icon, url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/unknown.png\"));\n  -webkit-mask-size: 100%;\n  -webkit-mask-position: 100%;\n  mask-image: var(--icon, url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/unknown.png\"));\n  mask-size: 100%;\n  mask-position: 100%;\n  top: 0;\n  width: 100%;\n  height: 100%;\n}\n[unknown] .msr-name::before {\n  content: \"???\";\n}\n[unknown] .msr-line p {\n  background: #f1f1f1;\n}\n[unknown] .msr-line p:first-child::before {\n  box-shadow: 20px 0 0 0 #f1f1f1;\n}\n\n[hidden] .msr-icon__wrapper::after {\n  content: \"\";\n  display: block;\n  position: absolute;\n  background: #000;\n  -webkit-mask-image: var(--icon, url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/unknown.png\"));\n  -webkit-mask-size: 100%;\n  -webkit-mask-position: 100%;\n  mask-image: var(--icon, url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/unknown.png\"));\n  mask-size: 100%;\n  mask-position: 100%;\n  top: 0;\n  width: 100%;\n  height: 100%;\n}\n\n.hold {\n  display: inline-block;\n}\n\n.thought {\n  color: #5555c0;\n}\n\n.spell {\n  font-family: \"Almendra\", serif;\n  letter-spacing: 0.015em;\n  font-size: 1.1em;\n  line-height: 1.3;\n}\n\n[character].dark .msr-line p {\n  background: var(--dark-mode, #0e0e0e);\n  color: #eee;\n}\n[character].dark .msr-line p:first-child::before {\n  box-shadow: 20px 0 0 0 var(--dark-mode, #0e0e0e);\n}\n[character].dark .msr-line[unknown] p {\n  background: #0e0e0e;\n}\n[character].dark .msr-line[unknown]:first-child::before {\n  box-shadow: 20px 0 0 0 #0e0e0e;\n}\n\n.dark .thought {\n  color: #d4d4fa;\n}\n\n[character].fill .msr-line p {\n  background: var(--fill-mode, #737373);\n  color: #fff;\n}\n[character].fill .msr-line p:first-child::before {\n  box-shadow: 20px 0 0 0 var(--fill-mode, #737373);\n}\n[character].fill .msr-line[unknown] p {\n  background: #737373;\n}\n[character].fill .msr-line[unknown]:first-child::before {\n  box-shadow: 20px 0 0 0 #737373;\n}\n\n.fill .thought {\n  color: #e9efff;\n}\n\n[character].smallest .msr-line p {\n  font-size: 0.8em;\n}\n\n[character].smaller .msr-line p {\n  font-size: 0.9em;\n}\n\n[character].bigger .msr-line p {\n  font-size: 1.1em;\n}\n\n[character].biggest .msr-line p {\n  font-size: 1.2em;\n}\n\n@media (min-width: 1200px) {\n  .spell {\n    font-size: 1.15em;\n  }\n}\n@media (max-width: 650px) {\n  .msr-unit {\n    margin-bottom: 0.75em;\n  }\n\n  .msr-icon__wrapper {\n    width: var(--msr-icon-size__small);\n    height: var(--msr-icon-size__small);\n  }\n}\n.story-wrapper,\n.preview-wrapper,\n.lightbox__dim,\n.three-wrapper,\n.two-wrapper {\n  width: 100%;\n  font-size: 0.92em;\n  --storyColor-dark-l: calc(var(--storyColor-l) - 20%);\n  --storyColor-dark: hsl(\n      var(--storyColor-h),\n      var(--storyColor-s),\n      var(--storyColor-dark-l)\n  );\n}\n\n.story-wrapper img,\n.lightbox__dim img,\n.preview-wrapper img,\n.three-wrapper img,\n.two-wrapper img {\n  margin-bottom: 0;\n  border-radius: 0;\n}\n\n.grid-wrapper {\n  display: grid;\n}\n\n.chapter-area ul,\n.lightbox ul {\n  list-style: none;\n  padding: 0;\n  margin: 0;\n}\n\n.story-background {\n  border-radius: 5px 5px 0 0;\n  width: 100%;\n  height: 400px;\n  background: var(--background) no-repeat;\n  background-size: cover;\n  background-position: top;\n  mask-image: linear-gradient(to bottom, #000 70%, transparent 100%);\n  -webkit-mask-image: linear-gradient(to bottom, #000 70%, transparent 100%);\n}\n\n.story-box {\n  border-radius: 15px 5px;\n  background: #fff;\n  box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.1), 0 0 15px 5px rgba(0, 0, 0, 0.05);\n  margin: -200px 15px 0;\n  padding: 20px;\n  z-index: 1;\n  display: grid;\n  grid-template-columns: 120px 1fr 200px;\n  grid-template-rows: auto 1fr;\n  grid-gap: 15px;\n}\n\n.story-cover {\n  display: flex;\n  flex-direction: column;\n  justify-content: flex-end;\n}\n.story-cover > div {\n  height: 0;\n}\n.story-cover img {\n  height: 150px;\n  width: 120px;\n  object-fit: cover;\n  border-radius: 3px;\n  box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.5);\n  transform: translate(0, -100%);\n  margin-bottom: 0 !important;\n}\n\n.preview-wrapper .grid-wrapper {\n  width: 100%;\n  grid-template-columns: 22% 10% 2fr 1fr;\n}\n.preview-wrapper .title-area {\n  line-height: 1.25;\n  display: grid;\n  grid-template-columns: auto 1fr;\n  gap: 5px;\n  margin-bottom: 10px;\n  align-items: center;\n}\n.preview-wrapper .title-area__title {\n  font-size: 1.35em;\n  grid-column: 1/3;\n}\n.preview-wrapper .title-area__subtitle {\n  line-height: 0;\n}\n.preview-wrapper .title-area__start a {\n  font-size: 0.88em;\n}\n\n.preview-background,\n.preview-box {\n  grid-row-start: 1;\n  grid-column-end: span 3;\n}\n\n.preview-background {\n  width: 100%;\n  background-repeat: no-repeat;\n  background-size: cover;\n  grid-column: 1/3;\n  border-radius: 5px 0 0 5px;\n  mask-image: linear-gradient(to right, #000 70%, transparent 100%);\n  -webkit-mask-image: linear-gradient(to right, #000 70%, transparent 100%);\n  background-position: top 35% right 50%;\n}\n\n.preview-box {\n  border-radius: 15px 5px;\n  background: #fff;\n  box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.1), 0 0 15px 5px rgba(0, 0, 0, 0.05);\n  padding: 20px;\n  grid-column-start: 2;\n  z-index: 1;\n  margin: 10px;\n}\n\n.title-area {\n  line-height: 1.25;\n  display: flex;\n  flex-direction: column;\n  gap: 5px;\n}\n\n.title-area__title,\n.title-area__subtitle,\n.tab-header__name,\n.card__name,\n.card__jp {\n  font: inherit;\n  margin: 0;\n  border: 0;\n}\n\n.title-area__subtitle,\n.card__jp {\n  font-family: \"Noto Sans JP\";\n}\n\n.title-area__title,\n.card__name {\n  font-weight: 700;\n}\n\n.title-area__title {\n  font-size: 1.35em;\n}\n\n.title-area__start a {\n  background: rgba(var(--storyColor-rgb), 0.1);\n  color: rgba(var(--storyColor-rgb), 1);\n  padding: 5px 10px;\n  display: inline-block;\n  border-radius: 5px;\n  transition: all 0.2s ease;\n  border: none;\n}\n.title-area__start a:hover {\n  background: rgba(var(--storyColor-rgb), 1);\n  color: #fff;\n}\n\n.preview-wrapper .title-area__start a:hover {\n  background: rgba(var(--storyColor-rgb), 1);\n  color: #fff;\n}\n\n.info-area {\n  grid-column: 1/3;\n  display: flex;\n  flex-direction: column;\n  gap: 10px;\n}\n.info-area a {\n  color: var(--storyColor);\n  transition: 0.2s ease-in-out;\n  border-bottom: none;\n}\n.info-area a:hover {\n  color: var(--storyColor-dark);\n}\n.info-area .synopsis {\n  margin-bottom: 5px;\n}\n.info-area ol,\n.info-area li {\n  margin-block-start: 0;\n  margin-block-end: 0;\n  margin-inline-start: 0;\n  margin-inline-end: 0;\n  padding-inline-start: 0;\n}\n\n.info {\n  display: grid;\n  grid-template-columns: 2fr 1fr 1fr 2fr;\n  gap: 5px;\n}\n\n.info-item {\n  border-radius: 5px;\n  padding: 5px 10px;\n  border: solid 2px rgba(var(--storyColor-rgb), 0.2);\n}\n.info-item.season {\n  grid-column: 1/2;\n  grid-row: 1/2;\n}\n.info-item.chapters {\n  grid-column: 2/4;\n  grid-row: 1/2;\n}\n.info-item.writer {\n  grid-column: 4/5;\n  grid-row: 1/2;\n}\n.info-item.characters {\n  grid-column: 1/5;\n  padding: 5px 10px 0;\n}\n.info-item.tl {\n  grid-column: 1/3;\n}\n.info-item.pr {\n  grid-column: 3/5;\n}\n.info-item > .label {\n  padding: 0;\n  font-weight: 700;\n  font-size: 0.82em;\n}\n.info-item > .value {\n  flex-grow: 1;\n  font-size: 0.9em;\n}\n\n.three-wrapper .info-item.one {\n  grid-column: 1/2;\n  grid-row: 2/3;\n}\n.three-wrapper .info-item.two {\n  grid-column: 2/4;\n}\n.three-wrapper .info-item.three {\n  grid-column: 4/5;\n}\n\n.two-wrapper .info-item.one {\n  grid-column: 1/3;\n}\n.two-wrapper .info-item.two {\n  grid-column: 3/5;\n}\n\n.three-wrapper,\n.two-wrapper {\n  margin-bottom: 20px;\n}\n\n.characters > .value a {\n  display: inline-block;\n  background: var(--charahead) 0 0/cover;\n  height: 40px;\n  width: 40px;\n  margin: 0 -3px;\n}\n\n.value > [character]::before, .value > [character]::after {\n  content: none;\n}\n\n.chapter-area {\n  grid-column: 3/3;\n  grid-row: 1/3;\n  font-size: 0.9em;\n}\n.chapter-area > .chapters:not(:only-child) {\n  margin-bottom: 15px;\n}\n.chapter-area > .chapters span {\n  grid-row: 1;\n  grid-column: 1/5;\n}\n.chapter-area li {\n  display: grid;\n  margin-bottom: 5px;\n  gap: 5px;\n}\n.chapter-area > .mini-talks {\n  border-top: solid 1px #eff0f4;\n}\n.chapter-area > .mini-talks::before {\n  content: \"Mini Talks\";\n  display: flex;\n  align-items: center;\n  font-weight: 700;\n  margin-top: 5px;\n}\n.chapter-area > .mini-talks .mt-content {\n  display: none;\n}\n.chapter-area > .mini-talks .mt-content > .item {\n  display: grid;\n  grid-template-columns: 1fr 1fr;\n  gap: 5px;\n}\n.chapter-area > .mini-talks .mt-header {\n  margin-bottom: 5px;\n  cursor: pointer;\n}\n.chapter-area > .mini-talks .mt-header::after {\n  content: \"\\e5cf\";\n  display: inline-block;\n  font-family: \"Material Icons Round\";\n  font-size: 1.1em;\n  transition: transform 0.4s ease;\n  position: relative;\n  top: 1px;\n  left: 3px;\n}\n.chapter-area a {\n  border-bottom: 0;\n  display: block;\n  border-radius: 3px;\n  transition: all 0.2s ease;\n  background: rgba(var(--storyColor-rgb), 0.1);\n  padding: 5px;\n  text-align: center;\n}\n.chapter-area a:hover {\n  background: rgba(var(--storyColor-rgb), 0.2);\n}\n\n#none {\n  background: rgba(225, 227, 234, 0.4);\n}\n#none:hover {\n  background: rgba(225, 227, 234, 0.8);\n}\n\n.tab-content .source {\n  text-align: right;\n  font-size: 0.9em;\n}\n\n.story-wrapper .tab-content,\n.tab-header {\n  font-size: 0.9em;\n}\n\n.chapter-area > .mini-talk__open:after,\n.tab-header__open:first-child:after {\n  transform: rotate(180deg);\n}\n\n.story-wrapper .tab-header {\n  background: rgba(var(--storyColor-rgb), 0.1);\n  font-weight: 700;\n  border-radius: 5px;\n  cursor: pointer;\n  padding: 8px;\n  display: flex;\n  justify-content: space-between;\n}\n.story-wrapper .tab-content {\n  display: none;\n  padding: 10px 10px 0;\n}\n.story-wrapper .tab-content > .tab-item:first-child {\n  padding: 0 0 8px 0;\n}\n.story-wrapper .tab-content > .tab-item:not(:first-child) {\n  border-top: solid 1px #eff0f4;\n  padding: 8px 0;\n}\n.story-wrapper .tab-content > .tab-item:last-child {\n  padding: 8px 0 0 0;\n}\n.story-wrapper .tab-header:first-child:after {\n  content: \"\\e5cf\";\n  display: inline-block;\n  font-family: \"Material Icons Round\";\n  font-size: 1.5em;\n  line-height: 1;\n  transition: transform 0.4s ease;\n}\n.story-wrapper .tab-item > .label {\n  font-weight: 700;\n  font-size: 0.89em;\n}\n.story-wrapper .tab-item > .value {\n  margin-left: 10px;\n}\n\n.cg-gallery > .tab-content > .gallery {\n  display: grid;\n  grid-template-columns: repeat(auto-fit, minmax(200px, 2fr));\n  gap: 8px;\n}\n\n.gallery-item {\n  overflow: hidden;\n  border-radius: 5px;\n  position: relative;\n  width: 100%;\n  height: auto;\n}\n.gallery-item img {\n  transition: 0.2s ease;\n  margin-bottom: 0 !important;\n}\n.gallery-item:hover img {\n  transform: scale(1.02);\n}\n.gallery-item:hover .caption {\n  transform: translateY(0);\n}\n.gallery-item .caption {\n  position: absolute;\n  bottom: 0;\n  width: calc(100% - 24px);\n  color: #fff;\n  background: linear-gradient(to bottom, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.8));\n  padding: 40px 12px 12px;\n  transition: 0.2s ease;\n  transform: translateY(100%);\n}\n\n.story-cards > .tab-content > .cards {\n  display: grid;\n  grid-template-columns: repeat(5, minmax(auto, 1fr));\n  gap: 0 8px;\n}\n\n.single {\n  transition: transform 0.2s ease;\n  position: relative;\n  display: inline-block;\n  filter: drop-shadow(0px 0px 4px rgba(0, 0, 0, 0.6));\n}\n.single img {\n  object-fit: contain;\n  width: 100%;\n  margin-bottom: 0 !important;\n}\n\n.image {\n  position: relative;\n}\n.image .single.unbloomed {\n  z-index: 2;\n  transform: scale(1);\n  filter: brightness(100%);\n}\n.image .single.bloomed {\n  z-index: 1;\n  top: 0;\n  left: 0;\n  transform: translateX(5%) scale(0.95) rotate(2deg);\n  filter: brightness(70%);\n  position: absolute;\n  width: 100%;\n  height: 100%;\n}\n.image:hover .single.bloomed {\n  z-index: 2;\n  transform: translateX(0%) scale(1) rotate(0deg);\n  filter: brightness(100%);\n}\n.image:hover .single.unbloomed {\n  z-index: 1;\n  transform: translateX(-5%) scale(0.95) rotate(-2deg);\n  filter: brightness(70%);\n}\n.image:hover .quotes {\n  transform: translate(0, calc(-1 * var(--quote-height)));\n}\n.image .quotes__wrapper {\n  display: none;\n}\n.image .quotes {\n  display: grid;\n  grid-template-rows: var(--quote-height) var(--quote-height);\n  transition: 0.2s ease;\n}\n.image .quotes > * {\n  display: flex;\n  justify-content: center;\n  align-items: center;\n  text-align: center;\n  line-height: 1.2;\n}\n\n.cards-item > .image {\n  cursor: zoom-in;\n}\n\n.lightbox-content {\n  background: #fff;\n  width: 90vw;\n  max-width: 600px;\n  max-height: 100vh;\n  overflow: auto;\n  display: grid;\n  grid-template-columns: 1fr 2fr;\n  gap: 20px;\n  padding: 20px;\n  border-radius: 5px;\n  box-shadow: 0 5px 10px 0 rgba(0, 0, 0, 0.2), 0 0 40px 0 rgba(0, 0, 0, 0.1);\n  box-sizing: border-box;\n}\n.lightbox-content .image .quotes__wrapper {\n  display: block;\n  --quote-height: 2.5em;\n  height: var(--quote-height);\n  overflow: hidden;\n}\n\n.lightbox__dim {\n  position: fixed;\n  z-index: 99999999;\n  height: 100vh;\n  width: 100vw;\n  top: 0;\n  left: 0;\n  background: rgba(0, 0, 0, 0.7);\n  display: flex;\n  align-items: center;\n  justify-content: center;\n}\n\n.lightbox > .tlnote {\n  font-size: smaller;\n}\n\nbody.lightbox-visible {\n  overflow: hidden;\n}\n\n.cards-item .lightbox {\n  display: none;\n}\n\n.card__name {\n  font-size: 1.1em;\n}\n\n.skills li {\n  display: grid;\n  grid-template-columns: 63px 1fr;\n  gap: 0 5px;\n  margin: 10px 0;\n}\n.skills li::before {\n  color: #fff;\n  background-color: #0c195c;\n  padding: 2px 6px;\n  grid-row-start: 1;\n  grid-column-start: 1;\n  grid-column-end: 2;\n  text-align: center;\n  font-weight: 700;\n  font-size: 0.8em;\n  display: flex;\n  justify-content: center;\n  align-items: center;\n  height: 1.6em;\n  content: attr(id);\n  text-transform: uppercase;\n}\n.skills .name {\n  font-weight: 700;\n}\n.skills .desc {\n  grid-column-start: 2;\n}\n\n.reverse .grid-wrapper {\n  grid-template-columns: 2fr 1fr 10% 22%;\n}\n.reverse .preview-background {\n  grid-column: 3/5;\n  border-radius: 0 5px 5px 0;\n  mask-image: linear-gradient(to left, #000 70%, transparent 100%);\n  -webkit-mask-image: linear-gradient(to left, #000 70%, transparent 100%);\n  background-position: top 35% left 50%;\n}\n.reverse .preview-box {\n  grid-column: 1/4;\n}\n\n.reverse .preview-background,\n.reverse .preview-box {\n  grid-column-end: 3 span;\n}\n\n@media only screen and (max-width: 812px) {\n  .story-box {\n    grid-template-columns: auto [col-start] 1fr [last];\n    grid-template-rows: auto;\n    margin: -245px 15px 0;\n  }\n\n  .story-cover {\n    grid-column: 1/2;\n    grid-row: 1/2;\n  }\n\n  .title-area {\n    grid-column: 2/3;\n    grid-row: 1/2;\n    line-height: 1.25;\n    display: flex;\n    flex-direction: column;\n    gap: 5px;\n  }\n\n  .mobile-reverse .story-box {\n    grid-template-columns: 1fr [col-start] auto [last];\n  }\n  .mobile-reverse .story-cover {\n    grid-column: 2/2;\n  }\n  .mobile-reverse .title-area {\n    grid-column: 1/2;\n  }\n\n  .info-area {\n    grid-column: 1/3;\n  }\n\n  .chapter-area {\n    grid-column: 1/3;\n    grid-row: 3;\n    font-size: 0.9em;\n  }\n\n  .characters > .value a {\n    height: 35px;\n    width: 35px;\n    margin-bottom: -3px;\n  }\n\n  .lightbox__dim {\n    font-size: 0.9em;\n  }\n\n  .lightbox-content {\n    padding: 15px;\n    gap: 15px;\n  }\n\n  .lightbox__dim .skills li {\n    grid-template-columns: 50px 1fr;\n  }\n\n  .card__name {\n    font-size: 1em;\n  }\n\n  .card__jp {\n    font-size: 0.9em;\n  }\n\n  .skills li:before {\n    font-size: 0.7em;\n  }\n  .skills .name,\n.skills .desc {\n    font-size: 0.88em;\n  }\n\n  .quotes {\n    font-size: 0.83em;\n  }\n}\n@media only screen and (max-width: 567px) {\n  .preview-background {\n    display: none;\n  }\n\n  .preview-wrapper .grid-wrapper {\n    grid-template-columns: unset;\n  }\n\n  .preview-box {\n    padding: 0;\n    margin: 0;\n    background: none;\n    box-shadow: none;\n  }\n\n  .characters > .value a {\n    height: 35px;\n    width: 35px;\n    margin-bottom: -3px;\n  }\n}\n@media only screen and (max-width: 400px) {\n  .story-cover {\n    display: none;\n  }\n\n  .title-area {\n    grid-column: 1/3;\n  }\n}\n.minitalk {\n  display: flex;\n  flex-direction: column;\n  gap: 10px;\n  transition: 0.15s all ease;\n}\n.minitalk [character] p:last-of-type {\n  margin-bottom: unset;\n}\n.minitalk ul {\n  margin-block-start: 0;\n  margin-block-end: 0;\n  margin-inline-start: 0;\n  margin-inline-end: 0;\n  padding-inline-start: 0;\n  list-style: none;\n  padding: 0;\n  margin-bottom: 15px;\n  display: grid;\n  grid-template-columns: 1fr 1fr;\n  border-bottom: solid 3px;\n  border-color: var(--light-mode, #f1f1f1);\n  gap: 5px;\n}\n.minitalk li {\n  border-radius: 10px 10px 0 0;\n  border: solid 3px;\n  border-color: var(--light-mode, #f1f1f1);\n  border-bottom: 0;\n  padding: 0;\n  margin-bottom: -2px;\n}\n.minitalk li > a {\n  color: #222;\n  border: 0;\n  display: block;\n  padding: 3px;\n  text-align: center;\n}\n.minitalk li.active {\n  background: var(--light-mode, #f1f1f1);\n  font-weight: 700;\n}\n\n.minitalk-option_header {\n  background: var(--light-mode, #f1f1f1);\n  border-radius: 5px;\n  cursor: pointer;\n  padding: 8px;\n  display: grid;\n  grid-template-columns: 40px 1fr 40px;\n  text-align: center;\n  align-items: center;\n  gap: 10px;\n  color: #222;\n  transition: 0.15s all ease;\n}\n.minitalk-option_header::after {\n  content: \"\\e5cf\";\n  display: inline-block;\n  font-family: \"Material Icons Round\";\n  font-size: 1.5em;\n  font-weight: 700;\n  line-height: 1;\n  transition: transform 0.4s ease;\n  justify-self: end;\n  align-self: center;\n}\n.minitalk-option_header::before {\n  content: \"\";\n  background: var(--charahead) 0 0/cover;\n  height: 40px;\n  width: 40px;\n  display: inline-block;\n}\n\n.minitalk-option_content {\n  display: none;\n  padding: 15px 0 5px;\n}\n\n.minitalk[character]::before, .minitalk[character]::after {\n  content: none;\n}\n\n.dark .minitalk-option_header {\n  color: #eee;\n  background: var(--dark-mode, #0e0e0e);\n}\n\n.dark.minitalk ul {\n  border-color: var(--dark-mode, #0e0e0e);\n}\n.dark.minitalk li {\n  border-color: var(--dark-mode, #0e0e0e);\n}\n.dark.minitalk li.active {\n  background: var(--dark-mode, #0e0e0e);\n}\n.dark.minitalk li.active > a {\n  color: #eee;\n}\n\n.fill .minitalk-option_header {\n  color: #fff;\n  background: var(--fill-mode, #737373);\n}\n\n.fill.minitalk ul {\n  border-color: var(--fill-mode, #737373);\n}\n.fill.minitalk li {\n  border-color: var(--fill-mode, #737373);\n}\n.fill.minitalk li.active {\n  background: var(--fill-mode, #737373);\n}\n.fill.minitalk li.active > a {\n  color: #fff;\n}\n\n.smallest .minitalk-option_header {\n  font-size: 0.8em;\n}\n.smallest .minitalk-option_header::after {\n  font-size: 1.7em;\n}\n\n.smaller .minitalk-option_header {\n  font-size: 0.9em;\n}\n.smaller .minitalk-option_header::after {\n  font-size: 1.6em;\n}\n\n.smallest .minitalk-option_header,\n.smaller .minitalk-option_header {\n  padding: 6px;\n  grid-template-columns: 35px 1fr 35px;\n}\n.smallest .minitalk-option_header::before,\n.smaller .minitalk-option_header::before {\n  height: 35px;\n  width: 35px;\n}\n\n.bigger .minitalk-option_header {\n  font-size: 1.1em;\n}\n.bigger .minitalk-option_header::after {\n  font-size: 1.4em;\n}\n\n.biggest .minitalk-option_header {\n  font-size: 1.2em;\n}\n.biggest .minitalk-option_header::after {\n  font-size: 1.3em;\n}\n\n.bigger .minitalk-option_header,\n.biggest .minitalk-option_header {\n  grid-template-columns: 45px 1fr 45px;\n}\n.bigger .minitalk-option_header::before,\n.biggest .minitalk-option_header::before {\n  height: 45px;\n  width: 45px;\n}\n\n[mt=normal],\n[mt=rare] {\n  display: inline-block;\n  width: 25px;\n  height: 29.28px;\n  margin: 0 10px -8px 0 !important;\n  background-size: cover;\n}\n\n[mt=normal] {\n  background-image: url(\"https://cdn.jsdelivr.net/gh/enstars/img/talkevent_normal.png\");\n}\n\n[mt=rare] {\n  background-image: url(\"https://cdn.jsdelivr.net/gh/enstars/img/talkevent_rare.png\");\n}\n\n.toolbar-wrapper {\n  position: sticky;\n  display: flex;\n  flex-direction: column;\n  align-items: center;\n  gap: 4px;\n  top: 5px;\n  z-index: 2;\n  margin-bottom: 20px;\n}\n\n.toolbar {\n  display: grid;\n  grid-auto-flow: column;\n  gap: 23px;\n  background: #fff;\n  justify-content: center;\n  align-items: center;\n  width: auto;\n  border-radius: 15px;\n  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.2);\n  padding: 2px 35px;\n  z-index: 3;\n}\n.toolbar a {\n  color: #555;\n  border-bottom: none;\n  transition: 0.2s ease-in-out;\n  line-height: 0;\n  border-radius: 5px;\n  padding: 2px;\n}\n.toolbar a:hover {\n  color: #000;\n  background-color: #e0e0e0;\n}\n.toolbar .material-icons-round {\n  font-size: 1.35em;\n  font-weight: 700;\n}\n\n.toolbar__section {\n  display: flex;\n}\n\n.slider-container {\n  position: absolute;\n  background: #fff;\n  justify-content: center;\n  align-items: center;\n  width: auto;\n  padding: 0 8px 5px;\n  border-radius: 15px;\n  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.2);\n  transition: transform 0.3s ease, max-height 0s 0.3s step-end;\n}\n\n.toolbar-wrapper.showSlider .slider-container {\n  transition: transform 0.3s ease, max-height 0s 0.3s step-end;\n  transform: translateY(calc(100% + 5px));\n}\n\n.slider {\n  -webkit-appearance: none;\n  appearance: none;\n  width: 100px;\n  height: 6px;\n  border-radius: 5px;\n  background: #d3d3d3;\n  outline: 0;\n  opacity: 0.7;\n  transition: opacity 0.2s;\n}\n.slider:hover {\n  opacity: 1;\n}\n.slider::-webkit-slider-thumb {\n  -webkit-appearance: none;\n  appearance: none;\n  width: 15px;\n  height: 15px;\n  border-radius: 50%;\n  background: var(--storyColor, #222);\n  cursor: pointer;\n}\n.slider::-moz-range-thumb {\n  width: 15px;\n  height: 15px;\n  border-radius: 50%;\n  background: var(--storyColor, #222);\n  cursor: pointer;\n}\n\na.inline-note {\n  display: inline-block;\n  vertical-align: middle;\n  margin: 0 2px;\n  font-weight: 700;\n  font-size: 0.7em;\n  border-radius: 3px;\n  border: solid 1px #ababab;\n  padding: 0 3px;\n  background: rgba(255, 255, 255, 0.5);\n  color: var(--storyColor);\n  --storyColor-dark-l: calc(var(--storyColor-l) - 20%);\n  --storyColor-dark: hsl(\n      var(--storyColor-h),\n      var(--storyColor-s),\n      var(--storyColor-dark-l)\n  );\n}\n\na.inline-note:hover {\n  color: var(--storyColor-dark);\n}","@use \"_mixins.scss\";\n\n[character],\n.minitalk,\n.toolbar {\n    @include mixins.disableSelect;\n}\n\n.note {\n    &.location,\n    &.narration,\n    &.cw {\n        @include mixins.disableSelect;\n    }\n}\n","@mixin disableSelect {\n    -webkit-touch-callout: none;\n    -webkit-user-select: none;\n    -khtml-user-select: none;\n    -moz-user-select: none;\n    -ms-user-select: none;\n    user-select: none;\n}\n\n@mixin normalizeImg {\n    margin-bottom: 0;\n    border-radius: 0;\n}\n",":root {\n    --msr-icon-border: 12px 4px;\n    --msr-icon-size: 50px;\n    --msr-icon-size__small: 45px;\n    --msr-name-case: uppercase;\n    /* --msr-line-filter: drop-shadow(0 1px 1.5px rgba(0, 0, 0, 0.05))\n        drop-shadow(0 1px 1px rgba(0, 0, 0, 0.06)); */\n    --msr-line-border: 8px;\n    --msr-line-size: 1em;\n}\n","[character=\"Anzu\"] {\n    --color: #ffb6da;\n    --hue: 330.4;\n    --name: \"Anzu\";\n}\n\n[character=\"Adonis\"] {\n    --color: #915da3;\n    --hue: 284.6;\n    --name: \"Adonis\";\n    --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/adonis.png\");\n    --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/adonis.png\");\n}\n\n[character=\"Aira\"] {\n    --color: #fff1cf;\n    --hue: 42.5;\n    --name: \"Aira\";\n    --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/aira.png\");\n    --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/aira.png\");\n}\n\n[character=\"Akiomi\"] {\n    --color: #915c8b;\n    --hue: 306.8;\n    --name: \"Akiomi\";\n    --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/akiomi.png\");\n    --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/akiomi.png\");\n}\n\n[character=\"Arashi\"] {\n    --color: #edde7b;\n    --hue: 52.1;\n    --name: \"Arashi\";\n    --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/arashi.png\");\n    --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/arashi.png\");\n}\n\n[character=\"Chiaki\"] {\n    --color: #e60033;\n    --hue: 346.7;\n    --name: \"Chiaki\";\n    --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/chiaki.png\");\n    --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/chiaki.png\");\n}\n\n[character=\"Eichi\"] {\n    --color: #fff3b8;\n    --hue: 49.9;\n    --name: \"Eichi\";\n    --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/eichi.png\");\n    --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/eichi.png\");\n}\n\n[character=\"Gatekeeper\"] {\n    --color: #7e6407;\n    --hue: 46.9;\n    --name: \"Gatekeeper\";\n    --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/gatekeeper.png\");\n    --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/gatekeeper.png\");\n}\n\n[character=\"Hajime\"] {\n    --color: #cab8d9;\n    --hue: 272.7;\n    --name: \"Hajime\";\n    --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/hajime.png\");\n    --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/hajime.png\");\n}\n\n[character=\"Hiiro\"] {\n    --color: #ba2636;\n    --hue: 353.5;\n    --name: \"Hiiro\";\n    --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/hiiro.png\");\n    --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/hiiro.png\");\n}\n\n[character=\"HiMERU\"] {\n    --color: #89c3eb;\n    --hue: 204.5;\n    --name: \"HiMERU\";\n    --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/himeru.png\");\n    --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/himeru.png\");\n}\n\n[character=\"Hinata\"] {\n    --color: #eb6ea0;\n    --hue: 336;\n    --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/hinata.png\");\n    --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/hinata.png\");\n}\n\n[character=\"Hiyori\"] {\n    --color: #b8d200;\n    --hue: 67.4;\n    --name: \"Hiyori\";\n    --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/hiyori.png\");\n    --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/hiyori.png\");\n}\n\n[character=\"Hokuto\"] {\n    --color: #0068b7;\n    --hue: 205.9;\n    --name: \"Hokuto\";\n    --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/hokuto.png\");\n    --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/hokuto.png\");\n}\n\n[character=\"Ibara\"] {\n    --color: #74325c;\n    --hue: 321.8;\n    --name: \"Ibara\";\n    --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/ibara.png\");\n    --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/ibara.png\");\n}\n\n[character=\"Izumi\"] {\n    --color: #bbdbf3;\n    --hue: 205.7;\n    --name: \"Izumi\";\n    --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/izumi.png\");\n    --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/izumi.png\");\n}\n\n[character=\"Jin\"] {\n    --color: #8da0b6;\n    --hue: 212.2;\n    --name: \"Jin\";\n    --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/jin.png\");\n    --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/jin.png\");\n}\n\n[character=\"Jun\"] {\n    --color: #192f60;\n    --hue: 221.4;\n    --name: \"Jun\";\n    --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/jun.png\");\n    --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/jun.png\");\n}\n\n[character=\"Kanata\"] {\n    --color: #008db7;\n    --hue: 193.8;\n    --name: \"Kanata\";\n    --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/kanata.png\");\n    --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/kanata.png\");\n}\n\n[character=\"Kaoru\"] {\n    --color: #fdd35c;\n    --hue: 44.3;\n    --name: \"Kaoru\";\n    --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/kaoru.png\");\n    --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/kaoru.png\");\n}\n\n[character=\"Keito\"] {\n    --color: #316745;\n    --hue: 142.2;\n    --name: \"Keito\";\n    --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/keito.png\");\n    --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/keito.png\");\n}\n\n[character=\"Koga\"] {\n    --color: #c9caca;\n    --hue: 180;\n    --name: \"Koga\";\n    --light-mode: hsl(180, 9%, 92%) !important;\n    --dark-mode: hsl(180, 5%, 25%) !important;\n    --fill-mode: hsl(180, 5%, 45%) !important;\n    --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/koga.png\");\n    --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/koga.png\");\n}\n\n[character=\"Kohaku\"] {\n    --color: #f4b3c2;\n    --hue: 346.2;\n    --name: \"Kohaku\";\n    --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/kohaku.png\");\n    --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/kohaku.png\");\n}\n\n[character=\"Kuro\"] {\n    --color: #e83929;\n    --hue: 5;\n    --name: \"Kuro\";\n    --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/kuro.png\");\n    --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/kuro.png\");\n}\n\n[character=\"Leo\"] {\n    --color: #ec6d51;\n    --hue: 10.8;\n    --name: \"Leo\";\n    --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/leo.png\");\n    --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/leo.png\");\n}\n\n[character=\"Madara\"] {\n    --color: #622d18;\n    --hue: 17;\n    --name: \"Madara\";\n    --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/madara.png\");\n    --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/madara.png\");\n}\n\n[character=\"Makoto\"] {\n    --color: #65ab31;\n    --hue: 94.4;\n    --name: \"Makoto\";\n    --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/makoto.png\");\n    --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/makoto.png\");\n}\n\n[character=\"Mao\"] {\n    --color: #941f57;\n    --hue: 331.3;\n    --name: \"Mao\";\n    --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/mao.png\");\n    --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/mao.png\");\n}\n\n[character=\"Mayoi\"] {\n    --color: #522f60;\n    --hue: 282.9;\n    --name: \"Mayoi\";\n    --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/mayoi.png\");\n    --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/mayoi.png\");\n}\n\n[character=\"Midori\"] {\n    --color: #00533f;\n    --hue: 165.5;\n    --name: \"Midori\";\n    --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/midori.png\");\n    --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/midori.png\");\n}\n\n[character=\"Mika\"] {\n    --color: #006a6c;\n    --hue: 181.1;\n    --name: \"Mika\";\n    --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/mika.png\");\n    --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/mika.png\");\n}\n\n[character=\"Mitsuru\"] {\n    --color: #ed6d35;\n    --hue: 18.3;\n    --name: \"Mitsuru\";\n    --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/mitsuru.png\");\n    --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/mitsuru.png\");\n}\n\n[character=\"Nagisa\"] {\n    --color: #a73836;\n    --hue: 1.1;\n    --name: \"Nagisa\";\n    --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/nagisa.png\");\n    --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/nagisa.png\");\n}\n\n[character=\"Natsume\"] {\n    --color: #d70035;\n    --hue: 345.2;\n    --name: \"Natsume\";\n    --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/natsume.png\");\n    --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/natsume.png\");\n}\n\n[character=\"Nazuna\"] {\n    --color: #ffec47;\n    --hue: 53.8;\n    --name: \"Nazuna\";\n    --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/nazuna.png\");\n    --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/nazuna.png\");\n}\n\n[character=\"Niki\"] {\n    --color: #507ea4;\n    --hue: 207.1;\n    --name: \"Niki\";\n    --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/niki.png\");\n    --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/niki.png\");\n}\n\n[character=\"Rei\"] {\n    --color: #47266e;\n    --hue: 267.5;\n    --name: \"Rei\";\n    --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/rei.png\");\n    --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/rei.png\");\n}\n\n[character=\"Rinne\"] {\n    --color: #b7282e;\n    --hue: 357.5;\n    --name: \"Rinne\";\n    --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/rinne.png\");\n    --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/rinne.png\");\n}\n\n[character=\"Ritsu\"] {\n    --color: #001e43;\n    --hue: 213.1;\n    --name: \"Ritsu\";\n    --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/ritsu.png\");\n    --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/ritsu.png\");\n}\n\n[character=\"Seiya\"] {\n    --color: #07467f;\n    --hue: 208.5;\n    --name: \"Seiya\";\n    --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/seiya.png\");\n    --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/seiya.png\");\n}\n\n[character=\"Shinobu\"] {\n    --color: #ffdc00;\n    --hue: 51.8;\n    --name: \"Shinobu\";\n    --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/shinobu.png\");\n    --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/shinobu.png\");\n}\n\n[character=\"Shu\"] {\n    --color: #e3acae;\n    --hue: 357.8;\n    --name: \"Shu\";\n    --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/shu.png\");\n    --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/shu.png\");\n}\n\n[character=\"Sora\"] {\n    --color: #fff352;\n    --hue: 55.8;\n    --name: \"Sora\";\n    --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/sora.png\");\n    --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/sora.png\");\n}\n\n[character=\"Souma\"] {\n    --color: #5654a2;\n    --hue: 241.5;\n    --name: \"Souma\";\n    --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/souma.png\");\n    --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/souma.png\");\n}\n\n[character=\"Subaru\"] {\n    --color: #f3981d;\n    --hue: 34.5;\n    --name: \"Subaru\";\n    --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/subaru.png\");\n    --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/subaru.png\");\n}\n\n[character=\"Tatsumi\"] {\n    --color: #7ebea5;\n    --hue: 156.6;\n    --name: \"Tatsumi\";\n    --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/tatsumi.png\");\n    --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/tatsumi.png\");\n}\n\n[character=\"Tetora\"] {\n    --color: #302833;\n    --hue: 283.6;\n    --name: \"Tetora\";\n    --light-mode: hsl(283.6, 9%, 92%) !important;\n    --dark-mode: hsl(283.6, 5%, 25%) !important;\n    --fill-mode: hsl(283.6, 5%, 45%) !important;\n    --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/tetora.png\");\n    --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/tetora.png\");\n}\n\n[character=\"Tomoya\"] {\n    --color: #eedcb3;\n    --hue: 41.7;\n    --name: \"Tomoya\";\n    --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/tomoya.png\");\n    --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/tomoya.png\");\n}\n\n[character=\"Tori\"] {\n    --color: #f5b2b2;\n    --hue: 0;\n    --name: \"Tori\";\n    --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/tori.png\");\n    --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/tori.png\");\n}\n\n[character=\"Tsukasa\"] {\n    --color: #942343;\n    --hue: 343;\n    --name: \"Tsukasa\";\n    --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/tsukasa.png\");\n    --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/tsukasa.png\");\n}\n\n[character=\"Tsumugi\"] {\n    --color: #00608d;\n    --hue: 199.1;\n    --name: \"Tsumugi\";\n    --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/tsumugi.png\");\n    --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/tsumugi.png\");\n}\n\n[character=\"Wataru\"] {\n    --color: #a1d8e2;\n    --hue: 189.2;\n    --name: \"Wataru\";\n    --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/wataru.png\");\n    --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/wataru.png\");\n}\n\n[character=\"Yuta\"] {\n    --color: #00a1e9;\n    --hue: 198.5;\n    --name: \"Yuta\";\n    --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/yuta.png\");\n    --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/yuta.png\");\n}\n\n[character=\"Yuzuru\"] {\n    --color: #3e62ad;\n    --hue: 220.5;\n    --name: \"Yuzuru\";\n    --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/yuzuru.png\");\n    --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/yuzuru.png\");\n}\n",".msr-unit {\n    * {\n        transition: all 0.2s ease;\n    }\n\n    display: grid;\n    grid-template-columns: auto 1fr;\n    column-gap: 12px;\n    row-gap: 2px;\n    margin-bottom: 0.95em;\n    font-size: 1em;\n    --light-mode: hsl(var(--hue), 54%, 93%);\n    --dark-mode: hsl(var(--hue), 12%, 25%);\n    --fill-mode: hsl(var(--hue), 30%, 45%);\n}\n\n.msr-icon {\n    grid-row: 1/3;\n}\n\n.msr-icon__wrapper {\n    border-radius: var(--msr-icon-border);\n    position: relative;\n    overflow: hidden;\n    width: var(--msr-icon-size);\n    height: var(--msr-icon-size);\n}\n\n.msr-icon__base {\n    display: block;\n    background: 100% / 100%\n            var(\n                --icon,\n                url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/unknown.png\")\n            ),\n        var(--color, #b3b3b3);\n    width: 100%;\n    height: 100%;\n}\n\n.msr-name {\n    font-size: 0.85em;\n    line-height: 1;\n    font-weight: 700;\n    text-transform: var(--msr-name-case);\n\n    &::before {\n        content: var(--name, \"???\");\n    }\n}\n\n.msr-line {\n    display: flex;\n    flex-direction: column;\n    grid-column: 2;\n    row-gap: 5px;\n\n    p {\n        align-self: flex-start;\n        font-size: var(--msr-line-size);\n        background: var(--light-mode, #f1f1f1);\n        color: #222;\n        padding: 0.6em;\n        border-radius: var(--msr-line-border);\n        position: relative;\n        filter: var(--msr-line-filter, 0);\n\n        &:hover {\n            transform: translate(2px, 0px);\n        }\n\n        &:first-child {\n            border-top-left-radius: 0;\n\n            &::before {\n                background: transparent;\n                content: \"\";\n                position: absolute;\n                left: -30px;\n                top: 0px;\n                height: 10px;\n                width: 30px;\n                border-top-right-radius: 25px;\n                box-shadow: 23px 0 0 0 var(--light-mode, #f1f1f1);\n            }\n        }\n    }\n}\n","[unknown] {\n    .msr-icon__base {\n        background: #b3b3b3;\n    }\n\n    .msr-icon__wrapper::after {\n        content: \"\";\n        display: block;\n        position: absolute;\n        background: #000;\n        -webkit-mask-image: var(\n            --icon,\n            url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/unknown.png\")\n        );\n        -webkit-mask-size: 100%;\n        -webkit-mask-position: 100%;\n        mask-image: var(\n            --icon,\n            url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/unknown.png\")\n        );\n        mask-size: 100%;\n        mask-position: 100%;\n        top: 0;\n        width: 100%;\n        height: 100%;\n    }\n\n    .msr-name::before {\n        content: \"???\";\n    }\n\n    .msr-line p {\n        background: #f1f1f1;\n\n        &:first-child::before {\n            box-shadow: 20px 0 0 0 #f1f1f1;\n        }\n    }\n}\n\n[hidden] {\n    .msr-icon__wrapper::after {\n        content: \"\";\n        display: block;\n        position: absolute;\n        background: #000;\n        -webkit-mask-image: var(\n            --icon,\n            url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/unknown.png\")\n        );\n        -webkit-mask-size: 100%;\n        -webkit-mask-position: 100%;\n        mask-image: var(\n            --icon,\n            url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/unknown.png\")\n        );\n        mask-size: 100%;\n        mask-position: 100%;\n        top: 0;\n        width: 100%;\n        height: 100%;\n    }\n}\n",".hold {\n    display: inline-block;\n}\n\n.thought {\n    color: #5555c0;\n}\n\n.spell {\n    font-family: \"Almendra\", serif;\n    letter-spacing: 0.015em;\n    font-size: 1.1em;\n    line-height: 1.3;\n}\n","[character].dark {\n    .msr-line {\n        p {\n            background: var(--dark-mode, #0e0e0e);\n            color: #eee;\n\n            &:first-child {\n                &::before {\n                    box-shadow: 20px 0 0 0 var(--dark-mode, #0e0e0e);\n                }\n            }\n        }\n        &[unknown] {\n            p {\n                background: #0e0e0e;\n            }\n            &:first-child {\n                &::before {\n                    box-shadow: 20px 0 0 0 #0e0e0e;\n                }\n            }\n        }\n    }\n}\n\n.dark .thought {\n    color: #d4d4fa;\n}\n","[character].fill {\n    .msr-line {\n        p {\n            background: var(--fill-mode, #737373);\n            color: #fff;\n\n            &:first-child {\n                &::before {\n                    box-shadow: 20px 0 0 0 var(--fill-mode, #737373);\n                }\n            }\n        }\n        &[unknown] {\n            p {\n                background: #737373;\n            }\n            &:first-child {\n                &::before {\n                    box-shadow: 20px 0 0 0 #737373;\n                }\n            }\n        }\n    }\n}\n\n.fill .thought {\n    color: #e9efff;\n}\n","[character].smallest {\n    .msr-line {\n        p {\n            font-size: 0.8em;\n        }\n    }\n}\n\n[character].smaller {\n    .msr-line {\n        p {\n            font-size: 0.9em;\n        }\n    }\n}\n\n[character].bigger {\n    .msr-line {\n        p {\n            font-size: 1.1em;\n        }\n    }\n}\n\n[character].biggest {\n    .msr-line {\n        p {\n            font-size: 1.2em;\n        }\n    }\n}\n","@media (min-width: 1200px) {\n    .spell {\n        font-size: 1.15em;\n    }\n}\n\n@media (max-width: 650px) {\n    .msr-unit {\n        margin-bottom: 0.75em;\n    }\n\n    .msr-icon__wrapper {\n        width: var(--msr-icon-size__small);\n        height: var(--msr-icon-size__small);\n    }\n}\n",".story-wrapper,\n.preview-wrapper,\n.lightbox__dim,\n.three-wrapper,\n.two-wrapper {\n    width: 100%;\n    font-size: 0.92em;\n    --storyColor-dark-l: calc(var(--storyColor-l) - 20%);\n    --storyColor-dark: hsl(\n        var(--storyColor-h),\n        var(--storyColor-s),\n        var(--storyColor-dark-l)\n    );\n}\n\n.story-wrapper img,\n.lightbox__dim img,\n.preview-wrapper img,\n.three-wrapper img,\n.two-wrapper img {\n    margin-bottom: 0;\n    border-radius: 0;\n}\n\n.grid-wrapper {\n    display: grid;\n}\n\n.chapter-area ul,\n.lightbox ul {\n    list-style: none;\n    padding: 0;\n    margin: 0;\n}\n",".story-background {\n    border-radius: 5px 5px 0 0;\n    width: 100%;\n    height: 400px;\n    background: var(--background) no-repeat;\n    background-size: cover;\n    background-position: top;\n    mask-image: linear-gradient(to bottom, #000 70%, transparent 100%);\n    -webkit-mask-image: linear-gradient(to bottom, #000 70%, transparent 100%);\n}\n\n.story-box {\n    border-radius: 15px 5px;\n    background: #fff;\n    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.1), 0 0 15px 5px rgba(0, 0, 0, 0.05);\n    margin: -200px 15px 0;\n    padding: 20px;\n    z-index: 1;\n    display: grid;\n    grid-template-columns: 120px 1fr 200px;\n    grid-template-rows: auto 1fr;\n    grid-gap: 15px;\n}\n\n.story-cover {\n    display: flex;\n    flex-direction: column;\n    justify-content: flex-end;\n\n    > div {\n        height: 0;\n    }\n\n    img {\n        height: 150px;\n        width: 120px;\n        object-fit: cover;\n        border-radius: 3px;\n        box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.5);\n        transform: translate(0, -100%);\n        margin-bottom: 0 !important;\n    }\n}\n",".preview-wrapper {\n    .grid-wrapper {\n        width: 100%;\n        grid-template-columns: 22% 10% 2fr 1fr;\n    }\n\n    .title-area {\n        line-height: 1.25;\n        display: grid;\n        grid-template-columns: auto 1fr;\n        gap: 5px;\n        margin-bottom: 10px;\n        align-items: center;\n    }\n\n    .title-area__title {\n        font-size: 1.35em;\n        grid-column: 1/3;\n    }\n\n    .title-area__subtitle {\n        line-height: 0;\n    }\n\n    .title-area__start a {\n        font-size: 0.88em;\n    }\n}\n\n.preview-background,\n.preview-box {\n    grid-row-start: 1;\n    grid-column-end: span 3;\n}\n\n.preview-background {\n    width: 100%;\n    background-repeat: no-repeat;\n    background-size: cover;\n    grid-column: 1/3;\n    border-radius: 5px 0 0 5px;\n    mask-image: linear-gradient(to right, #000 70%, transparent 100%);\n    -webkit-mask-image: linear-gradient(to right, #000 70%, transparent 100%);\n    background-position: top 35% right 50%;\n}\n\n.preview-box {\n    border-radius: 15px 5px;\n    background: #fff;\n    box-shadow: 0 2px 5px 0 rgb(0 0 0 / 10%), 0 0 15px 5px rgb(0 0 0 / 5%);\n    padding: 20px;\n    grid-column-start: 2;\n    z-index: 1;\n    margin: 10px;\n}\n",".title-area {\n    line-height: 1.25;\n    display: flex;\n    flex-direction: column;\n    gap: 5px;\n}\n\n.title-area__title,\n.title-area__subtitle,\n.tab-header__name,\n.card__name,\n.card__jp {\n    font: inherit;\n    margin: 0;\n    border: 0;\n}\n\n.title-area__subtitle,\n.card__jp {\n    font-family: \"Noto Sans JP\";\n}\n\n.title-area__title,\n.card__name {\n    font-weight: 700;\n}\n\n.title-area__title {\n    font-size: 1.35em;\n}\n\n.title-area__start a {\n    background: rgba(var(--storyColor-rgb), 0.1);\n    color: rgba(var(--storyColor-rgb), 1);\n    padding: 5px 10px;\n    display: inline-block;\n    border-radius: 5px;\n    transition: all 0.2s ease;\n    border: none;\n\n    &:hover {\n        background: rgba(var(--storyColor-rgb), 1);\n        color: #fff;\n    }\n}\n\n.preview-wrapper .title-area__start a:hover {\n    background: rgba(var(--storyColor-rgb), 1);\n    color: #fff;\n}\n",".info-area {\n    grid-column: 1/3;\n    display: flex;\n    flex-direction: column;\n    gap: 10px;\n\n    a {\n        color: var(--storyColor);\n        transition: 0.2s ease-in-out;\n        border-bottom: none;\n\n        &:hover {\n            color: var(--storyColor-dark);\n        }\n    }\n\n    .synopsis {\n        margin-bottom: 5px;\n    }\n\n    ol,\n    li {\n        margin-block-start: 0;\n        margin-block-end: 0;\n        margin-inline-start: 0;\n        margin-inline-end: 0;\n        padding-inline-start: 0;\n    }\n}\n\n.info {\n    display: grid;\n    grid-template-columns: 2fr 1fr 1fr 2fr;\n    gap: 5px;\n}\n\n.info-item {\n    border-radius: 5px;\n    padding: 5px 10px;\n    border: solid 2px rgba(var(--storyColor-rgb), 0.2);\n\n    &.season {\n        grid-column: 1/2;\n        grid-row: 1/2;\n    }\n\n    &.chapters {\n        grid-column: 2/4;\n        grid-row: 1/2;\n    }\n\n    &.writer {\n        grid-column: 4/5;\n        grid-row: 1/2;\n    }\n\n    &.characters {\n        grid-column: 1/5;\n        padding: 5px 10px 0;\n    }\n\n    &.tl {\n        grid-column: 1/3;\n    }\n\n    &.pr {\n        grid-column: 3/5;\n    }\n\n    > {\n        .label {\n            padding: 0;\n            font-weight: 700;\n            font-size: 0.82em;\n        }\n\n        .value {\n            flex-grow: 1;\n            font-size: 0.9em;\n        }\n    }\n}\n\n.three-wrapper .info-item {\n    &.one {\n        grid-column: 1/2;\n        grid-row: 2/3;\n    }\n\n    &.two {\n        grid-column: 2/4;\n    }\n\n    &.three {\n        grid-column: 4/5;\n    }\n}\n\n.two-wrapper .info-item {\n    &.one {\n        grid-column: 1/3;\n    }\n\n    &.two {\n        grid-column: 3/5;\n    }\n}\n\n.three-wrapper,\n.two-wrapper {\n    margin-bottom: 20px;\n}\n\n.characters > .value a {\n    display: inline-block;\n    background: var(--charahead) 0 (0 / cover);\n    height: 40px;\n    width: 40px;\n    margin: 0 -3px;\n}\n\n.value > [character] {\n    &::before,\n    &::after {\n        content: none;\n    }\n}\n",".chapter-area {\n    grid-column: 3/3;\n    grid-row: 1/3;\n    font-size: 0.9em;\n\n    > .chapters {\n        &:not(:only-child) {\n            margin-bottom: 15px;\n        }\n\n        span {\n            grid-row: 1;\n            grid-column: 1/5;\n        }\n    }\n\n    li {\n        display: grid;\n        margin-bottom: 5px;\n        gap: 5px;\n    }\n\n    > .mini-talks {\n        border-top: solid 1px #eff0f4;\n\n        &::before {\n            content: \"Mini Talks\";\n            display: flex;\n            align-items: center;\n            font-weight: 700;\n            margin-top: 5px;\n        }\n\n        .mt-content {\n            display: none;\n\n            > .item {\n                display: grid;\n                grid-template-columns: 1fr 1fr;\n                gap: 5px;\n            }\n        }\n\n        .mt-header {\n            margin-bottom: 5px;\n            cursor: pointer;\n\n            &::after {\n                content: \"\\e5cf\";\n                display: inline-block;\n                font-family: \"Material Icons Round\";\n                font-size: 1.1em;\n                transition: transform 0.4s ease;\n                position: relative;\n                top: 1px;\n                left: 3px;\n            }\n        }\n    }\n\n    a {\n        border-bottom: 0;\n        display: block;\n        border-radius: 3px;\n        transition: all 0.2s ease;\n        background: rgba(var(--storyColor-rgb), 0.1);\n        padding: 5px;\n        text-align: center;\n\n        &:hover {\n            background: rgba(var(--storyColor-rgb), 0.2);\n        }\n    }\n}\n\n#none {\n    background: rgba(225, 227, 234, 0.4);\n\n    &:hover {\n        background: rgba(225, 227, 234, 0.8);\n    }\n}\n",".tab-content .source {\n    text-align: right;\n    font-size: 0.9em;\n}\n\n.story-wrapper .tab-content,\n.tab-header {\n    font-size: 0.9em;\n}\n\n.chapter-area > .mini-talk__open:after,\n.tab-header__open:first-child:after {\n    transform: rotate(180deg);\n}\n\n.story-wrapper {\n    .tab-header {\n        background: rgba(var(--storyColor-rgb), 0.1);\n        font-weight: 700;\n        border-radius: 5px;\n        cursor: pointer;\n        padding: 8px;\n        display: flex;\n        justify-content: space-between;\n    }\n\n    .tab-content {\n        display: none;\n        padding: 10px 10px 0;\n\n        > .tab-item {\n            &:first-child {\n                padding: 0 0 8px 0;\n            }\n\n            &:not(:first-child) {\n                border-top: solid 1px #eff0f4;\n                padding: 8px 0;\n            }\n\n            &:last-child {\n                padding: 8px 0 0 0;\n            }\n        }\n    }\n\n    .tab-header:first-child:after {\n        content: \"\\e5cf\";\n        display: inline-block;\n        font-family: \"Material Icons Round\";\n        font-size: 1.5em;\n        line-height: 1;\n        transition: transform 0.4s ease;\n    }\n\n    .tab-item > {\n        .label {\n            font-weight: 700;\n            font-size: 0.89em;\n        }\n\n        .value {\n            margin-left: 10px;\n        }\n    }\n}\n",".cg-gallery > .tab-content > .gallery {\n    display: grid;\n    grid-template-columns: repeat(auto-fit, minmax(200px, 2fr));\n    gap: 8px;\n}\n\n.gallery-item {\n    overflow: hidden;\n    border-radius: 5px;\n    position: relative;\n    width: 100%;\n    height: auto;\n\n    img {\n        transition: 0.2s ease;\n        margin-bottom: 0 !important;\n    }\n\n    &:hover {\n        img {\n            transform: scale(1.02);\n        }\n\n        .caption {\n            transform: translateY(0);\n        }\n    }\n\n    .caption {\n        position: absolute;\n        bottom: 0;\n        width: calc(100% - 24px);\n        color: #fff;\n        background: linear-gradient(\n            to bottom,\n            rgba(0, 0, 0, 0),\n            rgba(0, 0, 0, 0.8)\n        );\n        padding: 40px 12px 12px;\n        transition: 0.2s ease;\n        transform: translateY(100%);\n    }\n}\n",".story-cards > .tab-content > .cards {\n    display: grid;\n    grid-template-columns: repeat(5, minmax(auto, 1fr));\n    gap: 0 8px;\n}\n\n.single {\n    transition: transform 0.2s ease;\n    position: relative;\n    display: inline-block;\n    filter: drop-shadow(0px 0px 4px rgba(0, 0, 0, 0.6));\n\n    img {\n        object-fit: contain;\n        width: 100%;\n        margin-bottom: 0 !important;\n    }\n}\n\n.image {\n    position: relative;\n\n    .single {\n        &.unbloomed {\n            z-index: 2;\n            transform: scale(1);\n            filter: brightness(100%);\n        }\n\n        &.bloomed {\n            z-index: 1;\n            top: 0;\n            left: 0;\n            transform: translateX(5%) scale(0.95) rotate(2deg);\n            filter: brightness(70%);\n            position: absolute;\n            width: 100%;\n            height: 100%;\n        }\n    }\n\n    &:hover {\n        .single {\n            &.bloomed {\n                z-index: 2;\n                transform: translateX(0%) scale(1) rotate(0deg);\n                filter: brightness(100%);\n            }\n\n            &.unbloomed {\n                z-index: 1;\n                transform: translateX(-5%) scale(0.95) rotate(-2deg);\n                filter: brightness(70%);\n            }\n        }\n\n        .quotes {\n            transform: translate(0, calc(-1 * var(--quote-height)));\n        }\n    }\n\n    .quotes__wrapper {\n        display: none;\n    }\n\n    .quotes {\n        display: grid;\n        grid-template-rows: var(--quote-height) var(--quote-height);\n        transition: 0.2s ease;\n\n        > * {\n            display: flex;\n            justify-content: center;\n            align-items: center;\n            text-align: center;\n            line-height: 1.2;\n        }\n    }\n}\n\n.cards-item > .image {\n    cursor: zoom-in;\n}\n",".lightbox-content {\n    background: #fff;\n    width: 90vw;\n    max-width: 600px;\n    max-height: 100vh;\n    overflow: auto;\n    display: grid;\n    grid-template-columns: 1fr 2fr;\n    gap: 20px;\n    padding: 20px;\n    border-radius: 5px;\n    box-shadow: 0 5px 10px 0 rgba(0, 0, 0, 0.2), 0 0 40px 0 rgba(0, 0, 0, 0.1);\n    box-sizing: border-box;\n\n    .image .quotes__wrapper {\n        display: block;\n        --quote-height: 2.5em;\n        height: var(--quote-height);\n        overflow: hidden;\n    }\n}\n\n.lightbox__dim {\n    position: fixed;\n    z-index: 99999999;\n    height: 100vh;\n    width: 100vw;\n    top: 0;\n    left: 0;\n    background: rgba(0, 0, 0, 0.7);\n    display: flex;\n    align-items: center;\n    justify-content: center;\n}\n\n.lightbox > .tlnote {\n    font-size: smaller;\n}\n\nbody.lightbox-visible {\n    overflow: hidden;\n}\n\n.cards-item .lightbox {\n    display: none;\n}\n\n.card__name {\n    font-size: 1.1em;\n}\n\n.skills {\n    li {\n        display: grid;\n        grid-template-columns: 63px 1fr;\n        gap: 0 5px;\n        margin: 10px 0;\n\n        &::before {\n            color: #fff;\n            background-color: #0c195c;\n            padding: 2px 6px;\n            grid-row-start: 1;\n            grid-column-start: 1;\n            grid-column-end: 2;\n            text-align: center;\n            font-weight: 700;\n            font-size: 0.8em;\n            display: flex;\n            justify-content: center;\n            align-items: center;\n            height: 1.6em;\n            content: attr(id);\n            text-transform: uppercase;\n        }\n    }\n\n    .name {\n        font-weight: 700;\n    }\n\n    .desc {\n        grid-column-start: 2;\n    }\n}\n",".reverse {\n    .grid-wrapper {\n        grid-template-columns: 2fr 1fr 10% 22%;\n    }\n\n    .preview-background {\n        grid-column: 3/5;\n        border-radius: 0 5px 5px 0;\n        mask-image: linear-gradient(to left, #000 70%, transparent 100%);\n        -webkit-mask-image: linear-gradient(\n            to left,\n            #000 70%,\n            transparent 100%\n        );\n        background-position: top 35% left 50%;\n    }\n\n    .preview-box {\n        grid-column: 1/4;\n    }\n}\n\n.reverse {\n    .preview-background,\n    .preview-box {\n        grid-column-end: 3 span;\n    }\n}\n","@media only screen and (max-width: 812px) {\n    .story-box {\n        grid-template-columns: auto [col-start] 1fr [last];\n        grid-template-rows: auto;\n        margin: -245px 15px 0;\n    }\n\n    .story-cover {\n        grid-column: 1/2;\n        grid-row: 1/2;\n    }\n\n    .title-area {\n        grid-column: 2/3;\n        grid-row: 1/2;\n        line-height: 1.25;\n        display: flex;\n        flex-direction: column;\n        gap: 5px;\n    }\n\n    .mobile-reverse {\n        .story-box {\n            grid-template-columns: 1fr [col-start] auto [last];\n        }\n\n        .story-cover {\n            grid-column: 2/2;\n        }\n\n        .title-area {\n            grid-column: 1/2;\n        }\n    }\n\n    .info-area {\n        grid-column: 1/3;\n    }\n\n    .chapter-area {\n        grid-column: 1/3;\n        grid-row: 3;\n        font-size: 0.9em;\n    }\n\n    .characters > .value a {\n        height: 35px;\n        width: 35px;\n        margin-bottom: -3px;\n    }\n\n    .lightbox__dim {\n        font-size: 0.9em;\n    }\n\n    .lightbox-content {\n        padding: 15px;\n        gap: 15px;\n    }\n\n    .lightbox__dim .skills li {\n        grid-template-columns: 50px 1fr;\n    }\n\n    .card__name {\n        font-size: 1em;\n    }\n\n    .card__jp {\n        font-size: 0.9em;\n    }\n\n    .skills {\n        li:before {\n            font-size: 0.7em;\n        }\n\n        .name,\n        .desc {\n            font-size: 0.88em;\n        }\n    }\n\n    .quotes {\n        font-size: 0.83em;\n    }\n}\n\n@media only screen and (max-width: 567px) {\n    .preview-background {\n        display: none;\n    }\n\n    .preview-wrapper .grid-wrapper {\n        grid-template-columns: unset;\n    }\n\n    .preview-box {\n        padding: 0;\n        margin: 0;\n        background: none;\n        box-shadow: none;\n    }\n\n    .characters > .value a {\n        height: 35px;\n        width: 35px;\n        margin-bottom: -3px;\n    }\n}\n\n@media only screen and (max-width: 400px) {\n    .story-cover {\n        display: none;\n    }\n\n    .title-area {\n        grid-column: 1/3;\n    }\n}\n",".minitalk {\n    display: flex;\n    flex-direction: column;\n    gap: 10px;\n    transition: 0.15s all ease;\n\n    [character] p:last-of-type {\n        margin-bottom: unset;\n    }\n\n    ul {\n        margin-block-start: 0;\n        margin-block-end: 0;\n        margin-inline-start: 0;\n        margin-inline-end: 0;\n        padding-inline-start: 0;\n        list-style: none;\n        padding: 0;\n        margin-bottom: 15px;\n        display: grid;\n        grid-template-columns: 1fr 1fr;\n        border-bottom: solid 3px;\n        border-color: var(--light-mode, #f1f1f1);\n        gap: 5px;\n    }\n\n    li {\n        border-radius: 10px 10px 0 0;\n        border: solid 3px;\n        border-color: var(--light-mode, #f1f1f1);\n        border-bottom: 0;\n        padding: 0;\n        margin-bottom: -2px;\n\n        > a {\n            color: #222;\n            border: 0;\n            display: block;\n            padding: 3px;\n            text-align: center;\n        }\n\n        &.active {\n            background: var(--light-mode, #f1f1f1);\n            font-weight: 700;\n        }\n    }\n}\n\n.minitalk-option_header {\n    background: var(--light-mode, #f1f1f1);\n    border-radius: 5px;\n    cursor: pointer;\n    padding: 8px;\n    display: grid;\n    grid-template-columns: 40px 1fr 40px;\n    text-align: center;\n    align-items: center;\n    gap: 10px;\n    color: #222;\n    transition: 0.15s all ease;\n\n    &::after {\n        content: \"\\e5cf\";\n        display: inline-block;\n        font-family: \"Material Icons Round\";\n        font-size: 1.5em;\n        font-weight: 700;\n        line-height: 1;\n        transition: transform 0.4s ease;\n        justify-self: end;\n        align-self: center;\n    }\n\n    &::before {\n        content: \"\";\n        background: var(--charahead) 0 (0 / cover);\n        height: 40px;\n        width: 40px;\n        display: inline-block;\n    }\n}\n\n.minitalk-option_content {\n    display: none;\n    padding: 15px 0 5px;\n}\n\n.minitalk[character] {\n    &::before,\n    &::after {\n        content: none;\n    }\n}\n",".dark .minitalk-option_header {\n    color: #eee;\n    background: var(--dark-mode, #0e0e0e);\n}\n\n.dark.minitalk {\n    ul {\n        border-color: var(--dark-mode, #0e0e0e);\n    }\n\n    li {\n        border-color: var(--dark-mode, #0e0e0e);\n\n        &.active {\n            background: var(--dark-mode, #0e0e0e);\n\n            > a {\n                color: #eee;\n            }\n        }\n    }\n}\n",".fill .minitalk-option_header {\n    color: #fff;\n    background: var(--fill-mode, #737373);\n}\n\n.fill.minitalk {\n    ul {\n        border-color: var(--fill-mode, #737373);\n    }\n\n    li {\n        border-color: var(--fill-mode, #737373);\n\n        &.active {\n            background: var(--fill-mode, #737373);\n\n            > a {\n                color: #fff;\n            }\n        }\n    }\n}\n",".smallest .minitalk-option_header {\n    font-size: 0.8em;\n\n    &::after {\n        font-size: 1.7em;\n    }\n}\n\n.smaller .minitalk-option_header {\n    font-size: 0.9em;\n\n    &::after {\n        font-size: 1.6em;\n    }\n}\n\n.smallest .minitalk-option_header,\n.smaller .minitalk-option_header {\n    padding: 6px;\n    grid-template-columns: 35px 1fr 35px;\n\n    &::before {\n        height: 35px;\n        width: 35px;\n    }\n}\n\n.bigger .minitalk-option_header {\n    font-size: 1.1em;\n\n    &::after {\n        font-size: 1.4em;\n    }\n}\n\n.biggest .minitalk-option_header {\n    font-size: 1.2em;\n\n    &::after {\n        font-size: 1.3em;\n    }\n}\n\n.bigger .minitalk-option_header,\n.biggest .minitalk-option_header {\n    grid-template-columns: 45px 1fr 45px;\n\n    &::before {\n        height: 45px;\n        width: 45px;\n    }\n}\n","[mt=\"normal\"],\n[mt=\"rare\"] {\n    display: inline-block;\n    width: 25px;\n    height: 29.28px;\n    margin: 0 10px -8px 0 !important;\n    background-size: cover;\n}\n\n[mt=\"normal\"] {\n    background-image: url(\"https://cdn.jsdelivr.net/gh/enstars/img/talkevent_normal.png\");\n}\n\n[mt=\"rare\"] {\n    background-image: url(\"https://cdn.jsdelivr.net/gh/enstars/img/talkevent_rare.png\");\n}\n","@use \"_mixins.scss\";\n\n.toolbar-wrapper {\n    position: sticky;\n    display: flex;\n    flex-direction: column;\n    align-items: center;\n    gap: 4px;\n    top: 5px;\n    z-index: 2;\n    margin-bottom: 20px;\n}\n\n.toolbar {\n    display: grid;\n    grid-auto-flow: column;\n    gap: 23px;\n    background: #fff;\n    justify-content: center;\n    align-items: center;\n    width: auto;\n    border-radius: 15px;\n    @include mixins.toolbarShadow;\n    padding: 2px 35px;\n    z-index: 3;\n\n    a {\n        color: #555;\n        border-bottom: none;\n        transition: 0.2s ease-in-out;\n        line-height: 0;\n        border-radius: 5px;\n        padding: 2px;\n\n        &:hover {\n            color: #000;\n            background-color: #e0e0e0;\n        }\n    }\n\n    .material-icons-round {\n        font-size: 1.35em;\n        font-weight: 700;\n    }\n}\n\n.toolbar__section {\n    display: flex;\n}\n","@mixin toolbarShadow {\n    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.2);\n}\n\n@mixin sliderTransition {\n    transition: transform 0.3s ease, max-height 0s 0.3s step-end;\n}\n","@use \"_mixins.scss\";\n\n.slider-container {\n    position: absolute;\n    background: #fff;\n    justify-content: center;\n    align-items: center;\n    width: auto;\n    padding: 0 8px 5px;\n    border-radius: 15px;\n    @include mixins.toolbarShadow;\n    @include mixins.sliderTransition;\n}\n\n.toolbar-wrapper.showSlider .slider-container {\n    @include mixins.sliderTransition;\n    transform: translateY(calc(100% + 5px));\n}\n\n.slider {\n    -webkit-appearance: none;\n    appearance: none;\n    width: 100px;\n    height: 6px;\n    border-radius: 5px;\n    background: #d3d3d3;\n    outline: 0;\n    opacity: 0.7;\n    transition: opacity 0.2s;\n\n    &:hover {\n        opacity: 1;\n    }\n\n    &::-webkit-slider-thumb {\n        -webkit-appearance: none;\n        appearance: none;\n        width: 15px;\n        height: 15px;\n        border-radius: 50%;\n        background: var(--storyColor, #222);\n        cursor: pointer;\n    }\n\n    &::-moz-range-thumb {\n        width: 15px;\n        height: 15px;\n        border-radius: 50%;\n        background: var(--storyColor, #222);\n        cursor: pointer;\n    }\n}\n","a.inline-note {\r\n    display: inline-block;\r\n    vertical-align: middle;\r\n    margin: 0 2px;\r\n    font-weight: 700;\r\n    font-size: 0.7em;\r\n    border-radius: 3px;\r\n    border: solid 1px #ababab;\r\n    padding: 0 3px;\r\n    background: rgb(255 255 255 / 50%);\r\n    color: var(--storyColor);\r\n    --storyColor-dark-l: calc(var(--storyColor-l) - 20%);\r\n    --storyColor-dark: hsl(\r\n        var(--storyColor-h),\r\n        var(--storyColor-s),\r\n        var(--storyColor-dark-l)\r\n    );\r\n}\r\n\r\na.inline-note:hover {\r\n    color: var(--storyColor-dark);\r\n}\r\n"],"sourceRoot":""}]);
+___CSS_LOADER_EXPORT___.push([module.id, "@font-face {\n  font-family: \"Almendra\";\n  font-style: italic;\n  font-weight: 400;\n  font-display: swap;\n  src: url(\"https://fonts.gstatic.com/s/almendra/v15/H4ciBXKAlMnTn0CskxY4yLs.ttf\") format(\"truetype\");\n}\n@font-face {\n  font-family: \"Almendra\";\n  font-style: italic;\n  font-weight: 700;\n  font-display: swap;\n  src: url(\"https://fonts.gstatic.com/s/almendra/v15/H4chBXKAlMnTn0CskxY48Ae9oqY.ttf\") format(\"truetype\");\n}\n@font-face {\n  font-family: \"Material Icons Round\";\n  font-style: normal;\n  font-weight: 400;\n  src: url(\"https://fonts.gstatic.com/s/materialiconsround/v79/LDItaoyNOAY6Uewc665JcIzCKsKc_M9flwmM.otf\") format(\"opentype\");\n}\n@font-face {\n  font-family: \"Noto Sans JP\";\n  font-style: normal;\n  font-weight: 300;\n  font-display: swap;\n  src: url(\"https://fonts.gstatic.com/s/notosansjp/v36/-F6pfjtqLzI2JPCgQBnw7HFQaioq1A.otf\") format(\"opentype\");\n}\n@font-face {\n  font-family: \"Noto Sans JP\";\n  font-style: normal;\n  font-weight: 400;\n  font-display: swap;\n  src: url(\"https://fonts.gstatic.com/s/notosansjp/v36/-F62fjtqLzI2JPCgQBnw7HFowA.otf\") format(\"opentype\");\n}\n@font-face {\n  font-family: \"Noto Sans JP\";\n  font-style: normal;\n  font-weight: 700;\n  font-display: swap;\n  src: url(\"https://fonts.gstatic.com/s/notosansjp/v36/-F6pfjtqLzI2JPCgQBnw7HFQei0q1A.otf\") format(\"opentype\");\n}\n.material-icons-round {\n  font-family: \"Material Icons Round\";\n  font-weight: 400;\n  font-style: normal;\n  font-size: 24px;\n  line-height: 1;\n  letter-spacing: normal;\n  text-transform: none;\n  display: inline-block;\n  white-space: nowrap;\n  word-wrap: normal;\n  direction: ltr;\n}\n\n[character],\n.minitalk,\n.toolbar {\n  -webkit-touch-callout: none;\n  -webkit-user-select: none;\n  -khtml-user-select: none;\n  -moz-user-select: none;\n  -ms-user-select: none;\n  user-select: none;\n}\n\n.note.location, .note.narration, .note.cw {\n  -webkit-touch-callout: none;\n  -webkit-user-select: none;\n  -khtml-user-select: none;\n  -moz-user-select: none;\n  -ms-user-select: none;\n  user-select: none;\n}\n\n:root {\n  --msr-icon-border: 12px 4px;\n  --msr-icon-size: 50px;\n  --msr-icon-size__small: 45px;\n  --msr-name-case: uppercase;\n  /* --msr-line-filter: drop-shadow(0 1px 1.5px rgba(0, 0, 0, 0.05))\n      drop-shadow(0 1px 1px rgba(0, 0, 0, 0.06)); */\n  --msr-line-border: 8px;\n  --msr-line-size: 1em;\n}\n\n[character=Anzu] {\n  --color: #ffb6da;\n  --hue: 330.4;\n  --name: \"Anzu\";\n}\n\n[character=Adonis] {\n  --color: #915da3;\n  --hue: 284.6;\n  --name: \"Adonis\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/adonis.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/adonis.png\");\n}\n\n[character=Aira] {\n  --color: #fff1cf;\n  --hue: 42.5;\n  --name: \"Aira\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/aira.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/aira.png\");\n}\n\n[character=Akiomi] {\n  --color: #915c8b;\n  --hue: 306.8;\n  --name: \"Akiomi\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/akiomi.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/akiomi.png\");\n}\n\n[character=Arashi] {\n  --color: #edde7b;\n  --hue: 52.1;\n  --name: \"Arashi\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/arashi.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/arashi.png\");\n}\n\n[character=Chiaki] {\n  --color: #e60033;\n  --hue: 346.7;\n  --name: \"Chiaki\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/chiaki.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/chiaki.png\");\n}\n\n[character=Eichi] {\n  --color: #fff3b8;\n  --hue: 49.9;\n  --name: \"Eichi\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/eichi.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/eichi.png\");\n}\n\n[character=Gatekeeper] {\n  --color: #7e6407;\n  --hue: 46.9;\n  --name: \"Gatekeeper\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/gatekeeper.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/gatekeeper.png\");\n}\n\n[character=Hajime] {\n  --color: #cab8d9;\n  --hue: 272.7;\n  --name: \"Hajime\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/hajime.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/hajime.png\");\n}\n\n[character=Hiiro] {\n  --color: #ba2636;\n  --hue: 353.5;\n  --name: \"Hiiro\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/hiiro.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/hiiro.png\");\n}\n\n[character=HiMERU] {\n  --color: #89c3eb;\n  --hue: 204.5;\n  --name: \"HiMERU\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/himeru.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/himeru.png\");\n}\n\n[character=Hinata] {\n  --color: #eb6ea0;\n  --hue: 336;\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/hinata.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/hinata.png\");\n}\n\n[character=Hiyori] {\n  --color: #b8d200;\n  --hue: 67.4;\n  --name: \"Hiyori\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/hiyori.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/hiyori.png\");\n}\n\n[character=Hokuto] {\n  --color: #0068b7;\n  --hue: 205.9;\n  --name: \"Hokuto\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/hokuto.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/hokuto.png\");\n}\n\n[character=Ibara] {\n  --color: #74325c;\n  --hue: 321.8;\n  --name: \"Ibara\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/ibara.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/ibara.png\");\n}\n\n[character=Izumi] {\n  --color: #bbdbf3;\n  --hue: 205.7;\n  --name: \"Izumi\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/izumi.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/izumi.png\");\n}\n\n[character=Jin] {\n  --color: #8da0b6;\n  --hue: 212.2;\n  --name: \"Jin\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/jin.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/jin.png\");\n}\n\n[character=Jun] {\n  --color: #192f60;\n  --hue: 221.4;\n  --name: \"Jun\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/jun.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/jun.png\");\n}\n\n[character=Kanata] {\n  --color: #008db7;\n  --hue: 193.8;\n  --name: \"Kanata\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/kanata.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/kanata.png\");\n}\n\n[character=Kaoru] {\n  --color: #fdd35c;\n  --hue: 44.3;\n  --name: \"Kaoru\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/kaoru.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/kaoru.png\");\n}\n\n[character=Keito] {\n  --color: #316745;\n  --hue: 142.2;\n  --name: \"Keito\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/keito.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/keito.png\");\n}\n\n[character=Koga] {\n  --color: #c9caca;\n  --hue: 180;\n  --name: \"Koga\";\n  --light-mode: hsl(180, 9%, 92%) !important;\n  --dark-mode: hsl(180, 5%, 25%) !important;\n  --fill-mode: hsl(180, 5%, 45%) !important;\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/koga.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/koga.png\");\n}\n\n[character=Kohaku] {\n  --color: #f4b3c2;\n  --hue: 346.2;\n  --name: \"Kohaku\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/kohaku.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/kohaku.png\");\n}\n\n[character=Kuro] {\n  --color: #e83929;\n  --hue: 5;\n  --name: \"Kuro\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/kuro.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/kuro.png\");\n}\n\n[character=Leo] {\n  --color: #ec6d51;\n  --hue: 10.8;\n  --name: \"Leo\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/leo.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/leo.png\");\n}\n\n[character=Madara] {\n  --color: #622d18;\n  --hue: 17;\n  --name: \"Madara\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/madara.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/madara.png\");\n}\n\n[character=Makoto] {\n  --color: #65ab31;\n  --hue: 94.4;\n  --name: \"Makoto\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/makoto.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/makoto.png\");\n}\n\n[character=Mao] {\n  --color: #941f57;\n  --hue: 331.3;\n  --name: \"Mao\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/mao.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/mao.png\");\n}\n\n[character=Mayoi] {\n  --color: #522f60;\n  --hue: 282.9;\n  --name: \"Mayoi\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/mayoi.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/mayoi.png\");\n}\n\n[character=Midori] {\n  --color: #00533f;\n  --hue: 165.5;\n  --name: \"Midori\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/midori.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/midori.png\");\n}\n\n[character=Mika] {\n  --color: #006a6c;\n  --hue: 181.1;\n  --name: \"Mika\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/mika.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/mika.png\");\n}\n\n[character=Mitsuru] {\n  --color: #ed6d35;\n  --hue: 18.3;\n  --name: \"Mitsuru\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/mitsuru.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/mitsuru.png\");\n}\n\n[character=Nagisa] {\n  --color: #a73836;\n  --hue: 1.1;\n  --name: \"Nagisa\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/nagisa.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/nagisa.png\");\n}\n\n[character=Natsume] {\n  --color: #d70035;\n  --hue: 345.2;\n  --name: \"Natsume\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/natsume.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/natsume.png\");\n}\n\n[character=Nazuna] {\n  --color: #ffec47;\n  --hue: 53.8;\n  --name: \"Nazuna\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/nazuna.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/nazuna.png\");\n}\n\n[character=Niki] {\n  --color: #507ea4;\n  --hue: 207.1;\n  --name: \"Niki\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/niki.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/niki.png\");\n}\n\n[character=Rei] {\n  --color: #47266e;\n  --hue: 267.5;\n  --name: \"Rei\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/rei.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/rei.png\");\n}\n\n[character=Rinne] {\n  --color: #b7282e;\n  --hue: 357.5;\n  --name: \"Rinne\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/rinne.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/rinne.png\");\n}\n\n[character=Ritsu] {\n  --color: #001e43;\n  --hue: 213.1;\n  --name: \"Ritsu\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/ritsu.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/ritsu.png\");\n}\n\n[character=Seiya] {\n  --color: #07467f;\n  --hue: 208.5;\n  --name: \"Seiya\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/seiya.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/seiya.png\");\n}\n\n[character=Shinobu] {\n  --color: #ffdc00;\n  --hue: 51.8;\n  --name: \"Shinobu\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/shinobu.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/shinobu.png\");\n}\n\n[character=Shu] {\n  --color: #e3acae;\n  --hue: 357.8;\n  --name: \"Shu\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/shu.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/shu.png\");\n}\n\n[character=Sora] {\n  --color: #fff352;\n  --hue: 55.8;\n  --name: \"Sora\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/sora.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/sora.png\");\n}\n\n[character=Souma] {\n  --color: #5654a2;\n  --hue: 241.5;\n  --name: \"Souma\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/souma.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/souma.png\");\n}\n\n[character=Subaru] {\n  --color: #f3981d;\n  --hue: 34.5;\n  --name: \"Subaru\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/subaru.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/subaru.png\");\n}\n\n[character=Tatsumi] {\n  --color: #7ebea5;\n  --hue: 156.6;\n  --name: \"Tatsumi\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/tatsumi.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/tatsumi.png\");\n}\n\n[character=Tetora] {\n  --color: #302833;\n  --hue: 283.6;\n  --name: \"Tetora\";\n  --light-mode: hsl(283.6, 9%, 92%) !important;\n  --dark-mode: hsl(283.6, 5%, 25%) !important;\n  --fill-mode: hsl(283.6, 5%, 45%) !important;\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/tetora.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/tetora.png\");\n}\n\n[character=Tomoya] {\n  --color: #eedcb3;\n  --hue: 41.7;\n  --name: \"Tomoya\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/tomoya.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/tomoya.png\");\n}\n\n[character=Tori] {\n  --color: #f5b2b2;\n  --hue: 0;\n  --name: \"Tori\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/tori.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/tori.png\");\n}\n\n[character=Tsukasa] {\n  --color: #942343;\n  --hue: 343;\n  --name: \"Tsukasa\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/tsukasa.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/tsukasa.png\");\n}\n\n[character=Tsumugi] {\n  --color: #00608d;\n  --hue: 199.1;\n  --name: \"Tsumugi\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/tsumugi.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/tsumugi.png\");\n}\n\n[character=Wataru] {\n  --color: #a1d8e2;\n  --hue: 189.2;\n  --name: \"Wataru\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/wataru.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/wataru.png\");\n}\n\n[character=Yuta] {\n  --color: #00a1e9;\n  --hue: 198.5;\n  --name: \"Yuta\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/yuta.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/yuta.png\");\n}\n\n[character=Yuzuru] {\n  --color: #3e62ad;\n  --hue: 220.5;\n  --name: \"Yuzuru\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/yuzuru.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/yuzuru.png\");\n}\n\n.msr-unit {\n  display: grid;\n  grid-template-columns: auto 1fr;\n  column-gap: 12px;\n  row-gap: 2px;\n  margin-bottom: 0.95em;\n  font-size: 1em;\n  --light-mode: hsl(var(--hue), 54%, 93%);\n  --dark-mode: hsl(var(--hue), 12%, 25%);\n  --fill-mode: hsl(var(--hue), 30%, 45%);\n}\n.msr-unit * {\n  transition: all 0.2s ease;\n}\n\n.msr-icon {\n  grid-row: 1/3;\n}\n\n.msr-icon__wrapper {\n  border-radius: var(--msr-icon-border);\n  position: relative;\n  overflow: hidden;\n  width: var(--msr-icon-size);\n  height: var(--msr-icon-size);\n}\n\n.msr-icon__base {\n  display: block;\n  background: 100%/100% var(--icon, url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/unknown.png\")), var(--color, #b3b3b3);\n  width: 100%;\n  height: 100%;\n}\n\n.msr-name {\n  font-size: 0.85em;\n  line-height: 1;\n  font-weight: 700;\n  text-transform: var(--msr-name-case);\n}\n.msr-name::before {\n  content: var(--name, \"???\");\n}\n\n.msr-line {\n  display: flex;\n  flex-direction: column;\n  grid-column: 2;\n  row-gap: 5px;\n}\n.msr-line p {\n  align-self: flex-start;\n  font-size: var(--msr-line-size);\n  background: var(--light-mode, #f1f1f1);\n  color: #222;\n  padding: 0.6em;\n  margin: 0;\n  border-radius: var(--msr-line-border);\n  position: relative;\n  filter: var(--msr-line-filter, 0);\n}\n.msr-line p:hover {\n  transform: translate(2px, 0px);\n}\n.msr-line p:first-child {\n  border-top-left-radius: 0;\n}\n.msr-line p:first-child::before {\n  background: transparent;\n  content: \"\";\n  position: absolute;\n  left: -30px;\n  top: 0px;\n  height: 10px;\n  width: 30px;\n  border-top-right-radius: 25px;\n  box-shadow: 23px 0 0 0 var(--light-mode, #f1f1f1);\n}\n\n[unknown] .msr-icon__base {\n  background: #b3b3b3;\n}\n[unknown] .msr-icon__wrapper::after {\n  content: \"\";\n  display: block;\n  position: absolute;\n  background: #000;\n  -webkit-mask-image: var(--icon, url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/unknown.png\"));\n  -webkit-mask-size: 100%;\n  -webkit-mask-position: 100%;\n  mask-image: var(--icon, url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/unknown.png\"));\n  mask-size: 100%;\n  mask-position: 100%;\n  top: 0;\n  width: 100%;\n  height: 100%;\n}\n[unknown] .msr-name::before {\n  content: \"???\";\n}\n[unknown] .msr-line p {\n  background: #f1f1f1;\n}\n[unknown] .msr-line p:first-child::before {\n  box-shadow: 20px 0 0 0 #f1f1f1;\n}\n\n[hidden] .msr-icon__wrapper::after {\n  content: \"\";\n  display: block;\n  position: absolute;\n  background: #000;\n  -webkit-mask-image: var(--icon, url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/unknown.png\"));\n  -webkit-mask-size: 100%;\n  -webkit-mask-position: 100%;\n  mask-image: var(--icon, url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/unknown.png\"));\n  mask-size: 100%;\n  mask-position: 100%;\n  top: 0;\n  width: 100%;\n  height: 100%;\n}\n\n.hold {\n  display: inline-block;\n}\n\n.thought {\n  color: #5555c0;\n}\n\n.spell {\n  font-family: \"Almendra\", serif;\n  letter-spacing: 0.015em;\n  font-size: 1.1em;\n  line-height: 1.3;\n}\n\n[character].dark .msr-line p {\n  background: var(--dark-mode, #0e0e0e);\n  color: #eee;\n}\n[character].dark .msr-line p:first-child::before {\n  box-shadow: 20px 0 0 0 var(--dark-mode, #0e0e0e);\n}\n[character].dark .msr-line[unknown] p {\n  background: #0e0e0e;\n}\n[character].dark .msr-line[unknown]:first-child::before {\n  box-shadow: 20px 0 0 0 #0e0e0e;\n}\n\n.dark .thought {\n  color: #d4d4fa;\n}\n\n[character].fill .msr-line p {\n  background: var(--fill-mode, #737373);\n  color: #fff;\n}\n[character].fill .msr-line p:first-child::before {\n  box-shadow: 20px 0 0 0 var(--fill-mode, #737373);\n}\n[character].fill .msr-line[unknown] p {\n  background: #737373;\n}\n[character].fill .msr-line[unknown]:first-child::before {\n  box-shadow: 20px 0 0 0 #737373;\n}\n\n.fill .thought {\n  color: #e9efff;\n}\n\n[character].smallest .msr-line p {\n  font-size: 0.8em;\n}\n\n[character].smaller .msr-line p {\n  font-size: 0.9em;\n}\n\n[character].bigger .msr-line p {\n  font-size: 1.1em;\n}\n\n[character].biggest .msr-line p {\n  font-size: 1.2em;\n}\n\n@media (min-width: 1200px) {\n  .spell {\n    font-size: 1.15em;\n  }\n}\n@media (max-width: 650px) {\n  .msr-unit {\n    margin-bottom: 0.75em;\n  }\n\n  .msr-icon__wrapper {\n    width: var(--msr-icon-size__small);\n    height: var(--msr-icon-size__small);\n  }\n}\n.story-wrapper,\n.preview-wrapper,\n.lightbox__dim,\n.three-wrapper,\n.two-wrapper {\n  width: 100%;\n  font-size: 0.92em;\n  --storyColor-dark-l: calc(var(--storyColor-l) - 20%);\n  --storyColor-dark: hsl(\n      var(--storyColor-h),\n      var(--storyColor-s),\n      var(--storyColor-dark-l)\n  );\n}\n\n.story-wrapper img,\n.lightbox__dim img,\n.preview-wrapper img,\n.three-wrapper img,\n.two-wrapper img {\n  margin-bottom: 0;\n  border-radius: 0;\n}\n\n.grid-wrapper {\n  display: grid;\n}\n\n.chapter-area ul,\n.lightbox ul {\n  list-style: none;\n  padding: 0;\n  margin: 0;\n}\n\n.story-background {\n  border-radius: 5px 5px 0 0;\n  width: 100%;\n  height: 400px;\n  background: var(--background) no-repeat;\n  background-size: cover;\n  background-position: top;\n  mask-image: linear-gradient(to bottom, #000 70%, transparent 100%);\n  -webkit-mask-image: linear-gradient(to bottom, #000 70%, transparent 100%);\n}\n\n.story-box {\n  border-radius: 15px 5px;\n  background: #fff;\n  box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.1), 0 0 15px 5px rgba(0, 0, 0, 0.05);\n  margin: -200px 15px 0;\n  padding: 20px;\n  z-index: 1;\n  display: grid;\n  grid-template-columns: 120px 1fr 200px;\n  grid-template-rows: auto 1fr;\n  grid-gap: 15px;\n}\n\n.story-cover {\n  display: flex;\n  flex-direction: column;\n  justify-content: flex-end;\n}\n.story-cover > div {\n  height: 0;\n}\n.story-cover img {\n  height: 150px;\n  width: 120px;\n  object-fit: cover;\n  border-radius: 3px;\n  box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.5);\n  transform: translate(0, -100%);\n  margin-bottom: 0 !important;\n}\n\n.preview-wrapper .grid-wrapper {\n  width: 100%;\n  grid-template-columns: 22% 10% 2fr 1fr;\n}\n.preview-wrapper .title-area {\n  line-height: 1.25;\n  display: grid;\n  grid-template-columns: auto 1fr;\n  gap: 5px;\n  margin-bottom: 10px;\n  align-items: center;\n}\n.preview-wrapper .title-area__title {\n  font-size: 1.35em;\n  grid-column: 1/3;\n}\n.preview-wrapper .title-area__subtitle {\n  line-height: 0;\n}\n.preview-wrapper .title-area__start a {\n  font-size: 0.88em;\n}\n\n.preview-background,\n.preview-box {\n  grid-row-start: 1;\n  grid-column-end: span 3;\n}\n\n.preview-background {\n  width: 100%;\n  background-repeat: no-repeat;\n  background-size: cover;\n  grid-column: 1/3;\n  border-radius: 5px 0 0 5px;\n  mask-image: linear-gradient(to right, #000 70%, transparent 100%);\n  -webkit-mask-image: linear-gradient(to right, #000 70%, transparent 100%);\n  background-position: top 35% right 50%;\n}\n\n.preview-box {\n  border-radius: 15px 5px;\n  background: #fff;\n  box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.1), 0 0 15px 5px rgba(0, 0, 0, 0.05);\n  padding: 20px;\n  grid-column-start: 2;\n  z-index: 1;\n  margin: 10px;\n}\n\n.title-area {\n  line-height: 1.25;\n  display: flex;\n  flex-direction: column;\n  gap: 5px;\n}\n\n.title-area__title,\n.title-area__subtitle,\n.tab-header__name,\n.card__name,\n.card__jp {\n  font: inherit;\n  margin: 0;\n  border: 0;\n}\n\n.title-area__subtitle,\n.card__jp {\n  font-family: \"Noto Sans JP\";\n}\n\n.title-area__title,\n.card__name {\n  font-weight: 700;\n}\n\n.title-area__title {\n  font-size: 1.35em;\n}\n\n.title-area__start a {\n  background: rgba(var(--storyColor-rgb), 0.1);\n  color: rgba(var(--storyColor-rgb), 1);\n  padding: 5px 10px;\n  display: inline-block;\n  border-radius: 5px;\n  transition: all 0.2s ease;\n  border: none;\n}\n.title-area__start a:hover {\n  background: rgba(var(--storyColor-rgb), 1);\n  color: #fff;\n}\n\n.preview-wrapper .title-area__start a:hover {\n  background: rgba(var(--storyColor-rgb), 1);\n  color: #fff;\n}\n\n.info-area {\n  grid-column: 1/3;\n  display: flex;\n  flex-direction: column;\n  gap: 10px;\n}\n.info-area a {\n  color: var(--storyColor);\n  transition: 0.2s ease-in-out;\n  border-bottom: none;\n}\n.info-area a:hover {\n  color: var(--storyColor-dark);\n}\n.info-area .synopsis {\n  margin-bottom: 5px;\n}\n.info-area ol,\n.info-area li {\n  margin-block-start: 0;\n  margin-block-end: 0;\n  margin-inline-start: 0;\n  margin-inline-end: 0;\n  padding-inline-start: 0;\n}\n\n.info {\n  display: grid;\n  grid-template-columns: 2fr 1fr 1fr 2fr;\n  gap: 5px;\n}\n\n.info-item {\n  border-radius: 5px;\n  padding: 5px 10px;\n  border: solid 2px rgba(var(--storyColor-rgb), 0.2);\n}\n.info-item.season {\n  grid-column: 1/2;\n  grid-row: 1/2;\n}\n.info-item.chapters {\n  grid-column: 2/4;\n  grid-row: 1/2;\n}\n.info-item.writer {\n  grid-column: 4/5;\n  grid-row: 1/2;\n}\n.info-item.characters {\n  grid-column: 1/5;\n  padding: 5px 10px 0;\n}\n.info-item.tl {\n  grid-column: 1/3;\n}\n.info-item.pr {\n  grid-column: 3/5;\n}\n.info-item > .label {\n  padding: 0;\n  font-weight: 700;\n  font-size: 0.82em;\n}\n.info-item > .value {\n  flex-grow: 1;\n  font-size: 0.9em;\n}\n\n.three-wrapper .info-item.one {\n  grid-column: 1/2;\n  grid-row: 2/3;\n}\n.three-wrapper .info-item.two {\n  grid-column: 2/4;\n}\n.three-wrapper .info-item.three {\n  grid-column: 4/5;\n}\n\n.two-wrapper .info-item.one {\n  grid-column: 1/3;\n}\n.two-wrapper .info-item.two {\n  grid-column: 3/5;\n}\n\n.three-wrapper,\n.two-wrapper {\n  margin-bottom: 20px;\n}\n\n.characters > .value a {\n  display: inline-block;\n  background: var(--charahead) 0 0/cover;\n  height: 40px;\n  width: 40px;\n  margin: 0 -3px;\n}\n\n.value > [character]::before, .value > [character]::after {\n  content: none;\n}\n\n.chapter-area {\n  grid-column: 3/3;\n  grid-row: 1/3;\n  font-size: 0.9em;\n}\n.chapter-area > .chapters:not(:only-child) {\n  margin-bottom: 15px;\n}\n.chapter-area > .chapters span {\n  grid-row: 1;\n  grid-column: 1/5;\n}\n.chapter-area li {\n  display: grid;\n  margin-bottom: 5px;\n  gap: 5px;\n}\n.chapter-area > .mini-talks {\n  border-top: solid 1px #eff0f4;\n}\n.chapter-area > .mini-talks::before {\n  content: \"Mini Talks\";\n  display: flex;\n  align-items: center;\n  font-weight: 700;\n  margin-top: 5px;\n}\n.chapter-area > .mini-talks .mt-content {\n  display: none;\n}\n.chapter-area > .mini-talks .mt-content > .item {\n  display: grid;\n  grid-template-columns: 1fr 1fr;\n  gap: 5px;\n}\n.chapter-area > .mini-talks .mt-header {\n  margin-bottom: 5px;\n  cursor: pointer;\n}\n.chapter-area > .mini-talks .mt-header::after {\n  content: \"\\e5cf\";\n  display: inline-block;\n  font-family: \"Material Icons Round\";\n  font-size: 1.1em;\n  transition: transform 0.4s ease;\n  position: relative;\n  top: 1px;\n  left: 3px;\n}\n.chapter-area a {\n  border-bottom: 0;\n  display: block;\n  border-radius: 3px;\n  transition: all 0.2s ease;\n  background: rgba(var(--storyColor-rgb), 0.1);\n  padding: 5px;\n  text-align: center;\n}\n.chapter-area a:hover {\n  background: rgba(var(--storyColor-rgb), 0.2);\n}\n\n#none {\n  background: rgba(225, 227, 234, 0.4);\n}\n#none:hover {\n  background: rgba(225, 227, 234, 0.8);\n}\n\n.tab-content .source {\n  text-align: right;\n  font-size: 0.9em;\n}\n\n.story-wrapper .tab-content,\n.tab-header {\n  font-size: 0.9em;\n}\n\n.chapter-area > .mini-talk__open:after,\n.tab-header__open:first-child:after {\n  transform: rotate(180deg);\n}\n\n.story-wrapper .tab-header {\n  background: rgba(var(--storyColor-rgb), 0.1);\n  font-weight: 700;\n  border-radius: 5px;\n  cursor: pointer;\n  padding: 8px;\n  display: flex;\n  justify-content: space-between;\n}\n.story-wrapper .tab-content {\n  display: none;\n  padding: 10px 10px 0;\n}\n.story-wrapper .tab-content > .tab-item:first-child {\n  padding: 0 0 8px 0;\n}\n.story-wrapper .tab-content > .tab-item:not(:first-child) {\n  border-top: solid 1px #eff0f4;\n  padding: 8px 0;\n}\n.story-wrapper .tab-content > .tab-item:last-child {\n  padding: 8px 0 0 0;\n}\n.story-wrapper .tab-header:first-child:after {\n  content: \"\\e5cf\";\n  display: inline-block;\n  font-family: \"Material Icons Round\";\n  font-size: 1.5em;\n  line-height: 1;\n  transition: transform 0.4s ease;\n}\n.story-wrapper .tab-item > .label {\n  font-weight: 700;\n  font-size: 0.89em;\n}\n.story-wrapper .tab-item > .value {\n  margin-left: 10px;\n}\n\n.cg-gallery > .tab-content > .gallery {\n  display: grid;\n  grid-template-columns: repeat(auto-fit, minmax(200px, 2fr));\n  gap: 8px;\n}\n\n.gallery-item {\n  overflow: hidden;\n  border-radius: 5px;\n  position: relative;\n  width: 100%;\n  height: auto;\n}\n.gallery-item img {\n  transition: 0.2s ease;\n  margin-bottom: 0 !important;\n}\n.gallery-item:hover img {\n  transform: scale(1.02);\n}\n.gallery-item:hover .caption {\n  transform: translateY(0);\n}\n.gallery-item .caption {\n  position: absolute;\n  bottom: 0;\n  width: calc(100% - 24px);\n  color: #fff;\n  background: linear-gradient(to bottom, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.8));\n  padding: 40px 12px 12px;\n  transition: 0.2s ease;\n  transform: translateY(100%);\n}\n\n.story-cards > .tab-content > .cards {\n  display: grid;\n  grid-template-columns: repeat(5, minmax(auto, 1fr));\n  gap: 0 8px;\n}\n\n.single {\n  transition: transform 0.2s ease;\n  position: relative;\n  display: inline-block;\n  filter: drop-shadow(0px 0px 4px rgba(0, 0, 0, 0.6));\n}\n.single img {\n  object-fit: contain;\n  width: 100%;\n  margin-bottom: 0 !important;\n}\n\n.image {\n  position: relative;\n}\n.image .single.unbloomed {\n  z-index: 2;\n  transform: scale(1);\n  filter: brightness(100%);\n}\n.image .single.bloomed {\n  z-index: 1;\n  top: 0;\n  left: 0;\n  transform: translateX(5%) scale(0.95) rotate(2deg);\n  filter: brightness(70%);\n  position: absolute;\n  width: 100%;\n  height: 100%;\n}\n.image:hover .single.bloomed {\n  z-index: 2;\n  transform: translateX(0%) scale(1) rotate(0deg);\n  filter: brightness(100%);\n}\n.image:hover .single.unbloomed {\n  z-index: 1;\n  transform: translateX(-5%) scale(0.95) rotate(-2deg);\n  filter: brightness(70%);\n}\n.image:hover .quotes {\n  transform: translate(0, calc(-1 * var(--quote-height)));\n}\n.image .quotes__wrapper {\n  display: none;\n}\n.image .quotes {\n  display: grid;\n  grid-template-rows: var(--quote-height) var(--quote-height);\n  transition: 0.2s ease;\n}\n.image .quotes > * {\n  display: flex;\n  justify-content: center;\n  align-items: center;\n  text-align: center;\n  line-height: 1.2;\n}\n\n.cards-item > .image {\n  cursor: zoom-in;\n}\n\n.lightbox-content {\n  background: #fff;\n  width: 90vw;\n  max-width: 600px;\n  max-height: 100vh;\n  overflow: auto;\n  display: grid;\n  grid-template-columns: 1fr 2fr;\n  gap: 20px;\n  padding: 20px;\n  border-radius: 5px;\n  box-shadow: 0 5px 10px 0 rgba(0, 0, 0, 0.2), 0 0 40px 0 rgba(0, 0, 0, 0.1);\n  box-sizing: border-box;\n}\n.lightbox-content .image .quotes__wrapper {\n  display: block;\n  --quote-height: 2.5em;\n  height: var(--quote-height);\n  overflow: hidden;\n}\n\n.lightbox__dim {\n  position: fixed;\n  z-index: 99999999;\n  height: 100vh;\n  width: 100vw;\n  top: 0;\n  left: 0;\n  background: rgba(0, 0, 0, 0.7);\n  display: flex;\n  align-items: center;\n  justify-content: center;\n}\n\n.lightbox > .tlnote {\n  font-size: smaller;\n}\n\nbody.lightbox-visible {\n  overflow: hidden;\n}\n\n.cards-item .lightbox {\n  display: none;\n}\n\n.card__name {\n  font-size: 1.1em;\n}\n\n.skills li {\n  display: grid;\n  grid-template-columns: 63px 1fr;\n  gap: 0 5px;\n  margin: 10px 0;\n}\n.skills li::before {\n  color: #fff;\n  background-color: #0c195c;\n  padding: 2px 6px;\n  grid-row-start: 1;\n  grid-column-start: 1;\n  grid-column-end: 2;\n  text-align: center;\n  font-weight: 700;\n  font-size: 0.8em;\n  display: flex;\n  justify-content: center;\n  align-items: center;\n  height: 1.6em;\n  content: attr(id);\n  text-transform: uppercase;\n}\n.skills .name {\n  font-weight: 700;\n}\n.skills .desc {\n  grid-column-start: 2;\n}\n\n.reverse .grid-wrapper {\n  grid-template-columns: 2fr 1fr 10% 22%;\n}\n.reverse .preview-background {\n  grid-column: 3/5;\n  border-radius: 0 5px 5px 0;\n  mask-image: linear-gradient(to left, #000 70%, transparent 100%);\n  -webkit-mask-image: linear-gradient(to left, #000 70%, transparent 100%);\n  background-position: top 35% left 50%;\n}\n.reverse .preview-box {\n  grid-column: 1/4;\n}\n\n.reverse .preview-background,\n.reverse .preview-box {\n  grid-column-end: 3 span;\n}\n\n@media only screen and (max-width: 812px) {\n  .story-box {\n    grid-template-columns: auto [col-start] 1fr [last];\n    grid-template-rows: auto;\n    margin: -245px 15px 0;\n  }\n\n  .story-cover {\n    grid-column: 1/2;\n    grid-row: 1/2;\n  }\n\n  .title-area {\n    grid-column: 2/3;\n    grid-row: 1/2;\n    line-height: 1.25;\n    display: flex;\n    flex-direction: column;\n    gap: 5px;\n  }\n\n  .mobile-reverse .story-box {\n    grid-template-columns: 1fr [col-start] auto [last];\n  }\n  .mobile-reverse .story-cover {\n    grid-column: 2/2;\n  }\n  .mobile-reverse .title-area {\n    grid-column: 1/2;\n  }\n\n  .info-area {\n    grid-column: 1/3;\n  }\n\n  .chapter-area {\n    grid-column: 1/3;\n    grid-row: 3;\n    font-size: 0.9em;\n  }\n\n  .characters > .value a {\n    height: 35px;\n    width: 35px;\n    margin-bottom: -3px;\n  }\n\n  .lightbox__dim {\n    font-size: 0.9em;\n  }\n\n  .lightbox-content {\n    padding: 15px;\n    gap: 15px;\n  }\n\n  .lightbox__dim .skills li {\n    grid-template-columns: 50px 1fr;\n  }\n\n  .card__name {\n    font-size: 1em;\n  }\n\n  .card__jp {\n    font-size: 0.9em;\n  }\n\n  .skills li:before {\n    font-size: 0.7em;\n  }\n  .skills .name,\n.skills .desc {\n    font-size: 0.88em;\n  }\n\n  .quotes {\n    font-size: 0.83em;\n  }\n}\n@media only screen and (max-width: 567px) {\n  .preview-background {\n    display: none;\n  }\n\n  .preview-wrapper .grid-wrapper {\n    grid-template-columns: unset;\n  }\n\n  .preview-box {\n    padding: 0;\n    margin: 0;\n    background: none;\n    box-shadow: none;\n  }\n\n  .characters > .value a {\n    height: 35px;\n    width: 35px;\n    margin-bottom: -3px;\n  }\n}\n@media only screen and (max-width: 400px) {\n  .story-cover {\n    display: none;\n  }\n\n  .title-area {\n    grid-column: 1/3;\n  }\n}\n.minitalk {\n  display: flex;\n  flex-direction: column;\n  gap: 10px;\n  transition: 0.15s all ease;\n}\n.minitalk [character] p:last-of-type {\n  margin-bottom: unset;\n}\n.minitalk ul {\n  margin-block-start: 0;\n  margin-block-end: 0;\n  margin-inline-start: 0;\n  margin-inline-end: 0;\n  padding-inline-start: 0;\n  list-style: none;\n  padding: 0;\n  margin-bottom: 15px;\n  display: grid;\n  grid-template-columns: 1fr 1fr;\n  border-bottom: solid 3px;\n  border-color: var(--light-mode, #f1f1f1);\n  gap: 5px;\n}\n.minitalk li {\n  border-radius: 10px 10px 0 0;\n  border: solid 3px;\n  border-color: var(--light-mode, #f1f1f1);\n  border-bottom: 0;\n  padding: 0;\n  margin-bottom: -2px;\n}\n.minitalk li > a {\n  color: #222;\n  border: 0;\n  display: block;\n  padding: 3px;\n  text-align: center;\n}\n.minitalk li.active {\n  background: var(--light-mode, #f1f1f1);\n  font-weight: 700;\n}\n\n.minitalk-option_header {\n  background: var(--light-mode, #f1f1f1);\n  border-radius: 5px;\n  cursor: pointer;\n  padding: 8px;\n  display: grid;\n  grid-template-columns: 40px 1fr 40px;\n  text-align: center;\n  align-items: center;\n  gap: 10px;\n  color: #222;\n  transition: 0.15s all ease;\n}\n.minitalk-option_header::after {\n  content: \"\\e5cf\";\n  display: inline-block;\n  font-family: \"Material Icons Round\";\n  font-size: 1.5em;\n  font-weight: 700;\n  line-height: 1;\n  transition: transform 0.4s ease;\n  justify-self: end;\n  align-self: center;\n}\n.minitalk-option_header::before {\n  content: \"\";\n  background: var(--charahead) 0 0/cover;\n  height: 40px;\n  width: 40px;\n  display: inline-block;\n}\n\n.minitalk-option_content {\n  display: none;\n  padding: 15px 0 5px;\n}\n\n.minitalk[character]::before, .minitalk[character]::after {\n  content: none;\n}\n\n.dark .minitalk-option_header {\n  color: #eee;\n  background: var(--dark-mode, #0e0e0e);\n}\n\n.dark.minitalk ul {\n  border-color: var(--dark-mode, #0e0e0e);\n}\n.dark.minitalk li {\n  border-color: var(--dark-mode, #0e0e0e);\n}\n.dark.minitalk li.active {\n  background: var(--dark-mode, #0e0e0e);\n}\n.dark.minitalk li.active > a {\n  color: #eee;\n}\n\n.fill .minitalk-option_header {\n  color: #fff;\n  background: var(--fill-mode, #737373);\n}\n\n.fill.minitalk ul {\n  border-color: var(--fill-mode, #737373);\n}\n.fill.minitalk li {\n  border-color: var(--fill-mode, #737373);\n}\n.fill.minitalk li.active {\n  background: var(--fill-mode, #737373);\n}\n.fill.minitalk li.active > a {\n  color: #fff;\n}\n\n.smallest .minitalk-option_header {\n  font-size: 0.8em;\n}\n.smallest .minitalk-option_header::after {\n  font-size: 1.7em;\n}\n\n.smaller .minitalk-option_header {\n  font-size: 0.9em;\n}\n.smaller .minitalk-option_header::after {\n  font-size: 1.6em;\n}\n\n.smallest .minitalk-option_header,\n.smaller .minitalk-option_header {\n  padding: 6px;\n  grid-template-columns: 35px 1fr 35px;\n}\n.smallest .minitalk-option_header::before,\n.smaller .minitalk-option_header::before {\n  height: 35px;\n  width: 35px;\n}\n\n.bigger .minitalk-option_header {\n  font-size: 1.1em;\n}\n.bigger .minitalk-option_header::after {\n  font-size: 1.4em;\n}\n\n.biggest .minitalk-option_header {\n  font-size: 1.2em;\n}\n.biggest .minitalk-option_header::after {\n  font-size: 1.3em;\n}\n\n.bigger .minitalk-option_header,\n.biggest .minitalk-option_header {\n  grid-template-columns: 45px 1fr 45px;\n}\n.bigger .minitalk-option_header::before,\n.biggest .minitalk-option_header::before {\n  height: 45px;\n  width: 45px;\n}\n\n[mt=normal],\n[mt=rare] {\n  display: inline-block;\n  width: 25px;\n  height: 29.28px;\n  margin: 0 10px -8px 0 !important;\n  background-size: cover;\n}\n\n[mt=normal] {\n  background-image: url(\"https://cdn.jsdelivr.net/gh/enstars/img/talkevent_normal.png\");\n}\n\n[mt=rare] {\n  background-image: url(\"https://cdn.jsdelivr.net/gh/enstars/img/talkevent_rare.png\");\n}\n\n.toolbar-wrapper {\n  position: sticky;\n  display: flex;\n  flex-direction: column;\n  align-items: center;\n  gap: 4px;\n  top: 5px;\n  z-index: 2;\n  margin-bottom: 20px;\n}\n\n.toolbar {\n  display: grid;\n  grid-auto-flow: column;\n  gap: 23px;\n  background: #fff;\n  justify-content: center;\n  align-items: center;\n  width: auto;\n  border-radius: 15px;\n  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.2);\n  padding: 2px 35px;\n  z-index: 3;\n}\n.toolbar a {\n  color: #555;\n  border-bottom: none;\n  transition: 0.2s ease-in-out;\n  line-height: 0;\n  border-radius: 5px;\n  padding: 2px;\n}\n.toolbar a:hover {\n  color: #000;\n  background-color: #e0e0e0;\n}\n.toolbar .material-icons-round {\n  font-size: 1.35em;\n  font-weight: 700;\n}\n\n.toolbar__section {\n  display: flex;\n}\n\n.slider-container {\n  position: absolute;\n  background: #fff;\n  justify-content: center;\n  align-items: center;\n  width: auto;\n  padding: 0 8px 5px;\n  border-radius: 15px;\n  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.2);\n  transition: transform 0.3s ease, max-height 0s 0.3s step-end;\n}\n\n.toolbar-wrapper.showSlider .slider-container {\n  transition: transform 0.3s ease, max-height 0s 0.3s step-end;\n  transform: translateY(calc(100% + 5px));\n}\n\n.slider {\n  -webkit-appearance: none;\n  appearance: none;\n  width: 100px;\n  height: 6px;\n  border-radius: 5px;\n  background: #d3d3d3;\n  outline: 0;\n  opacity: 0.7;\n  transition: opacity 0.2s;\n}\n.slider:hover {\n  opacity: 1;\n}\n.slider::-webkit-slider-thumb {\n  -webkit-appearance: none;\n  appearance: none;\n  width: 15px;\n  height: 15px;\n  border-radius: 50%;\n  background: var(--storyColor, #222);\n  cursor: pointer;\n}\n.slider::-moz-range-thumb {\n  width: 15px;\n  height: 15px;\n  border-radius: 50%;\n  background: var(--storyColor, #222);\n  cursor: pointer;\n}\n\na.inline-note {\n  display: inline-block;\n  vertical-align: middle;\n  margin: 0 2px;\n  font-weight: 700;\n  font-size: 0.7em;\n  border-radius: 3px;\n  border: solid 1px #ababab;\n  padding: 0 3px;\n  background: rgba(255, 255, 255, 0.5);\n  color: var(--storyColor);\n  --storyColor-dark-l: calc(var(--storyColor-l) - 20%);\n  --storyColor-dark: hsl(\n      var(--storyColor-h),\n      var(--storyColor-s),\n      var(--storyColor-dark-l)\n  );\n}\n\na.inline-note:hover {\n  color: var(--storyColor-dark);\n}", "",{"version":3,"sources":["webpack://./src/scss/_font.scss","webpack://./src/scss/main.scss","webpack://./src/scss/_general.scss","webpack://./src/scss/_mixins.scss","webpack://./src/scss/bubble/components/_variables.scss","webpack://./src/scss/bubble/components/enst.scss","webpack://./src/scss/bubble/components/_main.scss","webpack://./src/scss/bubble/components/attributes.scss","webpack://./src/scss/bubble/components/extra.scss","webpack://./src/scss/bubble/components/dark.scss","webpack://./src/scss/bubble/components/fill.scss","webpack://./src/scss/bubble/components/sizes.scss","webpack://./src/scss/bubble/components/_media.scss","webpack://./src/scss/story-cover/components/_main.scss","webpack://./src/scss/story-cover/components/story.scss","webpack://./src/scss/story-cover/components/preview.scss","webpack://./src/scss/story-cover/components/title.scss","webpack://./src/scss/story-cover/components/info.scss","webpack://./src/scss/story-cover/components/chapter.scss","webpack://./src/scss/story-cover/components/tab.scss","webpack://./src/scss/story-cover/components/gallery.scss","webpack://./src/scss/story-cover/components/cards.scss","webpack://./src/scss/story-cover/components/lightbox.scss","webpack://./src/scss/story-cover/components/reverse.scss","webpack://./src/scss/story-cover/components/_media.scss","webpack://./src/scss/mini-talk/components/_main.scss","webpack://./src/scss/mini-talk/components/dark.scss","webpack://./src/scss/mini-talk/components/fill.scss","webpack://./src/scss/mini-talk/components/sizes.scss","webpack://./src/scss/mini-talk/components/type.scss","webpack://./src/scss/toolbar/components/_main.scss","webpack://./src/scss/toolbar/components/_mixins.scss","webpack://./src/scss/toolbar/components/slider.scss","webpack://./src/scss/footnote/index.scss"],"names":[],"mappings":"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","sourcesContent":["@font-face {\n    font-family: \"Almendra\";\n    font-style: italic;\n    font-weight: 400;\n    font-display: swap;\n    src: url(\"https://fonts.gstatic.com/s/almendra/v15/H4ciBXKAlMnTn0CskxY4yLs.ttf\")\n        format(\"truetype\");\n}\n\n@font-face {\n    font-family: \"Almendra\";\n    font-style: italic;\n    font-weight: 700;\n    font-display: swap;\n    src: url(\"https://fonts.gstatic.com/s/almendra/v15/H4chBXKAlMnTn0CskxY48Ae9oqY.ttf\")\n        format(\"truetype\");\n}\n\n@font-face {\n    font-family: \"Material Icons Round\";\n    font-style: normal;\n    font-weight: 400;\n    src: url(\"https://fonts.gstatic.com/s/materialiconsround/v79/LDItaoyNOAY6Uewc665JcIzCKsKc_M9flwmM.otf\")\n        format(\"opentype\");\n}\n\n@font-face {\n    font-family: \"Noto Sans JP\";\n    font-style: normal;\n    font-weight: 300;\n    font-display: swap;\n    src: url(\"https://fonts.gstatic.com/s/notosansjp/v36/-F6pfjtqLzI2JPCgQBnw7HFQaioq1A.otf\")\n        format(\"opentype\");\n}\n\n@font-face {\n    font-family: \"Noto Sans JP\";\n    font-style: normal;\n    font-weight: 400;\n    font-display: swap;\n    src: url(\"https://fonts.gstatic.com/s/notosansjp/v36/-F62fjtqLzI2JPCgQBnw7HFowA.otf\")\n        format(\"opentype\");\n}\n\n@font-face {\n    font-family: \"Noto Sans JP\";\n    font-style: normal;\n    font-weight: 700;\n    font-display: swap;\n    src: url(\"https://fonts.gstatic.com/s/notosansjp/v36/-F6pfjtqLzI2JPCgQBnw7HFQei0q1A.otf\")\n        format(\"opentype\");\n}\n\n.material-icons-round {\n    font-family: \"Material Icons Round\";\n    font-weight: 400;\n    font-style: normal;\n    font-size: 24px;\n    line-height: 1;\n    letter-spacing: normal;\n    text-transform: none;\n    display: inline-block;\n    white-space: nowrap;\n    word-wrap: normal;\n    direction: ltr;\n}\n","@font-face {\n  font-family: \"Almendra\";\n  font-style: italic;\n  font-weight: 400;\n  font-display: swap;\n  src: url(\"https://fonts.gstatic.com/s/almendra/v15/H4ciBXKAlMnTn0CskxY4yLs.ttf\") format(\"truetype\");\n}\n@font-face {\n  font-family: \"Almendra\";\n  font-style: italic;\n  font-weight: 700;\n  font-display: swap;\n  src: url(\"https://fonts.gstatic.com/s/almendra/v15/H4chBXKAlMnTn0CskxY48Ae9oqY.ttf\") format(\"truetype\");\n}\n@font-face {\n  font-family: \"Material Icons Round\";\n  font-style: normal;\n  font-weight: 400;\n  src: url(\"https://fonts.gstatic.com/s/materialiconsround/v79/LDItaoyNOAY6Uewc665JcIzCKsKc_M9flwmM.otf\") format(\"opentype\");\n}\n@font-face {\n  font-family: \"Noto Sans JP\";\n  font-style: normal;\n  font-weight: 300;\n  font-display: swap;\n  src: url(\"https://fonts.gstatic.com/s/notosansjp/v36/-F6pfjtqLzI2JPCgQBnw7HFQaioq1A.otf\") format(\"opentype\");\n}\n@font-face {\n  font-family: \"Noto Sans JP\";\n  font-style: normal;\n  font-weight: 400;\n  font-display: swap;\n  src: url(\"https://fonts.gstatic.com/s/notosansjp/v36/-F62fjtqLzI2JPCgQBnw7HFowA.otf\") format(\"opentype\");\n}\n@font-face {\n  font-family: \"Noto Sans JP\";\n  font-style: normal;\n  font-weight: 700;\n  font-display: swap;\n  src: url(\"https://fonts.gstatic.com/s/notosansjp/v36/-F6pfjtqLzI2JPCgQBnw7HFQei0q1A.otf\") format(\"opentype\");\n}\n.material-icons-round {\n  font-family: \"Material Icons Round\";\n  font-weight: 400;\n  font-style: normal;\n  font-size: 24px;\n  line-height: 1;\n  letter-spacing: normal;\n  text-transform: none;\n  display: inline-block;\n  white-space: nowrap;\n  word-wrap: normal;\n  direction: ltr;\n}\n\n[character],\n.minitalk,\n.toolbar {\n  -webkit-touch-callout: none;\n  -webkit-user-select: none;\n  -khtml-user-select: none;\n  -moz-user-select: none;\n  -ms-user-select: none;\n  user-select: none;\n}\n\n.note.location, .note.narration, .note.cw {\n  -webkit-touch-callout: none;\n  -webkit-user-select: none;\n  -khtml-user-select: none;\n  -moz-user-select: none;\n  -ms-user-select: none;\n  user-select: none;\n}\n\n:root {\n  --msr-icon-border: 12px 4px;\n  --msr-icon-size: 50px;\n  --msr-icon-size__small: 45px;\n  --msr-name-case: uppercase;\n  /* --msr-line-filter: drop-shadow(0 1px 1.5px rgba(0, 0, 0, 0.05))\n      drop-shadow(0 1px 1px rgba(0, 0, 0, 0.06)); */\n  --msr-line-border: 8px;\n  --msr-line-size: 1em;\n}\n\n[character=Anzu] {\n  --color: #ffb6da;\n  --hue: 330.4;\n  --name: \"Anzu\";\n}\n\n[character=Adonis] {\n  --color: #915da3;\n  --hue: 284.6;\n  --name: \"Adonis\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/adonis.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/adonis.png\");\n}\n\n[character=Aira] {\n  --color: #fff1cf;\n  --hue: 42.5;\n  --name: \"Aira\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/aira.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/aira.png\");\n}\n\n[character=Akiomi] {\n  --color: #915c8b;\n  --hue: 306.8;\n  --name: \"Akiomi\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/akiomi.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/akiomi.png\");\n}\n\n[character=Arashi] {\n  --color: #edde7b;\n  --hue: 52.1;\n  --name: \"Arashi\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/arashi.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/arashi.png\");\n}\n\n[character=Chiaki] {\n  --color: #e60033;\n  --hue: 346.7;\n  --name: \"Chiaki\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/chiaki.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/chiaki.png\");\n}\n\n[character=Eichi] {\n  --color: #fff3b8;\n  --hue: 49.9;\n  --name: \"Eichi\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/eichi.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/eichi.png\");\n}\n\n[character=Gatekeeper] {\n  --color: #7e6407;\n  --hue: 46.9;\n  --name: \"Gatekeeper\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/gatekeeper.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/gatekeeper.png\");\n}\n\n[character=Hajime] {\n  --color: #cab8d9;\n  --hue: 272.7;\n  --name: \"Hajime\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/hajime.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/hajime.png\");\n}\n\n[character=Hiiro] {\n  --color: #ba2636;\n  --hue: 353.5;\n  --name: \"Hiiro\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/hiiro.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/hiiro.png\");\n}\n\n[character=HiMERU] {\n  --color: #89c3eb;\n  --hue: 204.5;\n  --name: \"HiMERU\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/himeru.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/himeru.png\");\n}\n\n[character=Hinata] {\n  --color: #eb6ea0;\n  --hue: 336;\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/hinata.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/hinata.png\");\n}\n\n[character=Hiyori] {\n  --color: #b8d200;\n  --hue: 67.4;\n  --name: \"Hiyori\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/hiyori.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/hiyori.png\");\n}\n\n[character=Hokuto] {\n  --color: #0068b7;\n  --hue: 205.9;\n  --name: \"Hokuto\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/hokuto.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/hokuto.png\");\n}\n\n[character=Ibara] {\n  --color: #74325c;\n  --hue: 321.8;\n  --name: \"Ibara\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/ibara.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/ibara.png\");\n}\n\n[character=Izumi] {\n  --color: #bbdbf3;\n  --hue: 205.7;\n  --name: \"Izumi\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/izumi.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/izumi.png\");\n}\n\n[character=Jin] {\n  --color: #8da0b6;\n  --hue: 212.2;\n  --name: \"Jin\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/jin.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/jin.png\");\n}\n\n[character=Jun] {\n  --color: #192f60;\n  --hue: 221.4;\n  --name: \"Jun\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/jun.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/jun.png\");\n}\n\n[character=Kanata] {\n  --color: #008db7;\n  --hue: 193.8;\n  --name: \"Kanata\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/kanata.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/kanata.png\");\n}\n\n[character=Kaoru] {\n  --color: #fdd35c;\n  --hue: 44.3;\n  --name: \"Kaoru\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/kaoru.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/kaoru.png\");\n}\n\n[character=Keito] {\n  --color: #316745;\n  --hue: 142.2;\n  --name: \"Keito\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/keito.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/keito.png\");\n}\n\n[character=Koga] {\n  --color: #c9caca;\n  --hue: 180;\n  --name: \"Koga\";\n  --light-mode: hsl(180, 9%, 92%) !important;\n  --dark-mode: hsl(180, 5%, 25%) !important;\n  --fill-mode: hsl(180, 5%, 45%) !important;\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/koga.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/koga.png\");\n}\n\n[character=Kohaku] {\n  --color: #f4b3c2;\n  --hue: 346.2;\n  --name: \"Kohaku\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/kohaku.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/kohaku.png\");\n}\n\n[character=Kuro] {\n  --color: #e83929;\n  --hue: 5;\n  --name: \"Kuro\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/kuro.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/kuro.png\");\n}\n\n[character=Leo] {\n  --color: #ec6d51;\n  --hue: 10.8;\n  --name: \"Leo\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/leo.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/leo.png\");\n}\n\n[character=Madara] {\n  --color: #622d18;\n  --hue: 17;\n  --name: \"Madara\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/madara.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/madara.png\");\n}\n\n[character=Makoto] {\n  --color: #65ab31;\n  --hue: 94.4;\n  --name: \"Makoto\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/makoto.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/makoto.png\");\n}\n\n[character=Mao] {\n  --color: #941f57;\n  --hue: 331.3;\n  --name: \"Mao\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/mao.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/mao.png\");\n}\n\n[character=Mayoi] {\n  --color: #522f60;\n  --hue: 282.9;\n  --name: \"Mayoi\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/mayoi.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/mayoi.png\");\n}\n\n[character=Midori] {\n  --color: #00533f;\n  --hue: 165.5;\n  --name: \"Midori\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/midori.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/midori.png\");\n}\n\n[character=Mika] {\n  --color: #006a6c;\n  --hue: 181.1;\n  --name: \"Mika\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/mika.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/mika.png\");\n}\n\n[character=Mitsuru] {\n  --color: #ed6d35;\n  --hue: 18.3;\n  --name: \"Mitsuru\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/mitsuru.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/mitsuru.png\");\n}\n\n[character=Nagisa] {\n  --color: #a73836;\n  --hue: 1.1;\n  --name: \"Nagisa\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/nagisa.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/nagisa.png\");\n}\n\n[character=Natsume] {\n  --color: #d70035;\n  --hue: 345.2;\n  --name: \"Natsume\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/natsume.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/natsume.png\");\n}\n\n[character=Nazuna] {\n  --color: #ffec47;\n  --hue: 53.8;\n  --name: \"Nazuna\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/nazuna.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/nazuna.png\");\n}\n\n[character=Niki] {\n  --color: #507ea4;\n  --hue: 207.1;\n  --name: \"Niki\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/niki.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/niki.png\");\n}\n\n[character=Rei] {\n  --color: #47266e;\n  --hue: 267.5;\n  --name: \"Rei\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/rei.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/rei.png\");\n}\n\n[character=Rinne] {\n  --color: #b7282e;\n  --hue: 357.5;\n  --name: \"Rinne\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/rinne.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/rinne.png\");\n}\n\n[character=Ritsu] {\n  --color: #001e43;\n  --hue: 213.1;\n  --name: \"Ritsu\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/ritsu.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/ritsu.png\");\n}\n\n[character=Seiya] {\n  --color: #07467f;\n  --hue: 208.5;\n  --name: \"Seiya\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/seiya.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/seiya.png\");\n}\n\n[character=Shinobu] {\n  --color: #ffdc00;\n  --hue: 51.8;\n  --name: \"Shinobu\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/shinobu.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/shinobu.png\");\n}\n\n[character=Shu] {\n  --color: #e3acae;\n  --hue: 357.8;\n  --name: \"Shu\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/shu.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/shu.png\");\n}\n\n[character=Sora] {\n  --color: #fff352;\n  --hue: 55.8;\n  --name: \"Sora\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/sora.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/sora.png\");\n}\n\n[character=Souma] {\n  --color: #5654a2;\n  --hue: 241.5;\n  --name: \"Souma\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/souma.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/souma.png\");\n}\n\n[character=Subaru] {\n  --color: #f3981d;\n  --hue: 34.5;\n  --name: \"Subaru\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/subaru.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/subaru.png\");\n}\n\n[character=Tatsumi] {\n  --color: #7ebea5;\n  --hue: 156.6;\n  --name: \"Tatsumi\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/tatsumi.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/tatsumi.png\");\n}\n\n[character=Tetora] {\n  --color: #302833;\n  --hue: 283.6;\n  --name: \"Tetora\";\n  --light-mode: hsl(283.6, 9%, 92%) !important;\n  --dark-mode: hsl(283.6, 5%, 25%) !important;\n  --fill-mode: hsl(283.6, 5%, 45%) !important;\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/tetora.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/tetora.png\");\n}\n\n[character=Tomoya] {\n  --color: #eedcb3;\n  --hue: 41.7;\n  --name: \"Tomoya\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/tomoya.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/tomoya.png\");\n}\n\n[character=Tori] {\n  --color: #f5b2b2;\n  --hue: 0;\n  --name: \"Tori\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/tori.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/tori.png\");\n}\n\n[character=Tsukasa] {\n  --color: #942343;\n  --hue: 343;\n  --name: \"Tsukasa\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/tsukasa.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/tsukasa.png\");\n}\n\n[character=Tsumugi] {\n  --color: #00608d;\n  --hue: 199.1;\n  --name: \"Tsumugi\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/tsumugi.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/tsumugi.png\");\n}\n\n[character=Wataru] {\n  --color: #a1d8e2;\n  --hue: 189.2;\n  --name: \"Wataru\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/wataru.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/wataru.png\");\n}\n\n[character=Yuta] {\n  --color: #00a1e9;\n  --hue: 198.5;\n  --name: \"Yuta\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/yuta.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/yuta.png\");\n}\n\n[character=Yuzuru] {\n  --color: #3e62ad;\n  --hue: 220.5;\n  --name: \"Yuzuru\";\n  --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/yuzuru.png\");\n  --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/yuzuru.png\");\n}\n\n.msr-unit {\n  display: grid;\n  grid-template-columns: auto 1fr;\n  column-gap: 12px;\n  row-gap: 2px;\n  margin-bottom: 0.95em;\n  font-size: 1em;\n  --light-mode: hsl(var(--hue), 54%, 93%);\n  --dark-mode: hsl(var(--hue), 12%, 25%);\n  --fill-mode: hsl(var(--hue), 30%, 45%);\n}\n.msr-unit * {\n  transition: all 0.2s ease;\n}\n\n.msr-icon {\n  grid-row: 1/3;\n}\n\n.msr-icon__wrapper {\n  border-radius: var(--msr-icon-border);\n  position: relative;\n  overflow: hidden;\n  width: var(--msr-icon-size);\n  height: var(--msr-icon-size);\n}\n\n.msr-icon__base {\n  display: block;\n  background: 100%/100% var(--icon, url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/unknown.png\")), var(--color, #b3b3b3);\n  width: 100%;\n  height: 100%;\n}\n\n.msr-name {\n  font-size: 0.85em;\n  line-height: 1;\n  font-weight: 700;\n  text-transform: var(--msr-name-case);\n}\n.msr-name::before {\n  content: var(--name, \"???\");\n}\n\n.msr-line {\n  display: flex;\n  flex-direction: column;\n  grid-column: 2;\n  row-gap: 5px;\n}\n.msr-line p {\n  align-self: flex-start;\n  font-size: var(--msr-line-size);\n  background: var(--light-mode, #f1f1f1);\n  color: #222;\n  padding: 0.6em;\n  margin: 0;\n  border-radius: var(--msr-line-border);\n  position: relative;\n  filter: var(--msr-line-filter, 0);\n}\n.msr-line p:hover {\n  transform: translate(2px, 0px);\n}\n.msr-line p:first-child {\n  border-top-left-radius: 0;\n}\n.msr-line p:first-child::before {\n  background: transparent;\n  content: \"\";\n  position: absolute;\n  left: -30px;\n  top: 0px;\n  height: 10px;\n  width: 30px;\n  border-top-right-radius: 25px;\n  box-shadow: 23px 0 0 0 var(--light-mode, #f1f1f1);\n}\n\n[unknown] .msr-icon__base {\n  background: #b3b3b3;\n}\n[unknown] .msr-icon__wrapper::after {\n  content: \"\";\n  display: block;\n  position: absolute;\n  background: #000;\n  -webkit-mask-image: var(--icon, url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/unknown.png\"));\n  -webkit-mask-size: 100%;\n  -webkit-mask-position: 100%;\n  mask-image: var(--icon, url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/unknown.png\"));\n  mask-size: 100%;\n  mask-position: 100%;\n  top: 0;\n  width: 100%;\n  height: 100%;\n}\n[unknown] .msr-name::before {\n  content: \"???\";\n}\n[unknown] .msr-line p {\n  background: #f1f1f1;\n}\n[unknown] .msr-line p:first-child::before {\n  box-shadow: 20px 0 0 0 #f1f1f1;\n}\n\n[hidden] .msr-icon__wrapper::after {\n  content: \"\";\n  display: block;\n  position: absolute;\n  background: #000;\n  -webkit-mask-image: var(--icon, url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/unknown.png\"));\n  -webkit-mask-size: 100%;\n  -webkit-mask-position: 100%;\n  mask-image: var(--icon, url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/unknown.png\"));\n  mask-size: 100%;\n  mask-position: 100%;\n  top: 0;\n  width: 100%;\n  height: 100%;\n}\n\n.hold {\n  display: inline-block;\n}\n\n.thought {\n  color: #5555c0;\n}\n\n.spell {\n  font-family: \"Almendra\", serif;\n  letter-spacing: 0.015em;\n  font-size: 1.1em;\n  line-height: 1.3;\n}\n\n[character].dark .msr-line p {\n  background: var(--dark-mode, #0e0e0e);\n  color: #eee;\n}\n[character].dark .msr-line p:first-child::before {\n  box-shadow: 20px 0 0 0 var(--dark-mode, #0e0e0e);\n}\n[character].dark .msr-line[unknown] p {\n  background: #0e0e0e;\n}\n[character].dark .msr-line[unknown]:first-child::before {\n  box-shadow: 20px 0 0 0 #0e0e0e;\n}\n\n.dark .thought {\n  color: #d4d4fa;\n}\n\n[character].fill .msr-line p {\n  background: var(--fill-mode, #737373);\n  color: #fff;\n}\n[character].fill .msr-line p:first-child::before {\n  box-shadow: 20px 0 0 0 var(--fill-mode, #737373);\n}\n[character].fill .msr-line[unknown] p {\n  background: #737373;\n}\n[character].fill .msr-line[unknown]:first-child::before {\n  box-shadow: 20px 0 0 0 #737373;\n}\n\n.fill .thought {\n  color: #e9efff;\n}\n\n[character].smallest .msr-line p {\n  font-size: 0.8em;\n}\n\n[character].smaller .msr-line p {\n  font-size: 0.9em;\n}\n\n[character].bigger .msr-line p {\n  font-size: 1.1em;\n}\n\n[character].biggest .msr-line p {\n  font-size: 1.2em;\n}\n\n@media (min-width: 1200px) {\n  .spell {\n    font-size: 1.15em;\n  }\n}\n@media (max-width: 650px) {\n  .msr-unit {\n    margin-bottom: 0.75em;\n  }\n\n  .msr-icon__wrapper {\n    width: var(--msr-icon-size__small);\n    height: var(--msr-icon-size__small);\n  }\n}\n.story-wrapper,\n.preview-wrapper,\n.lightbox__dim,\n.three-wrapper,\n.two-wrapper {\n  width: 100%;\n  font-size: 0.92em;\n  --storyColor-dark-l: calc(var(--storyColor-l) - 20%);\n  --storyColor-dark: hsl(\n      var(--storyColor-h),\n      var(--storyColor-s),\n      var(--storyColor-dark-l)\n  );\n}\n\n.story-wrapper img,\n.lightbox__dim img,\n.preview-wrapper img,\n.three-wrapper img,\n.two-wrapper img {\n  margin-bottom: 0;\n  border-radius: 0;\n}\n\n.grid-wrapper {\n  display: grid;\n}\n\n.chapter-area ul,\n.lightbox ul {\n  list-style: none;\n  padding: 0;\n  margin: 0;\n}\n\n.story-background {\n  border-radius: 5px 5px 0 0;\n  width: 100%;\n  height: 400px;\n  background: var(--background) no-repeat;\n  background-size: cover;\n  background-position: top;\n  mask-image: linear-gradient(to bottom, #000 70%, transparent 100%);\n  -webkit-mask-image: linear-gradient(to bottom, #000 70%, transparent 100%);\n}\n\n.story-box {\n  border-radius: 15px 5px;\n  background: #fff;\n  box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.1), 0 0 15px 5px rgba(0, 0, 0, 0.05);\n  margin: -200px 15px 0;\n  padding: 20px;\n  z-index: 1;\n  display: grid;\n  grid-template-columns: 120px 1fr 200px;\n  grid-template-rows: auto 1fr;\n  grid-gap: 15px;\n}\n\n.story-cover {\n  display: flex;\n  flex-direction: column;\n  justify-content: flex-end;\n}\n.story-cover > div {\n  height: 0;\n}\n.story-cover img {\n  height: 150px;\n  width: 120px;\n  object-fit: cover;\n  border-radius: 3px;\n  box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.5);\n  transform: translate(0, -100%);\n  margin-bottom: 0 !important;\n}\n\n.preview-wrapper .grid-wrapper {\n  width: 100%;\n  grid-template-columns: 22% 10% 2fr 1fr;\n}\n.preview-wrapper .title-area {\n  line-height: 1.25;\n  display: grid;\n  grid-template-columns: auto 1fr;\n  gap: 5px;\n  margin-bottom: 10px;\n  align-items: center;\n}\n.preview-wrapper .title-area__title {\n  font-size: 1.35em;\n  grid-column: 1/3;\n}\n.preview-wrapper .title-area__subtitle {\n  line-height: 0;\n}\n.preview-wrapper .title-area__start a {\n  font-size: 0.88em;\n}\n\n.preview-background,\n.preview-box {\n  grid-row-start: 1;\n  grid-column-end: span 3;\n}\n\n.preview-background {\n  width: 100%;\n  background-repeat: no-repeat;\n  background-size: cover;\n  grid-column: 1/3;\n  border-radius: 5px 0 0 5px;\n  mask-image: linear-gradient(to right, #000 70%, transparent 100%);\n  -webkit-mask-image: linear-gradient(to right, #000 70%, transparent 100%);\n  background-position: top 35% right 50%;\n}\n\n.preview-box {\n  border-radius: 15px 5px;\n  background: #fff;\n  box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.1), 0 0 15px 5px rgba(0, 0, 0, 0.05);\n  padding: 20px;\n  grid-column-start: 2;\n  z-index: 1;\n  margin: 10px;\n}\n\n.title-area {\n  line-height: 1.25;\n  display: flex;\n  flex-direction: column;\n  gap: 5px;\n}\n\n.title-area__title,\n.title-area__subtitle,\n.tab-header__name,\n.card__name,\n.card__jp {\n  font: inherit;\n  margin: 0;\n  border: 0;\n}\n\n.title-area__subtitle,\n.card__jp {\n  font-family: \"Noto Sans JP\";\n}\n\n.title-area__title,\n.card__name {\n  font-weight: 700;\n}\n\n.title-area__title {\n  font-size: 1.35em;\n}\n\n.title-area__start a {\n  background: rgba(var(--storyColor-rgb), 0.1);\n  color: rgba(var(--storyColor-rgb), 1);\n  padding: 5px 10px;\n  display: inline-block;\n  border-radius: 5px;\n  transition: all 0.2s ease;\n  border: none;\n}\n.title-area__start a:hover {\n  background: rgba(var(--storyColor-rgb), 1);\n  color: #fff;\n}\n\n.preview-wrapper .title-area__start a:hover {\n  background: rgba(var(--storyColor-rgb), 1);\n  color: #fff;\n}\n\n.info-area {\n  grid-column: 1/3;\n  display: flex;\n  flex-direction: column;\n  gap: 10px;\n}\n.info-area a {\n  color: var(--storyColor);\n  transition: 0.2s ease-in-out;\n  border-bottom: none;\n}\n.info-area a:hover {\n  color: var(--storyColor-dark);\n}\n.info-area .synopsis {\n  margin-bottom: 5px;\n}\n.info-area ol,\n.info-area li {\n  margin-block-start: 0;\n  margin-block-end: 0;\n  margin-inline-start: 0;\n  margin-inline-end: 0;\n  padding-inline-start: 0;\n}\n\n.info {\n  display: grid;\n  grid-template-columns: 2fr 1fr 1fr 2fr;\n  gap: 5px;\n}\n\n.info-item {\n  border-radius: 5px;\n  padding: 5px 10px;\n  border: solid 2px rgba(var(--storyColor-rgb), 0.2);\n}\n.info-item.season {\n  grid-column: 1/2;\n  grid-row: 1/2;\n}\n.info-item.chapters {\n  grid-column: 2/4;\n  grid-row: 1/2;\n}\n.info-item.writer {\n  grid-column: 4/5;\n  grid-row: 1/2;\n}\n.info-item.characters {\n  grid-column: 1/5;\n  padding: 5px 10px 0;\n}\n.info-item.tl {\n  grid-column: 1/3;\n}\n.info-item.pr {\n  grid-column: 3/5;\n}\n.info-item > .label {\n  padding: 0;\n  font-weight: 700;\n  font-size: 0.82em;\n}\n.info-item > .value {\n  flex-grow: 1;\n  font-size: 0.9em;\n}\n\n.three-wrapper .info-item.one {\n  grid-column: 1/2;\n  grid-row: 2/3;\n}\n.three-wrapper .info-item.two {\n  grid-column: 2/4;\n}\n.three-wrapper .info-item.three {\n  grid-column: 4/5;\n}\n\n.two-wrapper .info-item.one {\n  grid-column: 1/3;\n}\n.two-wrapper .info-item.two {\n  grid-column: 3/5;\n}\n\n.three-wrapper,\n.two-wrapper {\n  margin-bottom: 20px;\n}\n\n.characters > .value a {\n  display: inline-block;\n  background: var(--charahead) 0 0/cover;\n  height: 40px;\n  width: 40px;\n  margin: 0 -3px;\n}\n\n.value > [character]::before, .value > [character]::after {\n  content: none;\n}\n\n.chapter-area {\n  grid-column: 3/3;\n  grid-row: 1/3;\n  font-size: 0.9em;\n}\n.chapter-area > .chapters:not(:only-child) {\n  margin-bottom: 15px;\n}\n.chapter-area > .chapters span {\n  grid-row: 1;\n  grid-column: 1/5;\n}\n.chapter-area li {\n  display: grid;\n  margin-bottom: 5px;\n  gap: 5px;\n}\n.chapter-area > .mini-talks {\n  border-top: solid 1px #eff0f4;\n}\n.chapter-area > .mini-talks::before {\n  content: \"Mini Talks\";\n  display: flex;\n  align-items: center;\n  font-weight: 700;\n  margin-top: 5px;\n}\n.chapter-area > .mini-talks .mt-content {\n  display: none;\n}\n.chapter-area > .mini-talks .mt-content > .item {\n  display: grid;\n  grid-template-columns: 1fr 1fr;\n  gap: 5px;\n}\n.chapter-area > .mini-talks .mt-header {\n  margin-bottom: 5px;\n  cursor: pointer;\n}\n.chapter-area > .mini-talks .mt-header::after {\n  content: \"\\e5cf\";\n  display: inline-block;\n  font-family: \"Material Icons Round\";\n  font-size: 1.1em;\n  transition: transform 0.4s ease;\n  position: relative;\n  top: 1px;\n  left: 3px;\n}\n.chapter-area a {\n  border-bottom: 0;\n  display: block;\n  border-radius: 3px;\n  transition: all 0.2s ease;\n  background: rgba(var(--storyColor-rgb), 0.1);\n  padding: 5px;\n  text-align: center;\n}\n.chapter-area a:hover {\n  background: rgba(var(--storyColor-rgb), 0.2);\n}\n\n#none {\n  background: rgba(225, 227, 234, 0.4);\n}\n#none:hover {\n  background: rgba(225, 227, 234, 0.8);\n}\n\n.tab-content .source {\n  text-align: right;\n  font-size: 0.9em;\n}\n\n.story-wrapper .tab-content,\n.tab-header {\n  font-size: 0.9em;\n}\n\n.chapter-area > .mini-talk__open:after,\n.tab-header__open:first-child:after {\n  transform: rotate(180deg);\n}\n\n.story-wrapper .tab-header {\n  background: rgba(var(--storyColor-rgb), 0.1);\n  font-weight: 700;\n  border-radius: 5px;\n  cursor: pointer;\n  padding: 8px;\n  display: flex;\n  justify-content: space-between;\n}\n.story-wrapper .tab-content {\n  display: none;\n  padding: 10px 10px 0;\n}\n.story-wrapper .tab-content > .tab-item:first-child {\n  padding: 0 0 8px 0;\n}\n.story-wrapper .tab-content > .tab-item:not(:first-child) {\n  border-top: solid 1px #eff0f4;\n  padding: 8px 0;\n}\n.story-wrapper .tab-content > .tab-item:last-child {\n  padding: 8px 0 0 0;\n}\n.story-wrapper .tab-header:first-child:after {\n  content: \"\\e5cf\";\n  display: inline-block;\n  font-family: \"Material Icons Round\";\n  font-size: 1.5em;\n  line-height: 1;\n  transition: transform 0.4s ease;\n}\n.story-wrapper .tab-item > .label {\n  font-weight: 700;\n  font-size: 0.89em;\n}\n.story-wrapper .tab-item > .value {\n  margin-left: 10px;\n}\n\n.cg-gallery > .tab-content > .gallery {\n  display: grid;\n  grid-template-columns: repeat(auto-fit, minmax(200px, 2fr));\n  gap: 8px;\n}\n\n.gallery-item {\n  overflow: hidden;\n  border-radius: 5px;\n  position: relative;\n  width: 100%;\n  height: auto;\n}\n.gallery-item img {\n  transition: 0.2s ease;\n  margin-bottom: 0 !important;\n}\n.gallery-item:hover img {\n  transform: scale(1.02);\n}\n.gallery-item:hover .caption {\n  transform: translateY(0);\n}\n.gallery-item .caption {\n  position: absolute;\n  bottom: 0;\n  width: calc(100% - 24px);\n  color: #fff;\n  background: linear-gradient(to bottom, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.8));\n  padding: 40px 12px 12px;\n  transition: 0.2s ease;\n  transform: translateY(100%);\n}\n\n.story-cards > .tab-content > .cards {\n  display: grid;\n  grid-template-columns: repeat(5, minmax(auto, 1fr));\n  gap: 0 8px;\n}\n\n.single {\n  transition: transform 0.2s ease;\n  position: relative;\n  display: inline-block;\n  filter: drop-shadow(0px 0px 4px rgba(0, 0, 0, 0.6));\n}\n.single img {\n  object-fit: contain;\n  width: 100%;\n  margin-bottom: 0 !important;\n}\n\n.image {\n  position: relative;\n}\n.image .single.unbloomed {\n  z-index: 2;\n  transform: scale(1);\n  filter: brightness(100%);\n}\n.image .single.bloomed {\n  z-index: 1;\n  top: 0;\n  left: 0;\n  transform: translateX(5%) scale(0.95) rotate(2deg);\n  filter: brightness(70%);\n  position: absolute;\n  width: 100%;\n  height: 100%;\n}\n.image:hover .single.bloomed {\n  z-index: 2;\n  transform: translateX(0%) scale(1) rotate(0deg);\n  filter: brightness(100%);\n}\n.image:hover .single.unbloomed {\n  z-index: 1;\n  transform: translateX(-5%) scale(0.95) rotate(-2deg);\n  filter: brightness(70%);\n}\n.image:hover .quotes {\n  transform: translate(0, calc(-1 * var(--quote-height)));\n}\n.image .quotes__wrapper {\n  display: none;\n}\n.image .quotes {\n  display: grid;\n  grid-template-rows: var(--quote-height) var(--quote-height);\n  transition: 0.2s ease;\n}\n.image .quotes > * {\n  display: flex;\n  justify-content: center;\n  align-items: center;\n  text-align: center;\n  line-height: 1.2;\n}\n\n.cards-item > .image {\n  cursor: zoom-in;\n}\n\n.lightbox-content {\n  background: #fff;\n  width: 90vw;\n  max-width: 600px;\n  max-height: 100vh;\n  overflow: auto;\n  display: grid;\n  grid-template-columns: 1fr 2fr;\n  gap: 20px;\n  padding: 20px;\n  border-radius: 5px;\n  box-shadow: 0 5px 10px 0 rgba(0, 0, 0, 0.2), 0 0 40px 0 rgba(0, 0, 0, 0.1);\n  box-sizing: border-box;\n}\n.lightbox-content .image .quotes__wrapper {\n  display: block;\n  --quote-height: 2.5em;\n  height: var(--quote-height);\n  overflow: hidden;\n}\n\n.lightbox__dim {\n  position: fixed;\n  z-index: 99999999;\n  height: 100vh;\n  width: 100vw;\n  top: 0;\n  left: 0;\n  background: rgba(0, 0, 0, 0.7);\n  display: flex;\n  align-items: center;\n  justify-content: center;\n}\n\n.lightbox > .tlnote {\n  font-size: smaller;\n}\n\nbody.lightbox-visible {\n  overflow: hidden;\n}\n\n.cards-item .lightbox {\n  display: none;\n}\n\n.card__name {\n  font-size: 1.1em;\n}\n\n.skills li {\n  display: grid;\n  grid-template-columns: 63px 1fr;\n  gap: 0 5px;\n  margin: 10px 0;\n}\n.skills li::before {\n  color: #fff;\n  background-color: #0c195c;\n  padding: 2px 6px;\n  grid-row-start: 1;\n  grid-column-start: 1;\n  grid-column-end: 2;\n  text-align: center;\n  font-weight: 700;\n  font-size: 0.8em;\n  display: flex;\n  justify-content: center;\n  align-items: center;\n  height: 1.6em;\n  content: attr(id);\n  text-transform: uppercase;\n}\n.skills .name {\n  font-weight: 700;\n}\n.skills .desc {\n  grid-column-start: 2;\n}\n\n.reverse .grid-wrapper {\n  grid-template-columns: 2fr 1fr 10% 22%;\n}\n.reverse .preview-background {\n  grid-column: 3/5;\n  border-radius: 0 5px 5px 0;\n  mask-image: linear-gradient(to left, #000 70%, transparent 100%);\n  -webkit-mask-image: linear-gradient(to left, #000 70%, transparent 100%);\n  background-position: top 35% left 50%;\n}\n.reverse .preview-box {\n  grid-column: 1/4;\n}\n\n.reverse .preview-background,\n.reverse .preview-box {\n  grid-column-end: 3 span;\n}\n\n@media only screen and (max-width: 812px) {\n  .story-box {\n    grid-template-columns: auto [col-start] 1fr [last];\n    grid-template-rows: auto;\n    margin: -245px 15px 0;\n  }\n\n  .story-cover {\n    grid-column: 1/2;\n    grid-row: 1/2;\n  }\n\n  .title-area {\n    grid-column: 2/3;\n    grid-row: 1/2;\n    line-height: 1.25;\n    display: flex;\n    flex-direction: column;\n    gap: 5px;\n  }\n\n  .mobile-reverse .story-box {\n    grid-template-columns: 1fr [col-start] auto [last];\n  }\n  .mobile-reverse .story-cover {\n    grid-column: 2/2;\n  }\n  .mobile-reverse .title-area {\n    grid-column: 1/2;\n  }\n\n  .info-area {\n    grid-column: 1/3;\n  }\n\n  .chapter-area {\n    grid-column: 1/3;\n    grid-row: 3;\n    font-size: 0.9em;\n  }\n\n  .characters > .value a {\n    height: 35px;\n    width: 35px;\n    margin-bottom: -3px;\n  }\n\n  .lightbox__dim {\n    font-size: 0.9em;\n  }\n\n  .lightbox-content {\n    padding: 15px;\n    gap: 15px;\n  }\n\n  .lightbox__dim .skills li {\n    grid-template-columns: 50px 1fr;\n  }\n\n  .card__name {\n    font-size: 1em;\n  }\n\n  .card__jp {\n    font-size: 0.9em;\n  }\n\n  .skills li:before {\n    font-size: 0.7em;\n  }\n  .skills .name,\n.skills .desc {\n    font-size: 0.88em;\n  }\n\n  .quotes {\n    font-size: 0.83em;\n  }\n}\n@media only screen and (max-width: 567px) {\n  .preview-background {\n    display: none;\n  }\n\n  .preview-wrapper .grid-wrapper {\n    grid-template-columns: unset;\n  }\n\n  .preview-box {\n    padding: 0;\n    margin: 0;\n    background: none;\n    box-shadow: none;\n  }\n\n  .characters > .value a {\n    height: 35px;\n    width: 35px;\n    margin-bottom: -3px;\n  }\n}\n@media only screen and (max-width: 400px) {\n  .story-cover {\n    display: none;\n  }\n\n  .title-area {\n    grid-column: 1/3;\n  }\n}\n.minitalk {\n  display: flex;\n  flex-direction: column;\n  gap: 10px;\n  transition: 0.15s all ease;\n}\n.minitalk [character] p:last-of-type {\n  margin-bottom: unset;\n}\n.minitalk ul {\n  margin-block-start: 0;\n  margin-block-end: 0;\n  margin-inline-start: 0;\n  margin-inline-end: 0;\n  padding-inline-start: 0;\n  list-style: none;\n  padding: 0;\n  margin-bottom: 15px;\n  display: grid;\n  grid-template-columns: 1fr 1fr;\n  border-bottom: solid 3px;\n  border-color: var(--light-mode, #f1f1f1);\n  gap: 5px;\n}\n.minitalk li {\n  border-radius: 10px 10px 0 0;\n  border: solid 3px;\n  border-color: var(--light-mode, #f1f1f1);\n  border-bottom: 0;\n  padding: 0;\n  margin-bottom: -2px;\n}\n.minitalk li > a {\n  color: #222;\n  border: 0;\n  display: block;\n  padding: 3px;\n  text-align: center;\n}\n.minitalk li.active {\n  background: var(--light-mode, #f1f1f1);\n  font-weight: 700;\n}\n\n.minitalk-option_header {\n  background: var(--light-mode, #f1f1f1);\n  border-radius: 5px;\n  cursor: pointer;\n  padding: 8px;\n  display: grid;\n  grid-template-columns: 40px 1fr 40px;\n  text-align: center;\n  align-items: center;\n  gap: 10px;\n  color: #222;\n  transition: 0.15s all ease;\n}\n.minitalk-option_header::after {\n  content: \"\\e5cf\";\n  display: inline-block;\n  font-family: \"Material Icons Round\";\n  font-size: 1.5em;\n  font-weight: 700;\n  line-height: 1;\n  transition: transform 0.4s ease;\n  justify-self: end;\n  align-self: center;\n}\n.minitalk-option_header::before {\n  content: \"\";\n  background: var(--charahead) 0 0/cover;\n  height: 40px;\n  width: 40px;\n  display: inline-block;\n}\n\n.minitalk-option_content {\n  display: none;\n  padding: 15px 0 5px;\n}\n\n.minitalk[character]::before, .minitalk[character]::after {\n  content: none;\n}\n\n.dark .minitalk-option_header {\n  color: #eee;\n  background: var(--dark-mode, #0e0e0e);\n}\n\n.dark.minitalk ul {\n  border-color: var(--dark-mode, #0e0e0e);\n}\n.dark.minitalk li {\n  border-color: var(--dark-mode, #0e0e0e);\n}\n.dark.minitalk li.active {\n  background: var(--dark-mode, #0e0e0e);\n}\n.dark.minitalk li.active > a {\n  color: #eee;\n}\n\n.fill .minitalk-option_header {\n  color: #fff;\n  background: var(--fill-mode, #737373);\n}\n\n.fill.minitalk ul {\n  border-color: var(--fill-mode, #737373);\n}\n.fill.minitalk li {\n  border-color: var(--fill-mode, #737373);\n}\n.fill.minitalk li.active {\n  background: var(--fill-mode, #737373);\n}\n.fill.minitalk li.active > a {\n  color: #fff;\n}\n\n.smallest .minitalk-option_header {\n  font-size: 0.8em;\n}\n.smallest .minitalk-option_header::after {\n  font-size: 1.7em;\n}\n\n.smaller .minitalk-option_header {\n  font-size: 0.9em;\n}\n.smaller .minitalk-option_header::after {\n  font-size: 1.6em;\n}\n\n.smallest .minitalk-option_header,\n.smaller .minitalk-option_header {\n  padding: 6px;\n  grid-template-columns: 35px 1fr 35px;\n}\n.smallest .minitalk-option_header::before,\n.smaller .minitalk-option_header::before {\n  height: 35px;\n  width: 35px;\n}\n\n.bigger .minitalk-option_header {\n  font-size: 1.1em;\n}\n.bigger .minitalk-option_header::after {\n  font-size: 1.4em;\n}\n\n.biggest .minitalk-option_header {\n  font-size: 1.2em;\n}\n.biggest .minitalk-option_header::after {\n  font-size: 1.3em;\n}\n\n.bigger .minitalk-option_header,\n.biggest .minitalk-option_header {\n  grid-template-columns: 45px 1fr 45px;\n}\n.bigger .minitalk-option_header::before,\n.biggest .minitalk-option_header::before {\n  height: 45px;\n  width: 45px;\n}\n\n[mt=normal],\n[mt=rare] {\n  display: inline-block;\n  width: 25px;\n  height: 29.28px;\n  margin: 0 10px -8px 0 !important;\n  background-size: cover;\n}\n\n[mt=normal] {\n  background-image: url(\"https://cdn.jsdelivr.net/gh/enstars/img/talkevent_normal.png\");\n}\n\n[mt=rare] {\n  background-image: url(\"https://cdn.jsdelivr.net/gh/enstars/img/talkevent_rare.png\");\n}\n\n.toolbar-wrapper {\n  position: sticky;\n  display: flex;\n  flex-direction: column;\n  align-items: center;\n  gap: 4px;\n  top: 5px;\n  z-index: 2;\n  margin-bottom: 20px;\n}\n\n.toolbar {\n  display: grid;\n  grid-auto-flow: column;\n  gap: 23px;\n  background: #fff;\n  justify-content: center;\n  align-items: center;\n  width: auto;\n  border-radius: 15px;\n  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.2);\n  padding: 2px 35px;\n  z-index: 3;\n}\n.toolbar a {\n  color: #555;\n  border-bottom: none;\n  transition: 0.2s ease-in-out;\n  line-height: 0;\n  border-radius: 5px;\n  padding: 2px;\n}\n.toolbar a:hover {\n  color: #000;\n  background-color: #e0e0e0;\n}\n.toolbar .material-icons-round {\n  font-size: 1.35em;\n  font-weight: 700;\n}\n\n.toolbar__section {\n  display: flex;\n}\n\n.slider-container {\n  position: absolute;\n  background: #fff;\n  justify-content: center;\n  align-items: center;\n  width: auto;\n  padding: 0 8px 5px;\n  border-radius: 15px;\n  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.2);\n  transition: transform 0.3s ease, max-height 0s 0.3s step-end;\n}\n\n.toolbar-wrapper.showSlider .slider-container {\n  transition: transform 0.3s ease, max-height 0s 0.3s step-end;\n  transform: translateY(calc(100% + 5px));\n}\n\n.slider {\n  -webkit-appearance: none;\n  appearance: none;\n  width: 100px;\n  height: 6px;\n  border-radius: 5px;\n  background: #d3d3d3;\n  outline: 0;\n  opacity: 0.7;\n  transition: opacity 0.2s;\n}\n.slider:hover {\n  opacity: 1;\n}\n.slider::-webkit-slider-thumb {\n  -webkit-appearance: none;\n  appearance: none;\n  width: 15px;\n  height: 15px;\n  border-radius: 50%;\n  background: var(--storyColor, #222);\n  cursor: pointer;\n}\n.slider::-moz-range-thumb {\n  width: 15px;\n  height: 15px;\n  border-radius: 50%;\n  background: var(--storyColor, #222);\n  cursor: pointer;\n}\n\na.inline-note {\n  display: inline-block;\n  vertical-align: middle;\n  margin: 0 2px;\n  font-weight: 700;\n  font-size: 0.7em;\n  border-radius: 3px;\n  border: solid 1px #ababab;\n  padding: 0 3px;\n  background: rgba(255, 255, 255, 0.5);\n  color: var(--storyColor);\n  --storyColor-dark-l: calc(var(--storyColor-l) - 20%);\n  --storyColor-dark: hsl(\n      var(--storyColor-h),\n      var(--storyColor-s),\n      var(--storyColor-dark-l)\n  );\n}\n\na.inline-note:hover {\n  color: var(--storyColor-dark);\n}","@use \"_mixins.scss\";\n\n[character],\n.minitalk,\n.toolbar {\n    @include mixins.disableSelect;\n}\n\n.note {\n    &.location,\n    &.narration,\n    &.cw {\n        @include mixins.disableSelect;\n    }\n}\n","@mixin disableSelect {\n    -webkit-touch-callout: none;\n    -webkit-user-select: none;\n    -khtml-user-select: none;\n    -moz-user-select: none;\n    -ms-user-select: none;\n    user-select: none;\n}\n\n@mixin normalizeImg {\n    margin-bottom: 0;\n    border-radius: 0;\n}\n",":root {\n    --msr-icon-border: 12px 4px;\n    --msr-icon-size: 50px;\n    --msr-icon-size__small: 45px;\n    --msr-name-case: uppercase;\n    /* --msr-line-filter: drop-shadow(0 1px 1.5px rgba(0, 0, 0, 0.05))\n        drop-shadow(0 1px 1px rgba(0, 0, 0, 0.06)); */\n    --msr-line-border: 8px;\n    --msr-line-size: 1em;\n}\n","[character=\"Anzu\"] {\n    --color: #ffb6da;\n    --hue: 330.4;\n    --name: \"Anzu\";\n}\n\n[character=\"Adonis\"] {\n    --color: #915da3;\n    --hue: 284.6;\n    --name: \"Adonis\";\n    --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/adonis.png\");\n    --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/adonis.png\");\n}\n\n[character=\"Aira\"] {\n    --color: #fff1cf;\n    --hue: 42.5;\n    --name: \"Aira\";\n    --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/aira.png\");\n    --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/aira.png\");\n}\n\n[character=\"Akiomi\"] {\n    --color: #915c8b;\n    --hue: 306.8;\n    --name: \"Akiomi\";\n    --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/akiomi.png\");\n    --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/akiomi.png\");\n}\n\n[character=\"Arashi\"] {\n    --color: #edde7b;\n    --hue: 52.1;\n    --name: \"Arashi\";\n    --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/arashi.png\");\n    --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/arashi.png\");\n}\n\n[character=\"Chiaki\"] {\n    --color: #e60033;\n    --hue: 346.7;\n    --name: \"Chiaki\";\n    --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/chiaki.png\");\n    --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/chiaki.png\");\n}\n\n[character=\"Eichi\"] {\n    --color: #fff3b8;\n    --hue: 49.9;\n    --name: \"Eichi\";\n    --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/eichi.png\");\n    --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/eichi.png\");\n}\n\n[character=\"Gatekeeper\"] {\n    --color: #7e6407;\n    --hue: 46.9;\n    --name: \"Gatekeeper\";\n    --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/gatekeeper.png\");\n    --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/gatekeeper.png\");\n}\n\n[character=\"Hajime\"] {\n    --color: #cab8d9;\n    --hue: 272.7;\n    --name: \"Hajime\";\n    --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/hajime.png\");\n    --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/hajime.png\");\n}\n\n[character=\"Hiiro\"] {\n    --color: #ba2636;\n    --hue: 353.5;\n    --name: \"Hiiro\";\n    --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/hiiro.png\");\n    --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/hiiro.png\");\n}\n\n[character=\"HiMERU\"] {\n    --color: #89c3eb;\n    --hue: 204.5;\n    --name: \"HiMERU\";\n    --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/himeru.png\");\n    --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/himeru.png\");\n}\n\n[character=\"Hinata\"] {\n    --color: #eb6ea0;\n    --hue: 336;\n    --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/hinata.png\");\n    --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/hinata.png\");\n}\n\n[character=\"Hiyori\"] {\n    --color: #b8d200;\n    --hue: 67.4;\n    --name: \"Hiyori\";\n    --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/hiyori.png\");\n    --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/hiyori.png\");\n}\n\n[character=\"Hokuto\"] {\n    --color: #0068b7;\n    --hue: 205.9;\n    --name: \"Hokuto\";\n    --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/hokuto.png\");\n    --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/hokuto.png\");\n}\n\n[character=\"Ibara\"] {\n    --color: #74325c;\n    --hue: 321.8;\n    --name: \"Ibara\";\n    --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/ibara.png\");\n    --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/ibara.png\");\n}\n\n[character=\"Izumi\"] {\n    --color: #bbdbf3;\n    --hue: 205.7;\n    --name: \"Izumi\";\n    --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/izumi.png\");\n    --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/izumi.png\");\n}\n\n[character=\"Jin\"] {\n    --color: #8da0b6;\n    --hue: 212.2;\n    --name: \"Jin\";\n    --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/jin.png\");\n    --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/jin.png\");\n}\n\n[character=\"Jun\"] {\n    --color: #192f60;\n    --hue: 221.4;\n    --name: \"Jun\";\n    --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/jun.png\");\n    --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/jun.png\");\n}\n\n[character=\"Kanata\"] {\n    --color: #008db7;\n    --hue: 193.8;\n    --name: \"Kanata\";\n    --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/kanata.png\");\n    --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/kanata.png\");\n}\n\n[character=\"Kaoru\"] {\n    --color: #fdd35c;\n    --hue: 44.3;\n    --name: \"Kaoru\";\n    --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/kaoru.png\");\n    --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/kaoru.png\");\n}\n\n[character=\"Keito\"] {\n    --color: #316745;\n    --hue: 142.2;\n    --name: \"Keito\";\n    --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/keito.png\");\n    --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/keito.png\");\n}\n\n[character=\"Koga\"] {\n    --color: #c9caca;\n    --hue: 180;\n    --name: \"Koga\";\n    --light-mode: hsl(180, 9%, 92%) !important;\n    --dark-mode: hsl(180, 5%, 25%) !important;\n    --fill-mode: hsl(180, 5%, 45%) !important;\n    --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/koga.png\");\n    --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/koga.png\");\n}\n\n[character=\"Kohaku\"] {\n    --color: #f4b3c2;\n    --hue: 346.2;\n    --name: \"Kohaku\";\n    --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/kohaku.png\");\n    --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/kohaku.png\");\n}\n\n[character=\"Kuro\"] {\n    --color: #e83929;\n    --hue: 5;\n    --name: \"Kuro\";\n    --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/kuro.png\");\n    --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/kuro.png\");\n}\n\n[character=\"Leo\"] {\n    --color: #ec6d51;\n    --hue: 10.8;\n    --name: \"Leo\";\n    --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/leo.png\");\n    --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/leo.png\");\n}\n\n[character=\"Madara\"] {\n    --color: #622d18;\n    --hue: 17;\n    --name: \"Madara\";\n    --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/madara.png\");\n    --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/madara.png\");\n}\n\n[character=\"Makoto\"] {\n    --color: #65ab31;\n    --hue: 94.4;\n    --name: \"Makoto\";\n    --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/makoto.png\");\n    --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/makoto.png\");\n}\n\n[character=\"Mao\"] {\n    --color: #941f57;\n    --hue: 331.3;\n    --name: \"Mao\";\n    --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/mao.png\");\n    --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/mao.png\");\n}\n\n[character=\"Mayoi\"] {\n    --color: #522f60;\n    --hue: 282.9;\n    --name: \"Mayoi\";\n    --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/mayoi.png\");\n    --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/mayoi.png\");\n}\n\n[character=\"Midori\"] {\n    --color: #00533f;\n    --hue: 165.5;\n    --name: \"Midori\";\n    --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/midori.png\");\n    --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/midori.png\");\n}\n\n[character=\"Mika\"] {\n    --color: #006a6c;\n    --hue: 181.1;\n    --name: \"Mika\";\n    --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/mika.png\");\n    --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/mika.png\");\n}\n\n[character=\"Mitsuru\"] {\n    --color: #ed6d35;\n    --hue: 18.3;\n    --name: \"Mitsuru\";\n    --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/mitsuru.png\");\n    --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/mitsuru.png\");\n}\n\n[character=\"Nagisa\"] {\n    --color: #a73836;\n    --hue: 1.1;\n    --name: \"Nagisa\";\n    --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/nagisa.png\");\n    --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/nagisa.png\");\n}\n\n[character=\"Natsume\"] {\n    --color: #d70035;\n    --hue: 345.2;\n    --name: \"Natsume\";\n    --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/natsume.png\");\n    --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/natsume.png\");\n}\n\n[character=\"Nazuna\"] {\n    --color: #ffec47;\n    --hue: 53.8;\n    --name: \"Nazuna\";\n    --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/nazuna.png\");\n    --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/nazuna.png\");\n}\n\n[character=\"Niki\"] {\n    --color: #507ea4;\n    --hue: 207.1;\n    --name: \"Niki\";\n    --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/niki.png\");\n    --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/niki.png\");\n}\n\n[character=\"Rei\"] {\n    --color: #47266e;\n    --hue: 267.5;\n    --name: \"Rei\";\n    --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/rei.png\");\n    --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/rei.png\");\n}\n\n[character=\"Rinne\"] {\n    --color: #b7282e;\n    --hue: 357.5;\n    --name: \"Rinne\";\n    --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/rinne.png\");\n    --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/rinne.png\");\n}\n\n[character=\"Ritsu\"] {\n    --color: #001e43;\n    --hue: 213.1;\n    --name: \"Ritsu\";\n    --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/ritsu.png\");\n    --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/ritsu.png\");\n}\n\n[character=\"Seiya\"] {\n    --color: #07467f;\n    --hue: 208.5;\n    --name: \"Seiya\";\n    --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/seiya.png\");\n    --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/seiya.png\");\n}\n\n[character=\"Shinobu\"] {\n    --color: #ffdc00;\n    --hue: 51.8;\n    --name: \"Shinobu\";\n    --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/shinobu.png\");\n    --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/shinobu.png\");\n}\n\n[character=\"Shu\"] {\n    --color: #e3acae;\n    --hue: 357.8;\n    --name: \"Shu\";\n    --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/shu.png\");\n    --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/shu.png\");\n}\n\n[character=\"Sora\"] {\n    --color: #fff352;\n    --hue: 55.8;\n    --name: \"Sora\";\n    --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/sora.png\");\n    --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/sora.png\");\n}\n\n[character=\"Souma\"] {\n    --color: #5654a2;\n    --hue: 241.5;\n    --name: \"Souma\";\n    --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/souma.png\");\n    --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/souma.png\");\n}\n\n[character=\"Subaru\"] {\n    --color: #f3981d;\n    --hue: 34.5;\n    --name: \"Subaru\";\n    --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/subaru.png\");\n    --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/subaru.png\");\n}\n\n[character=\"Tatsumi\"] {\n    --color: #7ebea5;\n    --hue: 156.6;\n    --name: \"Tatsumi\";\n    --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/tatsumi.png\");\n    --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/tatsumi.png\");\n}\n\n[character=\"Tetora\"] {\n    --color: #302833;\n    --hue: 283.6;\n    --name: \"Tetora\";\n    --light-mode: hsl(283.6, 9%, 92%) !important;\n    --dark-mode: hsl(283.6, 5%, 25%) !important;\n    --fill-mode: hsl(283.6, 5%, 45%) !important;\n    --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/tetora.png\");\n    --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/tetora.png\");\n}\n\n[character=\"Tomoya\"] {\n    --color: #eedcb3;\n    --hue: 41.7;\n    --name: \"Tomoya\";\n    --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/tomoya.png\");\n    --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/tomoya.png\");\n}\n\n[character=\"Tori\"] {\n    --color: #f5b2b2;\n    --hue: 0;\n    --name: \"Tori\";\n    --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/tori.png\");\n    --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/tori.png\");\n}\n\n[character=\"Tsukasa\"] {\n    --color: #942343;\n    --hue: 343;\n    --name: \"Tsukasa\";\n    --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/tsukasa.png\");\n    --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/tsukasa.png\");\n}\n\n[character=\"Tsumugi\"] {\n    --color: #00608d;\n    --hue: 199.1;\n    --name: \"Tsumugi\";\n    --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/tsumugi.png\");\n    --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/tsumugi.png\");\n}\n\n[character=\"Wataru\"] {\n    --color: #a1d8e2;\n    --hue: 189.2;\n    --name: \"Wataru\";\n    --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/wataru.png\");\n    --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/wataru.png\");\n}\n\n[character=\"Yuta\"] {\n    --color: #00a1e9;\n    --hue: 198.5;\n    --name: \"Yuta\";\n    --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/yuta.png\");\n    --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/yuta.png\");\n}\n\n[character=\"Yuzuru\"] {\n    --color: #3e62ad;\n    --hue: 220.5;\n    --name: \"Yuzuru\";\n    --icon: url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/yuzuru.png\");\n    --charahead: url(\"https://cdn.jsdelivr.net/gh/enstars/img/charahead/yuzuru.png\");\n}\n",".msr-unit {\n    * {\n        transition: all 0.2s ease;\n    }\n\n    display: grid;\n    grid-template-columns: auto 1fr;\n    column-gap: 12px;\n    row-gap: 2px;\n    margin-bottom: 0.95em;\n    font-size: 1em;\n    --light-mode: hsl(var(--hue), 54%, 93%);\n    --dark-mode: hsl(var(--hue), 12%, 25%);\n    --fill-mode: hsl(var(--hue), 30%, 45%);\n}\n\n.msr-icon {\n    grid-row: 1/3;\n}\n\n.msr-icon__wrapper {\n    border-radius: var(--msr-icon-border);\n    position: relative;\n    overflow: hidden;\n    width: var(--msr-icon-size);\n    height: var(--msr-icon-size);\n}\n\n.msr-icon__base {\n    display: block;\n    background: 100% / 100%\n            var(\n                --icon,\n                url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/unknown.png\")\n            ),\n        var(--color, #b3b3b3);\n    width: 100%;\n    height: 100%;\n}\n\n.msr-name {\n    font-size: 0.85em;\n    line-height: 1;\n    font-weight: 700;\n    text-transform: var(--msr-name-case);\n\n    &::before {\n        content: var(--name, \"???\");\n    }\n}\n\n.msr-line {\n    display: flex;\n    flex-direction: column;\n    grid-column: 2;\n    row-gap: 5px;\n\n    p {\n        align-self: flex-start;\n        font-size: var(--msr-line-size);\n        background: var(--light-mode, #f1f1f1);\n        color: #222;\n        padding: 0.6em;\n        margin: 0;\n        border-radius: var(--msr-line-border);\n        position: relative;\n        filter: var(--msr-line-filter, 0);\n\n        &:hover {\n            transform: translate(2px, 0px);\n        }\n\n        &:first-child {\n            border-top-left-radius: 0;\n\n            &::before {\n                background: transparent;\n                content: \"\";\n                position: absolute;\n                left: -30px;\n                top: 0px;\n                height: 10px;\n                width: 30px;\n                border-top-right-radius: 25px;\n                box-shadow: 23px 0 0 0 var(--light-mode, #f1f1f1);\n            }\n        }\n    }\n}\n","[unknown] {\n    .msr-icon__base {\n        background: #b3b3b3;\n    }\n\n    .msr-icon__wrapper::after {\n        content: \"\";\n        display: block;\n        position: absolute;\n        background: #000;\n        -webkit-mask-image: var(\n            --icon,\n            url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/unknown.png\")\n        );\n        -webkit-mask-size: 100%;\n        -webkit-mask-position: 100%;\n        mask-image: var(\n            --icon,\n            url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/unknown.png\")\n        );\n        mask-size: 100%;\n        mask-position: 100%;\n        top: 0;\n        width: 100%;\n        height: 100%;\n    }\n\n    .msr-name::before {\n        content: \"???\";\n    }\n\n    .msr-line p {\n        background: #f1f1f1;\n\n        &:first-child::before {\n            box-shadow: 20px 0 0 0 #f1f1f1;\n        }\n    }\n}\n\n[hidden] {\n    .msr-icon__wrapper::after {\n        content: \"\";\n        display: block;\n        position: absolute;\n        background: #000;\n        -webkit-mask-image: var(\n            --icon,\n            url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/unknown.png\")\n        );\n        -webkit-mask-size: 100%;\n        -webkit-mask-position: 100%;\n        mask-image: var(\n            --icon,\n            url(\"https://cdn.jsdelivr.net/gh/enstars/img/icon/unknown.png\")\n        );\n        mask-size: 100%;\n        mask-position: 100%;\n        top: 0;\n        width: 100%;\n        height: 100%;\n    }\n}\n",".hold {\n    display: inline-block;\n}\n\n.thought {\n    color: #5555c0;\n}\n\n.spell {\n    font-family: \"Almendra\", serif;\n    letter-spacing: 0.015em;\n    font-size: 1.1em;\n    line-height: 1.3;\n}\n","[character].dark {\n    .msr-line {\n        p {\n            background: var(--dark-mode, #0e0e0e);\n            color: #eee;\n\n            &:first-child {\n                &::before {\n                    box-shadow: 20px 0 0 0 var(--dark-mode, #0e0e0e);\n                }\n            }\n        }\n        &[unknown] {\n            p {\n                background: #0e0e0e;\n            }\n            &:first-child {\n                &::before {\n                    box-shadow: 20px 0 0 0 #0e0e0e;\n                }\n            }\n        }\n    }\n}\n\n.dark .thought {\n    color: #d4d4fa;\n}\n","[character].fill {\n    .msr-line {\n        p {\n            background: var(--fill-mode, #737373);\n            color: #fff;\n\n            &:first-child {\n                &::before {\n                    box-shadow: 20px 0 0 0 var(--fill-mode, #737373);\n                }\n            }\n        }\n        &[unknown] {\n            p {\n                background: #737373;\n            }\n            &:first-child {\n                &::before {\n                    box-shadow: 20px 0 0 0 #737373;\n                }\n            }\n        }\n    }\n}\n\n.fill .thought {\n    color: #e9efff;\n}\n","[character].smallest {\n    .msr-line {\n        p {\n            font-size: 0.8em;\n        }\n    }\n}\n\n[character].smaller {\n    .msr-line {\n        p {\n            font-size: 0.9em;\n        }\n    }\n}\n\n[character].bigger {\n    .msr-line {\n        p {\n            font-size: 1.1em;\n        }\n    }\n}\n\n[character].biggest {\n    .msr-line {\n        p {\n            font-size: 1.2em;\n        }\n    }\n}\n","@media (min-width: 1200px) {\n    .spell {\n        font-size: 1.15em;\n    }\n}\n\n@media (max-width: 650px) {\n    .msr-unit {\n        margin-bottom: 0.75em;\n    }\n\n    .msr-icon__wrapper {\n        width: var(--msr-icon-size__small);\n        height: var(--msr-icon-size__small);\n    }\n}\n",".story-wrapper,\n.preview-wrapper,\n.lightbox__dim,\n.three-wrapper,\n.two-wrapper {\n    width: 100%;\n    font-size: 0.92em;\n    --storyColor-dark-l: calc(var(--storyColor-l) - 20%);\n    --storyColor-dark: hsl(\n        var(--storyColor-h),\n        var(--storyColor-s),\n        var(--storyColor-dark-l)\n    );\n}\n\n.story-wrapper img,\n.lightbox__dim img,\n.preview-wrapper img,\n.three-wrapper img,\n.two-wrapper img {\n    margin-bottom: 0;\n    border-radius: 0;\n}\n\n.grid-wrapper {\n    display: grid;\n}\n\n.chapter-area ul,\n.lightbox ul {\n    list-style: none;\n    padding: 0;\n    margin: 0;\n}\n",".story-background {\n    border-radius: 5px 5px 0 0;\n    width: 100%;\n    height: 400px;\n    background: var(--background) no-repeat;\n    background-size: cover;\n    background-position: top;\n    mask-image: linear-gradient(to bottom, #000 70%, transparent 100%);\n    -webkit-mask-image: linear-gradient(to bottom, #000 70%, transparent 100%);\n}\n\n.story-box {\n    border-radius: 15px 5px;\n    background: #fff;\n    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.1), 0 0 15px 5px rgba(0, 0, 0, 0.05);\n    margin: -200px 15px 0;\n    padding: 20px;\n    z-index: 1;\n    display: grid;\n    grid-template-columns: 120px 1fr 200px;\n    grid-template-rows: auto 1fr;\n    grid-gap: 15px;\n}\n\n.story-cover {\n    display: flex;\n    flex-direction: column;\n    justify-content: flex-end;\n\n    > div {\n        height: 0;\n    }\n\n    img {\n        height: 150px;\n        width: 120px;\n        object-fit: cover;\n        border-radius: 3px;\n        box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.5);\n        transform: translate(0, -100%);\n        margin-bottom: 0 !important;\n    }\n}\n",".preview-wrapper {\n    .grid-wrapper {\n        width: 100%;\n        grid-template-columns: 22% 10% 2fr 1fr;\n    }\n\n    .title-area {\n        line-height: 1.25;\n        display: grid;\n        grid-template-columns: auto 1fr;\n        gap: 5px;\n        margin-bottom: 10px;\n        align-items: center;\n    }\n\n    .title-area__title {\n        font-size: 1.35em;\n        grid-column: 1/3;\n    }\n\n    .title-area__subtitle {\n        line-height: 0;\n    }\n\n    .title-area__start a {\n        font-size: 0.88em;\n    }\n}\n\n.preview-background,\n.preview-box {\n    grid-row-start: 1;\n    grid-column-end: span 3;\n}\n\n.preview-background {\n    width: 100%;\n    background-repeat: no-repeat;\n    background-size: cover;\n    grid-column: 1/3;\n    border-radius: 5px 0 0 5px;\n    mask-image: linear-gradient(to right, #000 70%, transparent 100%);\n    -webkit-mask-image: linear-gradient(to right, #000 70%, transparent 100%);\n    background-position: top 35% right 50%;\n}\n\n.preview-box {\n    border-radius: 15px 5px;\n    background: #fff;\n    box-shadow: 0 2px 5px 0 rgb(0 0 0 / 10%), 0 0 15px 5px rgb(0 0 0 / 5%);\n    padding: 20px;\n    grid-column-start: 2;\n    z-index: 1;\n    margin: 10px;\n}\n",".title-area {\n    line-height: 1.25;\n    display: flex;\n    flex-direction: column;\n    gap: 5px;\n}\n\n.title-area__title,\n.title-area__subtitle,\n.tab-header__name,\n.card__name,\n.card__jp {\n    font: inherit;\n    margin: 0;\n    border: 0;\n}\n\n.title-area__subtitle,\n.card__jp {\n    font-family: \"Noto Sans JP\";\n}\n\n.title-area__title,\n.card__name {\n    font-weight: 700;\n}\n\n.title-area__title {\n    font-size: 1.35em;\n}\n\n.title-area__start a {\n    background: rgba(var(--storyColor-rgb), 0.1);\n    color: rgba(var(--storyColor-rgb), 1);\n    padding: 5px 10px;\n    display: inline-block;\n    border-radius: 5px;\n    transition: all 0.2s ease;\n    border: none;\n\n    &:hover {\n        background: rgba(var(--storyColor-rgb), 1);\n        color: #fff;\n    }\n}\n\n.preview-wrapper .title-area__start a:hover {\n    background: rgba(var(--storyColor-rgb), 1);\n    color: #fff;\n}\n",".info-area {\n    grid-column: 1/3;\n    display: flex;\n    flex-direction: column;\n    gap: 10px;\n\n    a {\n        color: var(--storyColor);\n        transition: 0.2s ease-in-out;\n        border-bottom: none;\n\n        &:hover {\n            color: var(--storyColor-dark);\n        }\n    }\n\n    .synopsis {\n        margin-bottom: 5px;\n    }\n\n    ol,\n    li {\n        margin-block-start: 0;\n        margin-block-end: 0;\n        margin-inline-start: 0;\n        margin-inline-end: 0;\n        padding-inline-start: 0;\n    }\n}\n\n.info {\n    display: grid;\n    grid-template-columns: 2fr 1fr 1fr 2fr;\n    gap: 5px;\n}\n\n.info-item {\n    border-radius: 5px;\n    padding: 5px 10px;\n    border: solid 2px rgba(var(--storyColor-rgb), 0.2);\n\n    &.season {\n        grid-column: 1/2;\n        grid-row: 1/2;\n    }\n\n    &.chapters {\n        grid-column: 2/4;\n        grid-row: 1/2;\n    }\n\n    &.writer {\n        grid-column: 4/5;\n        grid-row: 1/2;\n    }\n\n    &.characters {\n        grid-column: 1/5;\n        padding: 5px 10px 0;\n    }\n\n    &.tl {\n        grid-column: 1/3;\n    }\n\n    &.pr {\n        grid-column: 3/5;\n    }\n\n    > {\n        .label {\n            padding: 0;\n            font-weight: 700;\n            font-size: 0.82em;\n        }\n\n        .value {\n            flex-grow: 1;\n            font-size: 0.9em;\n        }\n    }\n}\n\n.three-wrapper .info-item {\n    &.one {\n        grid-column: 1/2;\n        grid-row: 2/3;\n    }\n\n    &.two {\n        grid-column: 2/4;\n    }\n\n    &.three {\n        grid-column: 4/5;\n    }\n}\n\n.two-wrapper .info-item {\n    &.one {\n        grid-column: 1/3;\n    }\n\n    &.two {\n        grid-column: 3/5;\n    }\n}\n\n.three-wrapper,\n.two-wrapper {\n    margin-bottom: 20px;\n}\n\n.characters > .value a {\n    display: inline-block;\n    background: var(--charahead) 0 (0 / cover);\n    height: 40px;\n    width: 40px;\n    margin: 0 -3px;\n}\n\n.value > [character] {\n    &::before,\n    &::after {\n        content: none;\n    }\n}\n",".chapter-area {\n    grid-column: 3/3;\n    grid-row: 1/3;\n    font-size: 0.9em;\n\n    > .chapters {\n        &:not(:only-child) {\n            margin-bottom: 15px;\n        }\n\n        span {\n            grid-row: 1;\n            grid-column: 1/5;\n        }\n    }\n\n    li {\n        display: grid;\n        margin-bottom: 5px;\n        gap: 5px;\n    }\n\n    > .mini-talks {\n        border-top: solid 1px #eff0f4;\n\n        &::before {\n            content: \"Mini Talks\";\n            display: flex;\n            align-items: center;\n            font-weight: 700;\n            margin-top: 5px;\n        }\n\n        .mt-content {\n            display: none;\n\n            > .item {\n                display: grid;\n                grid-template-columns: 1fr 1fr;\n                gap: 5px;\n            }\n        }\n\n        .mt-header {\n            margin-bottom: 5px;\n            cursor: pointer;\n\n            &::after {\n                content: \"\\e5cf\";\n                display: inline-block;\n                font-family: \"Material Icons Round\";\n                font-size: 1.1em;\n                transition: transform 0.4s ease;\n                position: relative;\n                top: 1px;\n                left: 3px;\n            }\n        }\n    }\n\n    a {\n        border-bottom: 0;\n        display: block;\n        border-radius: 3px;\n        transition: all 0.2s ease;\n        background: rgba(var(--storyColor-rgb), 0.1);\n        padding: 5px;\n        text-align: center;\n\n        &:hover {\n            background: rgba(var(--storyColor-rgb), 0.2);\n        }\n    }\n}\n\n#none {\n    background: rgba(225, 227, 234, 0.4);\n\n    &:hover {\n        background: rgba(225, 227, 234, 0.8);\n    }\n}\n",".tab-content .source {\n    text-align: right;\n    font-size: 0.9em;\n}\n\n.story-wrapper .tab-content,\n.tab-header {\n    font-size: 0.9em;\n}\n\n.chapter-area > .mini-talk__open:after,\n.tab-header__open:first-child:after {\n    transform: rotate(180deg);\n}\n\n.story-wrapper {\n    .tab-header {\n        background: rgba(var(--storyColor-rgb), 0.1);\n        font-weight: 700;\n        border-radius: 5px;\n        cursor: pointer;\n        padding: 8px;\n        display: flex;\n        justify-content: space-between;\n    }\n\n    .tab-content {\n        display: none;\n        padding: 10px 10px 0;\n\n        > .tab-item {\n            &:first-child {\n                padding: 0 0 8px 0;\n            }\n\n            &:not(:first-child) {\n                border-top: solid 1px #eff0f4;\n                padding: 8px 0;\n            }\n\n            &:last-child {\n                padding: 8px 0 0 0;\n            }\n        }\n    }\n\n    .tab-header:first-child:after {\n        content: \"\\e5cf\";\n        display: inline-block;\n        font-family: \"Material Icons Round\";\n        font-size: 1.5em;\n        line-height: 1;\n        transition: transform 0.4s ease;\n    }\n\n    .tab-item > {\n        .label {\n            font-weight: 700;\n            font-size: 0.89em;\n        }\n\n        .value {\n            margin-left: 10px;\n        }\n    }\n}\n",".cg-gallery > .tab-content > .gallery {\n    display: grid;\n    grid-template-columns: repeat(auto-fit, minmax(200px, 2fr));\n    gap: 8px;\n}\n\n.gallery-item {\n    overflow: hidden;\n    border-radius: 5px;\n    position: relative;\n    width: 100%;\n    height: auto;\n\n    img {\n        transition: 0.2s ease;\n        margin-bottom: 0 !important;\n    }\n\n    &:hover {\n        img {\n            transform: scale(1.02);\n        }\n\n        .caption {\n            transform: translateY(0);\n        }\n    }\n\n    .caption {\n        position: absolute;\n        bottom: 0;\n        width: calc(100% - 24px);\n        color: #fff;\n        background: linear-gradient(\n            to bottom,\n            rgba(0, 0, 0, 0),\n            rgba(0, 0, 0, 0.8)\n        );\n        padding: 40px 12px 12px;\n        transition: 0.2s ease;\n        transform: translateY(100%);\n    }\n}\n",".story-cards > .tab-content > .cards {\n    display: grid;\n    grid-template-columns: repeat(5, minmax(auto, 1fr));\n    gap: 0 8px;\n}\n\n.single {\n    transition: transform 0.2s ease;\n    position: relative;\n    display: inline-block;\n    filter: drop-shadow(0px 0px 4px rgba(0, 0, 0, 0.6));\n\n    img {\n        object-fit: contain;\n        width: 100%;\n        margin-bottom: 0 !important;\n    }\n}\n\n.image {\n    position: relative;\n\n    .single {\n        &.unbloomed {\n            z-index: 2;\n            transform: scale(1);\n            filter: brightness(100%);\n        }\n\n        &.bloomed {\n            z-index: 1;\n            top: 0;\n            left: 0;\n            transform: translateX(5%) scale(0.95) rotate(2deg);\n            filter: brightness(70%);\n            position: absolute;\n            width: 100%;\n            height: 100%;\n        }\n    }\n\n    &:hover {\n        .single {\n            &.bloomed {\n                z-index: 2;\n                transform: translateX(0%) scale(1) rotate(0deg);\n                filter: brightness(100%);\n            }\n\n            &.unbloomed {\n                z-index: 1;\n                transform: translateX(-5%) scale(0.95) rotate(-2deg);\n                filter: brightness(70%);\n            }\n        }\n\n        .quotes {\n            transform: translate(0, calc(-1 * var(--quote-height)));\n        }\n    }\n\n    .quotes__wrapper {\n        display: none;\n    }\n\n    .quotes {\n        display: grid;\n        grid-template-rows: var(--quote-height) var(--quote-height);\n        transition: 0.2s ease;\n\n        > * {\n            display: flex;\n            justify-content: center;\n            align-items: center;\n            text-align: center;\n            line-height: 1.2;\n        }\n    }\n}\n\n.cards-item > .image {\n    cursor: zoom-in;\n}\n",".lightbox-content {\n    background: #fff;\n    width: 90vw;\n    max-width: 600px;\n    max-height: 100vh;\n    overflow: auto;\n    display: grid;\n    grid-template-columns: 1fr 2fr;\n    gap: 20px;\n    padding: 20px;\n    border-radius: 5px;\n    box-shadow: 0 5px 10px 0 rgba(0, 0, 0, 0.2), 0 0 40px 0 rgba(0, 0, 0, 0.1);\n    box-sizing: border-box;\n\n    .image .quotes__wrapper {\n        display: block;\n        --quote-height: 2.5em;\n        height: var(--quote-height);\n        overflow: hidden;\n    }\n}\n\n.lightbox__dim {\n    position: fixed;\n    z-index: 99999999;\n    height: 100vh;\n    width: 100vw;\n    top: 0;\n    left: 0;\n    background: rgba(0, 0, 0, 0.7);\n    display: flex;\n    align-items: center;\n    justify-content: center;\n}\n\n.lightbox > .tlnote {\n    font-size: smaller;\n}\n\nbody.lightbox-visible {\n    overflow: hidden;\n}\n\n.cards-item .lightbox {\n    display: none;\n}\n\n.card__name {\n    font-size: 1.1em;\n}\n\n.skills {\n    li {\n        display: grid;\n        grid-template-columns: 63px 1fr;\n        gap: 0 5px;\n        margin: 10px 0;\n\n        &::before {\n            color: #fff;\n            background-color: #0c195c;\n            padding: 2px 6px;\n            grid-row-start: 1;\n            grid-column-start: 1;\n            grid-column-end: 2;\n            text-align: center;\n            font-weight: 700;\n            font-size: 0.8em;\n            display: flex;\n            justify-content: center;\n            align-items: center;\n            height: 1.6em;\n            content: attr(id);\n            text-transform: uppercase;\n        }\n    }\n\n    .name {\n        font-weight: 700;\n    }\n\n    .desc {\n        grid-column-start: 2;\n    }\n}\n",".reverse {\n    .grid-wrapper {\n        grid-template-columns: 2fr 1fr 10% 22%;\n    }\n\n    .preview-background {\n        grid-column: 3/5;\n        border-radius: 0 5px 5px 0;\n        mask-image: linear-gradient(to left, #000 70%, transparent 100%);\n        -webkit-mask-image: linear-gradient(\n            to left,\n            #000 70%,\n            transparent 100%\n        );\n        background-position: top 35% left 50%;\n    }\n\n    .preview-box {\n        grid-column: 1/4;\n    }\n}\n\n.reverse {\n    .preview-background,\n    .preview-box {\n        grid-column-end: 3 span;\n    }\n}\n","@media only screen and (max-width: 812px) {\n    .story-box {\n        grid-template-columns: auto [col-start] 1fr [last];\n        grid-template-rows: auto;\n        margin: -245px 15px 0;\n    }\n\n    .story-cover {\n        grid-column: 1/2;\n        grid-row: 1/2;\n    }\n\n    .title-area {\n        grid-column: 2/3;\n        grid-row: 1/2;\n        line-height: 1.25;\n        display: flex;\n        flex-direction: column;\n        gap: 5px;\n    }\n\n    .mobile-reverse {\n        .story-box {\n            grid-template-columns: 1fr [col-start] auto [last];\n        }\n\n        .story-cover {\n            grid-column: 2/2;\n        }\n\n        .title-area {\n            grid-column: 1/2;\n        }\n    }\n\n    .info-area {\n        grid-column: 1/3;\n    }\n\n    .chapter-area {\n        grid-column: 1/3;\n        grid-row: 3;\n        font-size: 0.9em;\n    }\n\n    .characters > .value a {\n        height: 35px;\n        width: 35px;\n        margin-bottom: -3px;\n    }\n\n    .lightbox__dim {\n        font-size: 0.9em;\n    }\n\n    .lightbox-content {\n        padding: 15px;\n        gap: 15px;\n    }\n\n    .lightbox__dim .skills li {\n        grid-template-columns: 50px 1fr;\n    }\n\n    .card__name {\n        font-size: 1em;\n    }\n\n    .card__jp {\n        font-size: 0.9em;\n    }\n\n    .skills {\n        li:before {\n            font-size: 0.7em;\n        }\n\n        .name,\n        .desc {\n            font-size: 0.88em;\n        }\n    }\n\n    .quotes {\n        font-size: 0.83em;\n    }\n}\n\n@media only screen and (max-width: 567px) {\n    .preview-background {\n        display: none;\n    }\n\n    .preview-wrapper .grid-wrapper {\n        grid-template-columns: unset;\n    }\n\n    .preview-box {\n        padding: 0;\n        margin: 0;\n        background: none;\n        box-shadow: none;\n    }\n\n    .characters > .value a {\n        height: 35px;\n        width: 35px;\n        margin-bottom: -3px;\n    }\n}\n\n@media only screen and (max-width: 400px) {\n    .story-cover {\n        display: none;\n    }\n\n    .title-area {\n        grid-column: 1/3;\n    }\n}\n",".minitalk {\n    display: flex;\n    flex-direction: column;\n    gap: 10px;\n    transition: 0.15s all ease;\n\n    [character] p:last-of-type {\n        margin-bottom: unset;\n    }\n\n    ul {\n        margin-block-start: 0;\n        margin-block-end: 0;\n        margin-inline-start: 0;\n        margin-inline-end: 0;\n        padding-inline-start: 0;\n        list-style: none;\n        padding: 0;\n        margin-bottom: 15px;\n        display: grid;\n        grid-template-columns: 1fr 1fr;\n        border-bottom: solid 3px;\n        border-color: var(--light-mode, #f1f1f1);\n        gap: 5px;\n    }\n\n    li {\n        border-radius: 10px 10px 0 0;\n        border: solid 3px;\n        border-color: var(--light-mode, #f1f1f1);\n        border-bottom: 0;\n        padding: 0;\n        margin-bottom: -2px;\n\n        > a {\n            color: #222;\n            border: 0;\n            display: block;\n            padding: 3px;\n            text-align: center;\n        }\n\n        &.active {\n            background: var(--light-mode, #f1f1f1);\n            font-weight: 700;\n        }\n    }\n}\n\n.minitalk-option_header {\n    background: var(--light-mode, #f1f1f1);\n    border-radius: 5px;\n    cursor: pointer;\n    padding: 8px;\n    display: grid;\n    grid-template-columns: 40px 1fr 40px;\n    text-align: center;\n    align-items: center;\n    gap: 10px;\n    color: #222;\n    transition: 0.15s all ease;\n\n    &::after {\n        content: \"\\e5cf\";\n        display: inline-block;\n        font-family: \"Material Icons Round\";\n        font-size: 1.5em;\n        font-weight: 700;\n        line-height: 1;\n        transition: transform 0.4s ease;\n        justify-self: end;\n        align-self: center;\n    }\n\n    &::before {\n        content: \"\";\n        background: var(--charahead) 0 (0 / cover);\n        height: 40px;\n        width: 40px;\n        display: inline-block;\n    }\n}\n\n.minitalk-option_content {\n    display: none;\n    padding: 15px 0 5px;\n}\n\n.minitalk[character] {\n    &::before,\n    &::after {\n        content: none;\n    }\n}\n",".dark .minitalk-option_header {\n    color: #eee;\n    background: var(--dark-mode, #0e0e0e);\n}\n\n.dark.minitalk {\n    ul {\n        border-color: var(--dark-mode, #0e0e0e);\n    }\n\n    li {\n        border-color: var(--dark-mode, #0e0e0e);\n\n        &.active {\n            background: var(--dark-mode, #0e0e0e);\n\n            > a {\n                color: #eee;\n            }\n        }\n    }\n}\n",".fill .minitalk-option_header {\n    color: #fff;\n    background: var(--fill-mode, #737373);\n}\n\n.fill.minitalk {\n    ul {\n        border-color: var(--fill-mode, #737373);\n    }\n\n    li {\n        border-color: var(--fill-mode, #737373);\n\n        &.active {\n            background: var(--fill-mode, #737373);\n\n            > a {\n                color: #fff;\n            }\n        }\n    }\n}\n",".smallest .minitalk-option_header {\n    font-size: 0.8em;\n\n    &::after {\n        font-size: 1.7em;\n    }\n}\n\n.smaller .minitalk-option_header {\n    font-size: 0.9em;\n\n    &::after {\n        font-size: 1.6em;\n    }\n}\n\n.smallest .minitalk-option_header,\n.smaller .minitalk-option_header {\n    padding: 6px;\n    grid-template-columns: 35px 1fr 35px;\n\n    &::before {\n        height: 35px;\n        width: 35px;\n    }\n}\n\n.bigger .minitalk-option_header {\n    font-size: 1.1em;\n\n    &::after {\n        font-size: 1.4em;\n    }\n}\n\n.biggest .minitalk-option_header {\n    font-size: 1.2em;\n\n    &::after {\n        font-size: 1.3em;\n    }\n}\n\n.bigger .minitalk-option_header,\n.biggest .minitalk-option_header {\n    grid-template-columns: 45px 1fr 45px;\n\n    &::before {\n        height: 45px;\n        width: 45px;\n    }\n}\n","[mt=\"normal\"],\n[mt=\"rare\"] {\n    display: inline-block;\n    width: 25px;\n    height: 29.28px;\n    margin: 0 10px -8px 0 !important;\n    background-size: cover;\n}\n\n[mt=\"normal\"] {\n    background-image: url(\"https://cdn.jsdelivr.net/gh/enstars/img/talkevent_normal.png\");\n}\n\n[mt=\"rare\"] {\n    background-image: url(\"https://cdn.jsdelivr.net/gh/enstars/img/talkevent_rare.png\");\n}\n","@use \"_mixins.scss\";\n\n.toolbar-wrapper {\n    position: sticky;\n    display: flex;\n    flex-direction: column;\n    align-items: center;\n    gap: 4px;\n    top: 5px;\n    z-index: 2;\n    margin-bottom: 20px;\n}\n\n.toolbar {\n    display: grid;\n    grid-auto-flow: column;\n    gap: 23px;\n    background: #fff;\n    justify-content: center;\n    align-items: center;\n    width: auto;\n    border-radius: 15px;\n    @include mixins.toolbarShadow;\n    padding: 2px 35px;\n    z-index: 3;\n\n    a {\n        color: #555;\n        border-bottom: none;\n        transition: 0.2s ease-in-out;\n        line-height: 0;\n        border-radius: 5px;\n        padding: 2px;\n\n        &:hover {\n            color: #000;\n            background-color: #e0e0e0;\n        }\n    }\n\n    .material-icons-round {\n        font-size: 1.35em;\n        font-weight: 700;\n    }\n}\n\n.toolbar__section {\n    display: flex;\n}\n","@mixin toolbarShadow {\n    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.2);\n}\n\n@mixin sliderTransition {\n    transition: transform 0.3s ease, max-height 0s 0.3s step-end;\n}\n","@use \"_mixins.scss\";\n\n.slider-container {\n    position: absolute;\n    background: #fff;\n    justify-content: center;\n    align-items: center;\n    width: auto;\n    padding: 0 8px 5px;\n    border-radius: 15px;\n    @include mixins.toolbarShadow;\n    @include mixins.sliderTransition;\n}\n\n.toolbar-wrapper.showSlider .slider-container {\n    @include mixins.sliderTransition;\n    transform: translateY(calc(100% + 5px));\n}\n\n.slider {\n    -webkit-appearance: none;\n    appearance: none;\n    width: 100px;\n    height: 6px;\n    border-radius: 5px;\n    background: #d3d3d3;\n    outline: 0;\n    opacity: 0.7;\n    transition: opacity 0.2s;\n\n    &:hover {\n        opacity: 1;\n    }\n\n    &::-webkit-slider-thumb {\n        -webkit-appearance: none;\n        appearance: none;\n        width: 15px;\n        height: 15px;\n        border-radius: 50%;\n        background: var(--storyColor, #222);\n        cursor: pointer;\n    }\n\n    &::-moz-range-thumb {\n        width: 15px;\n        height: 15px;\n        border-radius: 50%;\n        background: var(--storyColor, #222);\n        cursor: pointer;\n    }\n}\n","a.inline-note {\r\n    display: inline-block;\r\n    vertical-align: middle;\r\n    margin: 0 2px;\r\n    font-weight: 700;\r\n    font-size: 0.7em;\r\n    border-radius: 3px;\r\n    border: solid 1px #ababab;\r\n    padding: 0 3px;\r\n    background: rgb(255 255 255 / 50%);\r\n    color: var(--storyColor);\r\n    --storyColor-dark-l: calc(var(--storyColor-l) - 20%);\r\n    --storyColor-dark: hsl(\r\n        var(--storyColor-h),\r\n        var(--storyColor-s),\r\n        var(--storyColor-dark-l)\r\n    );\r\n}\r\n\r\na.inline-note:hover {\r\n    color: var(--storyColor-dark);\r\n}\r\n"],"sourceRoot":""}]);
+// Exports
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
+
+
+/***/ }),
+
+/***/ "./node_modules/css-loader/dist/cjs.js!./node_modules/tippy.js/dist/tippy.css":
+/*!************************************************************************************!*\
+  !*** ./node_modules/css-loader/dist/cjs.js!./node_modules/tippy.js/dist/tippy.css ***!
+  \************************************************************************************/
+/***/ ((module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _css_loader_dist_runtime_sourceMaps_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../css-loader/dist/runtime/sourceMaps.js */ "./node_modules/css-loader/dist/runtime/sourceMaps.js");
+/* harmony import */ var _css_loader_dist_runtime_sourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_css_loader_dist_runtime_sourceMaps_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js");
+/* harmony import */ var _css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__);
+// Imports
+
+
+var ___CSS_LOADER_EXPORT___ = _css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_css_loader_dist_runtime_sourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
+// Module
+___CSS_LOADER_EXPORT___.push([module.id, ".tippy-box[data-animation=fade][data-state=hidden]{opacity:0}[data-tippy-root]{max-width:calc(100vw - 10px)}.tippy-box{position:relative;background-color:#333;color:#fff;border-radius:4px;font-size:14px;line-height:1.4;white-space:normal;outline:0;transition-property:transform,visibility,opacity}.tippy-box[data-placement^=top]>.tippy-arrow{bottom:0}.tippy-box[data-placement^=top]>.tippy-arrow:before{bottom:-7px;left:0;border-width:8px 8px 0;border-top-color:initial;transform-origin:center top}.tippy-box[data-placement^=bottom]>.tippy-arrow{top:0}.tippy-box[data-placement^=bottom]>.tippy-arrow:before{top:-7px;left:0;border-width:0 8px 8px;border-bottom-color:initial;transform-origin:center bottom}.tippy-box[data-placement^=left]>.tippy-arrow{right:0}.tippy-box[data-placement^=left]>.tippy-arrow:before{border-width:8px 0 8px 8px;border-left-color:initial;right:-7px;transform-origin:center left}.tippy-box[data-placement^=right]>.tippy-arrow{left:0}.tippy-box[data-placement^=right]>.tippy-arrow:before{left:-7px;border-width:8px 8px 8px 0;border-right-color:initial;transform-origin:center right}.tippy-box[data-inertia][data-state=visible]{transition-timing-function:cubic-bezier(.54,1.5,.38,1.11)}.tippy-arrow{width:16px;height:16px;color:#333}.tippy-arrow:before{content:\"\";position:absolute;border-color:transparent;border-style:solid}.tippy-content{position:relative;padding:5px 9px;z-index:1}", "",{"version":3,"sources":["webpack://./node_modules/tippy.js/dist/tippy.css"],"names":[],"mappings":"AAAA,mDAAmD,SAAS,CAAC,kBAAkB,4BAA4B,CAAC,WAAW,iBAAiB,CAAC,qBAAqB,CAAC,UAAU,CAAC,iBAAiB,CAAC,cAAc,CAAC,eAAe,CAAC,kBAAkB,CAAC,SAAS,CAAC,gDAAgD,CAAC,6CAA6C,QAAQ,CAAC,oDAAoD,WAAW,CAAC,MAAM,CAAC,sBAAsB,CAAC,wBAAwB,CAAC,2BAA2B,CAAC,gDAAgD,KAAK,CAAC,uDAAuD,QAAQ,CAAC,MAAM,CAAC,sBAAsB,CAAC,2BAA2B,CAAC,8BAA8B,CAAC,8CAA8C,OAAO,CAAC,qDAAqD,0BAA0B,CAAC,yBAAyB,CAAC,UAAU,CAAC,4BAA4B,CAAC,+CAA+C,MAAM,CAAC,sDAAsD,SAAS,CAAC,0BAA0B,CAAC,0BAA0B,CAAC,6BAA6B,CAAC,6CAA6C,yDAAyD,CAAC,aAAa,UAAU,CAAC,WAAW,CAAC,UAAU,CAAC,oBAAoB,UAAU,CAAC,iBAAiB,CAAC,wBAAwB,CAAC,kBAAkB,CAAC,eAAe,iBAAiB,CAAC,eAAe,CAAC,SAAS","sourcesContent":[".tippy-box[data-animation=fade][data-state=hidden]{opacity:0}[data-tippy-root]{max-width:calc(100vw - 10px)}.tippy-box{position:relative;background-color:#333;color:#fff;border-radius:4px;font-size:14px;line-height:1.4;white-space:normal;outline:0;transition-property:transform,visibility,opacity}.tippy-box[data-placement^=top]>.tippy-arrow{bottom:0}.tippy-box[data-placement^=top]>.tippy-arrow:before{bottom:-7px;left:0;border-width:8px 8px 0;border-top-color:initial;transform-origin:center top}.tippy-box[data-placement^=bottom]>.tippy-arrow{top:0}.tippy-box[data-placement^=bottom]>.tippy-arrow:before{top:-7px;left:0;border-width:0 8px 8px;border-bottom-color:initial;transform-origin:center bottom}.tippy-box[data-placement^=left]>.tippy-arrow{right:0}.tippy-box[data-placement^=left]>.tippy-arrow:before{border-width:8px 0 8px 8px;border-left-color:initial;right:-7px;transform-origin:center left}.tippy-box[data-placement^=right]>.tippy-arrow{left:0}.tippy-box[data-placement^=right]>.tippy-arrow:before{left:-7px;border-width:8px 8px 8px 0;border-right-color:initial;transform-origin:center right}.tippy-box[data-inertia][data-state=visible]{transition-timing-function:cubic-bezier(.54,1.5,.38,1.11)}.tippy-arrow{width:16px;height:16px;color:#333}.tippy-arrow:before{content:\"\";position:absolute;border-color:transparent;border-style:solid}.tippy-content{position:relative;padding:5px 9px;z-index:1}"],"sourceRoot":""}]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -11119,6 +14228,61 @@ var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js
 
 /***/ }),
 
+/***/ "./node_modules/tippy.js/dist/tippy.css":
+/*!**********************************************!*\
+  !*** ./node_modules/tippy.js/dist/tippy.css ***!
+  \**********************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !../../style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
+/* harmony import */ var _style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _style_loader_dist_runtime_styleDomAPI_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !../../style-loader/dist/runtime/styleDomAPI.js */ "./node_modules/style-loader/dist/runtime/styleDomAPI.js");
+/* harmony import */ var _style_loader_dist_runtime_styleDomAPI_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_style_loader_dist_runtime_styleDomAPI_js__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _style_loader_dist_runtime_insertBySelector_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! !../../style-loader/dist/runtime/insertBySelector.js */ "./node_modules/style-loader/dist/runtime/insertBySelector.js");
+/* harmony import */ var _style_loader_dist_runtime_insertBySelector_js__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_style_loader_dist_runtime_insertBySelector_js__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _style_loader_dist_runtime_setAttributesWithoutAttributes_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! !../../style-loader/dist/runtime/setAttributesWithoutAttributes.js */ "./node_modules/style-loader/dist/runtime/setAttributesWithoutAttributes.js");
+/* harmony import */ var _style_loader_dist_runtime_setAttributesWithoutAttributes_js__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_style_loader_dist_runtime_setAttributesWithoutAttributes_js__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var _style_loader_dist_runtime_insertStyleElement_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! !../../style-loader/dist/runtime/insertStyleElement.js */ "./node_modules/style-loader/dist/runtime/insertStyleElement.js");
+/* harmony import */ var _style_loader_dist_runtime_insertStyleElement_js__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_style_loader_dist_runtime_insertStyleElement_js__WEBPACK_IMPORTED_MODULE_4__);
+/* harmony import */ var _style_loader_dist_runtime_styleTagTransform_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! !../../style-loader/dist/runtime/styleTagTransform.js */ "./node_modules/style-loader/dist/runtime/styleTagTransform.js");
+/* harmony import */ var _style_loader_dist_runtime_styleTagTransform_js__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(_style_loader_dist_runtime_styleTagTransform_js__WEBPACK_IMPORTED_MODULE_5__);
+/* harmony import */ var _css_loader_dist_cjs_js_tippy_css__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! !!../../css-loader/dist/cjs.js!./tippy.css */ "./node_modules/css-loader/dist/cjs.js!./node_modules/tippy.js/dist/tippy.css");
+
+      
+      
+      
+      
+      
+      
+      
+      
+      
+
+var options = {};
+
+options.styleTagTransform = (_style_loader_dist_runtime_styleTagTransform_js__WEBPACK_IMPORTED_MODULE_5___default());
+options.setAttributes = (_style_loader_dist_runtime_setAttributesWithoutAttributes_js__WEBPACK_IMPORTED_MODULE_3___default());
+
+      options.insert = _style_loader_dist_runtime_insertBySelector_js__WEBPACK_IMPORTED_MODULE_2___default().bind(null, "head");
+    
+options.domAPI = (_style_loader_dist_runtime_styleDomAPI_js__WEBPACK_IMPORTED_MODULE_1___default());
+options.insertStyleElement = (_style_loader_dist_runtime_insertStyleElement_js__WEBPACK_IMPORTED_MODULE_4___default());
+
+var update = _style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default()(_css_loader_dist_cjs_js_tippy_css__WEBPACK_IMPORTED_MODULE_6__["default"], options);
+
+
+
+
+       /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_css_loader_dist_cjs_js_tippy_css__WEBPACK_IMPORTED_MODULE_6__["default"] && _css_loader_dist_cjs_js_tippy_css__WEBPACK_IMPORTED_MODULE_6__["default"].locals ? _css_loader_dist_cjs_js_tippy_css__WEBPACK_IMPORTED_MODULE_6__["default"].locals : undefined);
+
+
+/***/ }),
+
 /***/ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js":
 /*!****************************************************************************!*\
   !*** ./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js ***!
@@ -11429,6 +14593,2517 @@ function styleTagTransform(css, styleElement) {
 
 module.exports = styleTagTransform;
 
+/***/ }),
+
+/***/ "./node_modules/tippy.js/dist/tippy.esm.js":
+/*!*************************************************!*\
+  !*** ./node_modules/tippy.js/dist/tippy.esm.js ***!
+  \*************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__),
+/* harmony export */   "animateFill": () => (/* binding */ animateFill),
+/* harmony export */   "createSingleton": () => (/* binding */ createSingleton),
+/* harmony export */   "delegate": () => (/* binding */ delegate),
+/* harmony export */   "followCursor": () => (/* binding */ followCursor),
+/* harmony export */   "hideAll": () => (/* binding */ hideAll),
+/* harmony export */   "inlinePositioning": () => (/* binding */ inlinePositioning),
+/* harmony export */   "roundArrow": () => (/* binding */ ROUND_ARROW),
+/* harmony export */   "sticky": () => (/* binding */ sticky)
+/* harmony export */ });
+/* harmony import */ var _popperjs_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @popperjs/core */ "./node_modules/@popperjs/core/lib/popper.js");
+/* harmony import */ var _popperjs_core__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @popperjs/core */ "./node_modules/@popperjs/core/lib/modifiers/applyStyles.js");
+/**!
+* tippy.js v6.3.7
+* (c) 2017-2021 atomiks
+* MIT License
+*/
+
+
+var ROUND_ARROW = '<svg width="16" height="6" xmlns="http://www.w3.org/2000/svg"><path d="M0 6s1.796-.013 4.67-3.615C5.851.9 6.93.006 8 0c1.07-.006 2.148.887 3.343 2.385C14.233 6.005 16 6 16 6H0z"></svg>';
+var BOX_CLASS = "tippy-box";
+var CONTENT_CLASS = "tippy-content";
+var BACKDROP_CLASS = "tippy-backdrop";
+var ARROW_CLASS = "tippy-arrow";
+var SVG_ARROW_CLASS = "tippy-svg-arrow";
+var TOUCH_OPTIONS = {
+  passive: true,
+  capture: true
+};
+var TIPPY_DEFAULT_APPEND_TO = function TIPPY_DEFAULT_APPEND_TO() {
+  return document.body;
+};
+
+function hasOwnProperty(obj, key) {
+  return {}.hasOwnProperty.call(obj, key);
+}
+function getValueAtIndexOrReturn(value, index, defaultValue) {
+  if (Array.isArray(value)) {
+    var v = value[index];
+    return v == null ? Array.isArray(defaultValue) ? defaultValue[index] : defaultValue : v;
+  }
+
+  return value;
+}
+function isType(value, type) {
+  var str = {}.toString.call(value);
+  return str.indexOf('[object') === 0 && str.indexOf(type + "]") > -1;
+}
+function invokeWithArgsOrReturn(value, args) {
+  return typeof value === 'function' ? value.apply(void 0, args) : value;
+}
+function debounce(fn, ms) {
+  // Avoid wrapping in `setTimeout` if ms is 0 anyway
+  if (ms === 0) {
+    return fn;
+  }
+
+  var timeout;
+  return function (arg) {
+    clearTimeout(timeout);
+    timeout = setTimeout(function () {
+      fn(arg);
+    }, ms);
+  };
+}
+function removeProperties(obj, keys) {
+  var clone = Object.assign({}, obj);
+  keys.forEach(function (key) {
+    delete clone[key];
+  });
+  return clone;
+}
+function splitBySpaces(value) {
+  return value.split(/\s+/).filter(Boolean);
+}
+function normalizeToArray(value) {
+  return [].concat(value);
+}
+function pushIfUnique(arr, value) {
+  if (arr.indexOf(value) === -1) {
+    arr.push(value);
+  }
+}
+function unique(arr) {
+  return arr.filter(function (item, index) {
+    return arr.indexOf(item) === index;
+  });
+}
+function getBasePlacement(placement) {
+  return placement.split('-')[0];
+}
+function arrayFrom(value) {
+  return [].slice.call(value);
+}
+function removeUndefinedProps(obj) {
+  return Object.keys(obj).reduce(function (acc, key) {
+    if (obj[key] !== undefined) {
+      acc[key] = obj[key];
+    }
+
+    return acc;
+  }, {});
+}
+
+function div() {
+  return document.createElement('div');
+}
+function isElement(value) {
+  return ['Element', 'Fragment'].some(function (type) {
+    return isType(value, type);
+  });
+}
+function isNodeList(value) {
+  return isType(value, 'NodeList');
+}
+function isMouseEvent(value) {
+  return isType(value, 'MouseEvent');
+}
+function isReferenceElement(value) {
+  return !!(value && value._tippy && value._tippy.reference === value);
+}
+function getArrayOfElements(value) {
+  if (isElement(value)) {
+    return [value];
+  }
+
+  if (isNodeList(value)) {
+    return arrayFrom(value);
+  }
+
+  if (Array.isArray(value)) {
+    return value;
+  }
+
+  return arrayFrom(document.querySelectorAll(value));
+}
+function setTransitionDuration(els, value) {
+  els.forEach(function (el) {
+    if (el) {
+      el.style.transitionDuration = value + "ms";
+    }
+  });
+}
+function setVisibilityState(els, state) {
+  els.forEach(function (el) {
+    if (el) {
+      el.setAttribute('data-state', state);
+    }
+  });
+}
+function getOwnerDocument(elementOrElements) {
+  var _element$ownerDocumen;
+
+  var _normalizeToArray = normalizeToArray(elementOrElements),
+      element = _normalizeToArray[0]; // Elements created via a <template> have an ownerDocument with no reference to the body
+
+
+  return element != null && (_element$ownerDocumen = element.ownerDocument) != null && _element$ownerDocumen.body ? element.ownerDocument : document;
+}
+function isCursorOutsideInteractiveBorder(popperTreeData, event) {
+  var clientX = event.clientX,
+      clientY = event.clientY;
+  return popperTreeData.every(function (_ref) {
+    var popperRect = _ref.popperRect,
+        popperState = _ref.popperState,
+        props = _ref.props;
+    var interactiveBorder = props.interactiveBorder;
+    var basePlacement = getBasePlacement(popperState.placement);
+    var offsetData = popperState.modifiersData.offset;
+
+    if (!offsetData) {
+      return true;
+    }
+
+    var topDistance = basePlacement === 'bottom' ? offsetData.top.y : 0;
+    var bottomDistance = basePlacement === 'top' ? offsetData.bottom.y : 0;
+    var leftDistance = basePlacement === 'right' ? offsetData.left.x : 0;
+    var rightDistance = basePlacement === 'left' ? offsetData.right.x : 0;
+    var exceedsTop = popperRect.top - clientY + topDistance > interactiveBorder;
+    var exceedsBottom = clientY - popperRect.bottom - bottomDistance > interactiveBorder;
+    var exceedsLeft = popperRect.left - clientX + leftDistance > interactiveBorder;
+    var exceedsRight = clientX - popperRect.right - rightDistance > interactiveBorder;
+    return exceedsTop || exceedsBottom || exceedsLeft || exceedsRight;
+  });
+}
+function updateTransitionEndListener(box, action, listener) {
+  var method = action + "EventListener"; // some browsers apparently support `transition` (unprefixed) but only fire
+  // `webkitTransitionEnd`...
+
+  ['transitionend', 'webkitTransitionEnd'].forEach(function (event) {
+    box[method](event, listener);
+  });
+}
+/**
+ * Compared to xxx.contains, this function works for dom structures with shadow
+ * dom
+ */
+
+function actualContains(parent, child) {
+  var target = child;
+
+  while (target) {
+    var _target$getRootNode;
+
+    if (parent.contains(target)) {
+      return true;
+    }
+
+    target = target.getRootNode == null ? void 0 : (_target$getRootNode = target.getRootNode()) == null ? void 0 : _target$getRootNode.host;
+  }
+
+  return false;
+}
+
+var currentInput = {
+  isTouch: false
+};
+var lastMouseMoveTime = 0;
+/**
+ * When a `touchstart` event is fired, it's assumed the user is using touch
+ * input. We'll bind a `mousemove` event listener to listen for mouse input in
+ * the future. This way, the `isTouch` property is fully dynamic and will handle
+ * hybrid devices that use a mix of touch + mouse input.
+ */
+
+function onDocumentTouchStart() {
+  if (currentInput.isTouch) {
+    return;
+  }
+
+  currentInput.isTouch = true;
+
+  if (window.performance) {
+    document.addEventListener('mousemove', onDocumentMouseMove);
+  }
+}
+/**
+ * When two `mousemove` event are fired consecutively within 20ms, it's assumed
+ * the user is using mouse input again. `mousemove` can fire on touch devices as
+ * well, but very rarely that quickly.
+ */
+
+function onDocumentMouseMove() {
+  var now = performance.now();
+
+  if (now - lastMouseMoveTime < 20) {
+    currentInput.isTouch = false;
+    document.removeEventListener('mousemove', onDocumentMouseMove);
+  }
+
+  lastMouseMoveTime = now;
+}
+/**
+ * When an element is in focus and has a tippy, leaving the tab/window and
+ * returning causes it to show again. For mouse users this is unexpected, but
+ * for keyboard use it makes sense.
+ * TODO: find a better technique to solve this problem
+ */
+
+function onWindowBlur() {
+  var activeElement = document.activeElement;
+
+  if (isReferenceElement(activeElement)) {
+    var instance = activeElement._tippy;
+
+    if (activeElement.blur && !instance.state.isVisible) {
+      activeElement.blur();
+    }
+  }
+}
+function bindGlobalEventListeners() {
+  document.addEventListener('touchstart', onDocumentTouchStart, TOUCH_OPTIONS);
+  window.addEventListener('blur', onWindowBlur);
+}
+
+var isBrowser = typeof window !== 'undefined' && typeof document !== 'undefined';
+var isIE11 = isBrowser ? // @ts-ignore
+!!window.msCrypto : false;
+
+function createMemoryLeakWarning(method) {
+  var txt = method === 'destroy' ? 'n already-' : ' ';
+  return [method + "() was called on a" + txt + "destroyed instance. This is a no-op but", 'indicates a potential memory leak.'].join(' ');
+}
+function clean(value) {
+  var spacesAndTabs = /[ \t]{2,}/g;
+  var lineStartWithSpaces = /^[ \t]*/gm;
+  return value.replace(spacesAndTabs, ' ').replace(lineStartWithSpaces, '').trim();
+}
+
+function getDevMessage(message) {
+  return clean("\n  %ctippy.js\n\n  %c" + clean(message) + "\n\n  %c\uD83D\uDC77\u200D This is a development-only message. It will be removed in production.\n  ");
+}
+
+function getFormattedMessage(message) {
+  return [getDevMessage(message), // title
+  'color: #00C584; font-size: 1.3em; font-weight: bold;', // message
+  'line-height: 1.5', // footer
+  'color: #a6a095;'];
+} // Assume warnings and errors never have the same message
+
+var visitedMessages;
+
+if (true) {
+  resetVisitedMessages();
+}
+
+function resetVisitedMessages() {
+  visitedMessages = new Set();
+}
+function warnWhen(condition, message) {
+  if (condition && !visitedMessages.has(message)) {
+    var _console;
+
+    visitedMessages.add(message);
+
+    (_console = console).warn.apply(_console, getFormattedMessage(message));
+  }
+}
+function errorWhen(condition, message) {
+  if (condition && !visitedMessages.has(message)) {
+    var _console2;
+
+    visitedMessages.add(message);
+
+    (_console2 = console).error.apply(_console2, getFormattedMessage(message));
+  }
+}
+function validateTargets(targets) {
+  var didPassFalsyValue = !targets;
+  var didPassPlainObject = Object.prototype.toString.call(targets) === '[object Object]' && !targets.addEventListener;
+  errorWhen(didPassFalsyValue, ['tippy() was passed', '`' + String(targets) + '`', 'as its targets (first) argument. Valid types are: String, Element,', 'Element[], or NodeList.'].join(' '));
+  errorWhen(didPassPlainObject, ['tippy() was passed a plain object which is not supported as an argument', 'for virtual positioning. Use props.getReferenceClientRect instead.'].join(' '));
+}
+
+var pluginProps = {
+  animateFill: false,
+  followCursor: false,
+  inlinePositioning: false,
+  sticky: false
+};
+var renderProps = {
+  allowHTML: false,
+  animation: 'fade',
+  arrow: true,
+  content: '',
+  inertia: false,
+  maxWidth: 350,
+  role: 'tooltip',
+  theme: '',
+  zIndex: 9999
+};
+var defaultProps = Object.assign({
+  appendTo: TIPPY_DEFAULT_APPEND_TO,
+  aria: {
+    content: 'auto',
+    expanded: 'auto'
+  },
+  delay: 0,
+  duration: [300, 250],
+  getReferenceClientRect: null,
+  hideOnClick: true,
+  ignoreAttributes: false,
+  interactive: false,
+  interactiveBorder: 2,
+  interactiveDebounce: 0,
+  moveTransition: '',
+  offset: [0, 10],
+  onAfterUpdate: function onAfterUpdate() {},
+  onBeforeUpdate: function onBeforeUpdate() {},
+  onCreate: function onCreate() {},
+  onDestroy: function onDestroy() {},
+  onHidden: function onHidden() {},
+  onHide: function onHide() {},
+  onMount: function onMount() {},
+  onShow: function onShow() {},
+  onShown: function onShown() {},
+  onTrigger: function onTrigger() {},
+  onUntrigger: function onUntrigger() {},
+  onClickOutside: function onClickOutside() {},
+  placement: 'top',
+  plugins: [],
+  popperOptions: {},
+  render: null,
+  showOnCreate: false,
+  touch: true,
+  trigger: 'mouseenter focus',
+  triggerTarget: null
+}, pluginProps, renderProps);
+var defaultKeys = Object.keys(defaultProps);
+var setDefaultProps = function setDefaultProps(partialProps) {
+  /* istanbul ignore else */
+  if (true) {
+    validateProps(partialProps, []);
+  }
+
+  var keys = Object.keys(partialProps);
+  keys.forEach(function (key) {
+    defaultProps[key] = partialProps[key];
+  });
+};
+function getExtendedPassedProps(passedProps) {
+  var plugins = passedProps.plugins || [];
+  var pluginProps = plugins.reduce(function (acc, plugin) {
+    var name = plugin.name,
+        defaultValue = plugin.defaultValue;
+
+    if (name) {
+      var _name;
+
+      acc[name] = passedProps[name] !== undefined ? passedProps[name] : (_name = defaultProps[name]) != null ? _name : defaultValue;
+    }
+
+    return acc;
+  }, {});
+  return Object.assign({}, passedProps, pluginProps);
+}
+function getDataAttributeProps(reference, plugins) {
+  var propKeys = plugins ? Object.keys(getExtendedPassedProps(Object.assign({}, defaultProps, {
+    plugins: plugins
+  }))) : defaultKeys;
+  var props = propKeys.reduce(function (acc, key) {
+    var valueAsString = (reference.getAttribute("data-tippy-" + key) || '').trim();
+
+    if (!valueAsString) {
+      return acc;
+    }
+
+    if (key === 'content') {
+      acc[key] = valueAsString;
+    } else {
+      try {
+        acc[key] = JSON.parse(valueAsString);
+      } catch (e) {
+        acc[key] = valueAsString;
+      }
+    }
+
+    return acc;
+  }, {});
+  return props;
+}
+function evaluateProps(reference, props) {
+  var out = Object.assign({}, props, {
+    content: invokeWithArgsOrReturn(props.content, [reference])
+  }, props.ignoreAttributes ? {} : getDataAttributeProps(reference, props.plugins));
+  out.aria = Object.assign({}, defaultProps.aria, out.aria);
+  out.aria = {
+    expanded: out.aria.expanded === 'auto' ? props.interactive : out.aria.expanded,
+    content: out.aria.content === 'auto' ? props.interactive ? null : 'describedby' : out.aria.content
+  };
+  return out;
+}
+function validateProps(partialProps, plugins) {
+  if (partialProps === void 0) {
+    partialProps = {};
+  }
+
+  if (plugins === void 0) {
+    plugins = [];
+  }
+
+  var keys = Object.keys(partialProps);
+  keys.forEach(function (prop) {
+    var nonPluginProps = removeProperties(defaultProps, Object.keys(pluginProps));
+    var didPassUnknownProp = !hasOwnProperty(nonPluginProps, prop); // Check if the prop exists in `plugins`
+
+    if (didPassUnknownProp) {
+      didPassUnknownProp = plugins.filter(function (plugin) {
+        return plugin.name === prop;
+      }).length === 0;
+    }
+
+    warnWhen(didPassUnknownProp, ["`" + prop + "`", "is not a valid prop. You may have spelled it incorrectly, or if it's", 'a plugin, forgot to pass it in an array as props.plugins.', '\n\n', 'All props: https://atomiks.github.io/tippyjs/v6/all-props/\n', 'Plugins: https://atomiks.github.io/tippyjs/v6/plugins/'].join(' '));
+  });
+}
+
+var innerHTML = function innerHTML() {
+  return 'innerHTML';
+};
+
+function dangerouslySetInnerHTML(element, html) {
+  element[innerHTML()] = html;
+}
+
+function createArrowElement(value) {
+  var arrow = div();
+
+  if (value === true) {
+    arrow.className = ARROW_CLASS;
+  } else {
+    arrow.className = SVG_ARROW_CLASS;
+
+    if (isElement(value)) {
+      arrow.appendChild(value);
+    } else {
+      dangerouslySetInnerHTML(arrow, value);
+    }
+  }
+
+  return arrow;
+}
+
+function setContent(content, props) {
+  if (isElement(props.content)) {
+    dangerouslySetInnerHTML(content, '');
+    content.appendChild(props.content);
+  } else if (typeof props.content !== 'function') {
+    if (props.allowHTML) {
+      dangerouslySetInnerHTML(content, props.content);
+    } else {
+      content.textContent = props.content;
+    }
+  }
+}
+function getChildren(popper) {
+  var box = popper.firstElementChild;
+  var boxChildren = arrayFrom(box.children);
+  return {
+    box: box,
+    content: boxChildren.find(function (node) {
+      return node.classList.contains(CONTENT_CLASS);
+    }),
+    arrow: boxChildren.find(function (node) {
+      return node.classList.contains(ARROW_CLASS) || node.classList.contains(SVG_ARROW_CLASS);
+    }),
+    backdrop: boxChildren.find(function (node) {
+      return node.classList.contains(BACKDROP_CLASS);
+    })
+  };
+}
+function render(instance) {
+  var popper = div();
+  var box = div();
+  box.className = BOX_CLASS;
+  box.setAttribute('data-state', 'hidden');
+  box.setAttribute('tabindex', '-1');
+  var content = div();
+  content.className = CONTENT_CLASS;
+  content.setAttribute('data-state', 'hidden');
+  setContent(content, instance.props);
+  popper.appendChild(box);
+  box.appendChild(content);
+  onUpdate(instance.props, instance.props);
+
+  function onUpdate(prevProps, nextProps) {
+    var _getChildren = getChildren(popper),
+        box = _getChildren.box,
+        content = _getChildren.content,
+        arrow = _getChildren.arrow;
+
+    if (nextProps.theme) {
+      box.setAttribute('data-theme', nextProps.theme);
+    } else {
+      box.removeAttribute('data-theme');
+    }
+
+    if (typeof nextProps.animation === 'string') {
+      box.setAttribute('data-animation', nextProps.animation);
+    } else {
+      box.removeAttribute('data-animation');
+    }
+
+    if (nextProps.inertia) {
+      box.setAttribute('data-inertia', '');
+    } else {
+      box.removeAttribute('data-inertia');
+    }
+
+    box.style.maxWidth = typeof nextProps.maxWidth === 'number' ? nextProps.maxWidth + "px" : nextProps.maxWidth;
+
+    if (nextProps.role) {
+      box.setAttribute('role', nextProps.role);
+    } else {
+      box.removeAttribute('role');
+    }
+
+    if (prevProps.content !== nextProps.content || prevProps.allowHTML !== nextProps.allowHTML) {
+      setContent(content, instance.props);
+    }
+
+    if (nextProps.arrow) {
+      if (!arrow) {
+        box.appendChild(createArrowElement(nextProps.arrow));
+      } else if (prevProps.arrow !== nextProps.arrow) {
+        box.removeChild(arrow);
+        box.appendChild(createArrowElement(nextProps.arrow));
+      }
+    } else if (arrow) {
+      box.removeChild(arrow);
+    }
+  }
+
+  return {
+    popper: popper,
+    onUpdate: onUpdate
+  };
+} // Runtime check to identify if the render function is the default one; this
+// way we can apply default CSS transitions logic and it can be tree-shaken away
+
+render.$$tippy = true;
+
+var idCounter = 1;
+var mouseMoveListeners = []; // Used by `hideAll()`
+
+var mountedInstances = [];
+function createTippy(reference, passedProps) {
+  var props = evaluateProps(reference, Object.assign({}, defaultProps, getExtendedPassedProps(removeUndefinedProps(passedProps)))); // ===========================================================================
+  // 🔒 Private members
+  // ===========================================================================
+
+  var showTimeout;
+  var hideTimeout;
+  var scheduleHideAnimationFrame;
+  var isVisibleFromClick = false;
+  var didHideDueToDocumentMouseDown = false;
+  var didTouchMove = false;
+  var ignoreOnFirstUpdate = false;
+  var lastTriggerEvent;
+  var currentTransitionEndListener;
+  var onFirstUpdate;
+  var listeners = [];
+  var debouncedOnMouseMove = debounce(onMouseMove, props.interactiveDebounce);
+  var currentTarget; // ===========================================================================
+  // 🔑 Public members
+  // ===========================================================================
+
+  var id = idCounter++;
+  var popperInstance = null;
+  var plugins = unique(props.plugins);
+  var state = {
+    // Is the instance currently enabled?
+    isEnabled: true,
+    // Is the tippy currently showing and not transitioning out?
+    isVisible: false,
+    // Has the instance been destroyed?
+    isDestroyed: false,
+    // Is the tippy currently mounted to the DOM?
+    isMounted: false,
+    // Has the tippy finished transitioning in?
+    isShown: false
+  };
+  var instance = {
+    // properties
+    id: id,
+    reference: reference,
+    popper: div(),
+    popperInstance: popperInstance,
+    props: props,
+    state: state,
+    plugins: plugins,
+    // methods
+    clearDelayTimeouts: clearDelayTimeouts,
+    setProps: setProps,
+    setContent: setContent,
+    show: show,
+    hide: hide,
+    hideWithInteractivity: hideWithInteractivity,
+    enable: enable,
+    disable: disable,
+    unmount: unmount,
+    destroy: destroy
+  }; // TODO: Investigate why this early return causes a TDZ error in the tests —
+  // it doesn't seem to happen in the browser
+
+  /* istanbul ignore if */
+
+  if (!props.render) {
+    if (true) {
+      errorWhen(true, 'render() function has not been supplied.');
+    }
+
+    return instance;
+  } // ===========================================================================
+  // Initial mutations
+  // ===========================================================================
+
+
+  var _props$render = props.render(instance),
+      popper = _props$render.popper,
+      onUpdate = _props$render.onUpdate;
+
+  popper.setAttribute('data-tippy-root', '');
+  popper.id = "tippy-" + instance.id;
+  instance.popper = popper;
+  reference._tippy = instance;
+  popper._tippy = instance;
+  var pluginsHooks = plugins.map(function (plugin) {
+    return plugin.fn(instance);
+  });
+  var hasAriaExpanded = reference.hasAttribute('aria-expanded');
+  addListeners();
+  handleAriaExpandedAttribute();
+  handleStyles();
+  invokeHook('onCreate', [instance]);
+
+  if (props.showOnCreate) {
+    scheduleShow();
+  } // Prevent a tippy with a delay from hiding if the cursor left then returned
+  // before it started hiding
+
+
+  popper.addEventListener('mouseenter', function () {
+    if (instance.props.interactive && instance.state.isVisible) {
+      instance.clearDelayTimeouts();
+    }
+  });
+  popper.addEventListener('mouseleave', function () {
+    if (instance.props.interactive && instance.props.trigger.indexOf('mouseenter') >= 0) {
+      getDocument().addEventListener('mousemove', debouncedOnMouseMove);
+    }
+  });
+  return instance; // ===========================================================================
+  // 🔒 Private methods
+  // ===========================================================================
+
+  function getNormalizedTouchSettings() {
+    var touch = instance.props.touch;
+    return Array.isArray(touch) ? touch : [touch, 0];
+  }
+
+  function getIsCustomTouchBehavior() {
+    return getNormalizedTouchSettings()[0] === 'hold';
+  }
+
+  function getIsDefaultRenderFn() {
+    var _instance$props$rende;
+
+    // @ts-ignore
+    return !!((_instance$props$rende = instance.props.render) != null && _instance$props$rende.$$tippy);
+  }
+
+  function getCurrentTarget() {
+    return currentTarget || reference;
+  }
+
+  function getDocument() {
+    var parent = getCurrentTarget().parentNode;
+    return parent ? getOwnerDocument(parent) : document;
+  }
+
+  function getDefaultTemplateChildren() {
+    return getChildren(popper);
+  }
+
+  function getDelay(isShow) {
+    // For touch or keyboard input, force `0` delay for UX reasons
+    // Also if the instance is mounted but not visible (transitioning out),
+    // ignore delay
+    if (instance.state.isMounted && !instance.state.isVisible || currentInput.isTouch || lastTriggerEvent && lastTriggerEvent.type === 'focus') {
+      return 0;
+    }
+
+    return getValueAtIndexOrReturn(instance.props.delay, isShow ? 0 : 1, defaultProps.delay);
+  }
+
+  function handleStyles(fromHide) {
+    if (fromHide === void 0) {
+      fromHide = false;
+    }
+
+    popper.style.pointerEvents = instance.props.interactive && !fromHide ? '' : 'none';
+    popper.style.zIndex = "" + instance.props.zIndex;
+  }
+
+  function invokeHook(hook, args, shouldInvokePropsHook) {
+    if (shouldInvokePropsHook === void 0) {
+      shouldInvokePropsHook = true;
+    }
+
+    pluginsHooks.forEach(function (pluginHooks) {
+      if (pluginHooks[hook]) {
+        pluginHooks[hook].apply(pluginHooks, args);
+      }
+    });
+
+    if (shouldInvokePropsHook) {
+      var _instance$props;
+
+      (_instance$props = instance.props)[hook].apply(_instance$props, args);
+    }
+  }
+
+  function handleAriaContentAttribute() {
+    var aria = instance.props.aria;
+
+    if (!aria.content) {
+      return;
+    }
+
+    var attr = "aria-" + aria.content;
+    var id = popper.id;
+    var nodes = normalizeToArray(instance.props.triggerTarget || reference);
+    nodes.forEach(function (node) {
+      var currentValue = node.getAttribute(attr);
+
+      if (instance.state.isVisible) {
+        node.setAttribute(attr, currentValue ? currentValue + " " + id : id);
+      } else {
+        var nextValue = currentValue && currentValue.replace(id, '').trim();
+
+        if (nextValue) {
+          node.setAttribute(attr, nextValue);
+        } else {
+          node.removeAttribute(attr);
+        }
+      }
+    });
+  }
+
+  function handleAriaExpandedAttribute() {
+    if (hasAriaExpanded || !instance.props.aria.expanded) {
+      return;
+    }
+
+    var nodes = normalizeToArray(instance.props.triggerTarget || reference);
+    nodes.forEach(function (node) {
+      if (instance.props.interactive) {
+        node.setAttribute('aria-expanded', instance.state.isVisible && node === getCurrentTarget() ? 'true' : 'false');
+      } else {
+        node.removeAttribute('aria-expanded');
+      }
+    });
+  }
+
+  function cleanupInteractiveMouseListeners() {
+    getDocument().removeEventListener('mousemove', debouncedOnMouseMove);
+    mouseMoveListeners = mouseMoveListeners.filter(function (listener) {
+      return listener !== debouncedOnMouseMove;
+    });
+  }
+
+  function onDocumentPress(event) {
+    // Moved finger to scroll instead of an intentional tap outside
+    if (currentInput.isTouch) {
+      if (didTouchMove || event.type === 'mousedown') {
+        return;
+      }
+    }
+
+    var actualTarget = event.composedPath && event.composedPath()[0] || event.target; // Clicked on interactive popper
+
+    if (instance.props.interactive && actualContains(popper, actualTarget)) {
+      return;
+    } // Clicked on the event listeners target
+
+
+    if (normalizeToArray(instance.props.triggerTarget || reference).some(function (el) {
+      return actualContains(el, actualTarget);
+    })) {
+      if (currentInput.isTouch) {
+        return;
+      }
+
+      if (instance.state.isVisible && instance.props.trigger.indexOf('click') >= 0) {
+        return;
+      }
+    } else {
+      invokeHook('onClickOutside', [instance, event]);
+    }
+
+    if (instance.props.hideOnClick === true) {
+      instance.clearDelayTimeouts();
+      instance.hide(); // `mousedown` event is fired right before `focus` if pressing the
+      // currentTarget. This lets a tippy with `focus` trigger know that it
+      // should not show
+
+      didHideDueToDocumentMouseDown = true;
+      setTimeout(function () {
+        didHideDueToDocumentMouseDown = false;
+      }); // The listener gets added in `scheduleShow()`, but this may be hiding it
+      // before it shows, and hide()'s early bail-out behavior can prevent it
+      // from being cleaned up
+
+      if (!instance.state.isMounted) {
+        removeDocumentPress();
+      }
+    }
+  }
+
+  function onTouchMove() {
+    didTouchMove = true;
+  }
+
+  function onTouchStart() {
+    didTouchMove = false;
+  }
+
+  function addDocumentPress() {
+    var doc = getDocument();
+    doc.addEventListener('mousedown', onDocumentPress, true);
+    doc.addEventListener('touchend', onDocumentPress, TOUCH_OPTIONS);
+    doc.addEventListener('touchstart', onTouchStart, TOUCH_OPTIONS);
+    doc.addEventListener('touchmove', onTouchMove, TOUCH_OPTIONS);
+  }
+
+  function removeDocumentPress() {
+    var doc = getDocument();
+    doc.removeEventListener('mousedown', onDocumentPress, true);
+    doc.removeEventListener('touchend', onDocumentPress, TOUCH_OPTIONS);
+    doc.removeEventListener('touchstart', onTouchStart, TOUCH_OPTIONS);
+    doc.removeEventListener('touchmove', onTouchMove, TOUCH_OPTIONS);
+  }
+
+  function onTransitionedOut(duration, callback) {
+    onTransitionEnd(duration, function () {
+      if (!instance.state.isVisible && popper.parentNode && popper.parentNode.contains(popper)) {
+        callback();
+      }
+    });
+  }
+
+  function onTransitionedIn(duration, callback) {
+    onTransitionEnd(duration, callback);
+  }
+
+  function onTransitionEnd(duration, callback) {
+    var box = getDefaultTemplateChildren().box;
+
+    function listener(event) {
+      if (event.target === box) {
+        updateTransitionEndListener(box, 'remove', listener);
+        callback();
+      }
+    } // Make callback synchronous if duration is 0
+    // `transitionend` won't fire otherwise
+
+
+    if (duration === 0) {
+      return callback();
+    }
+
+    updateTransitionEndListener(box, 'remove', currentTransitionEndListener);
+    updateTransitionEndListener(box, 'add', listener);
+    currentTransitionEndListener = listener;
+  }
+
+  function on(eventType, handler, options) {
+    if (options === void 0) {
+      options = false;
+    }
+
+    var nodes = normalizeToArray(instance.props.triggerTarget || reference);
+    nodes.forEach(function (node) {
+      node.addEventListener(eventType, handler, options);
+      listeners.push({
+        node: node,
+        eventType: eventType,
+        handler: handler,
+        options: options
+      });
+    });
+  }
+
+  function addListeners() {
+    if (getIsCustomTouchBehavior()) {
+      on('touchstart', onTrigger, {
+        passive: true
+      });
+      on('touchend', onMouseLeave, {
+        passive: true
+      });
+    }
+
+    splitBySpaces(instance.props.trigger).forEach(function (eventType) {
+      if (eventType === 'manual') {
+        return;
+      }
+
+      on(eventType, onTrigger);
+
+      switch (eventType) {
+        case 'mouseenter':
+          on('mouseleave', onMouseLeave);
+          break;
+
+        case 'focus':
+          on(isIE11 ? 'focusout' : 'blur', onBlurOrFocusOut);
+          break;
+
+        case 'focusin':
+          on('focusout', onBlurOrFocusOut);
+          break;
+      }
+    });
+  }
+
+  function removeListeners() {
+    listeners.forEach(function (_ref) {
+      var node = _ref.node,
+          eventType = _ref.eventType,
+          handler = _ref.handler,
+          options = _ref.options;
+      node.removeEventListener(eventType, handler, options);
+    });
+    listeners = [];
+  }
+
+  function onTrigger(event) {
+    var _lastTriggerEvent;
+
+    var shouldScheduleClickHide = false;
+
+    if (!instance.state.isEnabled || isEventListenerStopped(event) || didHideDueToDocumentMouseDown) {
+      return;
+    }
+
+    var wasFocused = ((_lastTriggerEvent = lastTriggerEvent) == null ? void 0 : _lastTriggerEvent.type) === 'focus';
+    lastTriggerEvent = event;
+    currentTarget = event.currentTarget;
+    handleAriaExpandedAttribute();
+
+    if (!instance.state.isVisible && isMouseEvent(event)) {
+      // If scrolling, `mouseenter` events can be fired if the cursor lands
+      // over a new target, but `mousemove` events don't get fired. This
+      // causes interactive tooltips to get stuck open until the cursor is
+      // moved
+      mouseMoveListeners.forEach(function (listener) {
+        return listener(event);
+      });
+    } // Toggle show/hide when clicking click-triggered tooltips
+
+
+    if (event.type === 'click' && (instance.props.trigger.indexOf('mouseenter') < 0 || isVisibleFromClick) && instance.props.hideOnClick !== false && instance.state.isVisible) {
+      shouldScheduleClickHide = true;
+    } else {
+      scheduleShow(event);
+    }
+
+    if (event.type === 'click') {
+      isVisibleFromClick = !shouldScheduleClickHide;
+    }
+
+    if (shouldScheduleClickHide && !wasFocused) {
+      scheduleHide(event);
+    }
+  }
+
+  function onMouseMove(event) {
+    var target = event.target;
+    var isCursorOverReferenceOrPopper = getCurrentTarget().contains(target) || popper.contains(target);
+
+    if (event.type === 'mousemove' && isCursorOverReferenceOrPopper) {
+      return;
+    }
+
+    var popperTreeData = getNestedPopperTree().concat(popper).map(function (popper) {
+      var _instance$popperInsta;
+
+      var instance = popper._tippy;
+      var state = (_instance$popperInsta = instance.popperInstance) == null ? void 0 : _instance$popperInsta.state;
+
+      if (state) {
+        return {
+          popperRect: popper.getBoundingClientRect(),
+          popperState: state,
+          props: props
+        };
+      }
+
+      return null;
+    }).filter(Boolean);
+
+    if (isCursorOutsideInteractiveBorder(popperTreeData, event)) {
+      cleanupInteractiveMouseListeners();
+      scheduleHide(event);
+    }
+  }
+
+  function onMouseLeave(event) {
+    var shouldBail = isEventListenerStopped(event) || instance.props.trigger.indexOf('click') >= 0 && isVisibleFromClick;
+
+    if (shouldBail) {
+      return;
+    }
+
+    if (instance.props.interactive) {
+      instance.hideWithInteractivity(event);
+      return;
+    }
+
+    scheduleHide(event);
+  }
+
+  function onBlurOrFocusOut(event) {
+    if (instance.props.trigger.indexOf('focusin') < 0 && event.target !== getCurrentTarget()) {
+      return;
+    } // If focus was moved to within the popper
+
+
+    if (instance.props.interactive && event.relatedTarget && popper.contains(event.relatedTarget)) {
+      return;
+    }
+
+    scheduleHide(event);
+  }
+
+  function isEventListenerStopped(event) {
+    return currentInput.isTouch ? getIsCustomTouchBehavior() !== event.type.indexOf('touch') >= 0 : false;
+  }
+
+  function createPopperInstance() {
+    destroyPopperInstance();
+    var _instance$props2 = instance.props,
+        popperOptions = _instance$props2.popperOptions,
+        placement = _instance$props2.placement,
+        offset = _instance$props2.offset,
+        getReferenceClientRect = _instance$props2.getReferenceClientRect,
+        moveTransition = _instance$props2.moveTransition;
+    var arrow = getIsDefaultRenderFn() ? getChildren(popper).arrow : null;
+    var computedReference = getReferenceClientRect ? {
+      getBoundingClientRect: getReferenceClientRect,
+      contextElement: getReferenceClientRect.contextElement || getCurrentTarget()
+    } : reference;
+    var tippyModifier = {
+      name: '$$tippy',
+      enabled: true,
+      phase: 'beforeWrite',
+      requires: ['computeStyles'],
+      fn: function fn(_ref2) {
+        var state = _ref2.state;
+
+        if (getIsDefaultRenderFn()) {
+          var _getDefaultTemplateCh = getDefaultTemplateChildren(),
+              box = _getDefaultTemplateCh.box;
+
+          ['placement', 'reference-hidden', 'escaped'].forEach(function (attr) {
+            if (attr === 'placement') {
+              box.setAttribute('data-placement', state.placement);
+            } else {
+              if (state.attributes.popper["data-popper-" + attr]) {
+                box.setAttribute("data-" + attr, '');
+              } else {
+                box.removeAttribute("data-" + attr);
+              }
+            }
+          });
+          state.attributes.popper = {};
+        }
+      }
+    };
+    var modifiers = [{
+      name: 'offset',
+      options: {
+        offset: offset
+      }
+    }, {
+      name: 'preventOverflow',
+      options: {
+        padding: {
+          top: 2,
+          bottom: 2,
+          left: 5,
+          right: 5
+        }
+      }
+    }, {
+      name: 'flip',
+      options: {
+        padding: 5
+      }
+    }, {
+      name: 'computeStyles',
+      options: {
+        adaptive: !moveTransition
+      }
+    }, tippyModifier];
+
+    if (getIsDefaultRenderFn() && arrow) {
+      modifiers.push({
+        name: 'arrow',
+        options: {
+          element: arrow,
+          padding: 3
+        }
+      });
+    }
+
+    modifiers.push.apply(modifiers, (popperOptions == null ? void 0 : popperOptions.modifiers) || []);
+    instance.popperInstance = (0,_popperjs_core__WEBPACK_IMPORTED_MODULE_0__.createPopper)(computedReference, popper, Object.assign({}, popperOptions, {
+      placement: placement,
+      onFirstUpdate: onFirstUpdate,
+      modifiers: modifiers
+    }));
+  }
+
+  function destroyPopperInstance() {
+    if (instance.popperInstance) {
+      instance.popperInstance.destroy();
+      instance.popperInstance = null;
+    }
+  }
+
+  function mount() {
+    var appendTo = instance.props.appendTo;
+    var parentNode; // By default, we'll append the popper to the triggerTargets's parentNode so
+    // it's directly after the reference element so the elements inside the
+    // tippy can be tabbed to
+    // If there are clipping issues, the user can specify a different appendTo
+    // and ensure focus management is handled correctly manually
+
+    var node = getCurrentTarget();
+
+    if (instance.props.interactive && appendTo === TIPPY_DEFAULT_APPEND_TO || appendTo === 'parent') {
+      parentNode = node.parentNode;
+    } else {
+      parentNode = invokeWithArgsOrReturn(appendTo, [node]);
+    } // The popper element needs to exist on the DOM before its position can be
+    // updated as Popper needs to read its dimensions
+
+
+    if (!parentNode.contains(popper)) {
+      parentNode.appendChild(popper);
+    }
+
+    instance.state.isMounted = true;
+    createPopperInstance();
+    /* istanbul ignore else */
+
+    if (true) {
+      // Accessibility check
+      warnWhen(instance.props.interactive && appendTo === defaultProps.appendTo && node.nextElementSibling !== popper, ['Interactive tippy element may not be accessible via keyboard', 'navigation because it is not directly after the reference element', 'in the DOM source order.', '\n\n', 'Using a wrapper <div> or <span> tag around the reference element', 'solves this by creating a new parentNode context.', '\n\n', 'Specifying `appendTo: document.body` silences this warning, but it', 'assumes you are using a focus management solution to handle', 'keyboard navigation.', '\n\n', 'See: https://atomiks.github.io/tippyjs/v6/accessibility/#interactivity'].join(' '));
+    }
+  }
+
+  function getNestedPopperTree() {
+    return arrayFrom(popper.querySelectorAll('[data-tippy-root]'));
+  }
+
+  function scheduleShow(event) {
+    instance.clearDelayTimeouts();
+
+    if (event) {
+      invokeHook('onTrigger', [instance, event]);
+    }
+
+    addDocumentPress();
+    var delay = getDelay(true);
+
+    var _getNormalizedTouchSe = getNormalizedTouchSettings(),
+        touchValue = _getNormalizedTouchSe[0],
+        touchDelay = _getNormalizedTouchSe[1];
+
+    if (currentInput.isTouch && touchValue === 'hold' && touchDelay) {
+      delay = touchDelay;
+    }
+
+    if (delay) {
+      showTimeout = setTimeout(function () {
+        instance.show();
+      }, delay);
+    } else {
+      instance.show();
+    }
+  }
+
+  function scheduleHide(event) {
+    instance.clearDelayTimeouts();
+    invokeHook('onUntrigger', [instance, event]);
+
+    if (!instance.state.isVisible) {
+      removeDocumentPress();
+      return;
+    } // For interactive tippies, scheduleHide is added to a document.body handler
+    // from onMouseLeave so must intercept scheduled hides from mousemove/leave
+    // events when trigger contains mouseenter and click, and the tip is
+    // currently shown as a result of a click.
+
+
+    if (instance.props.trigger.indexOf('mouseenter') >= 0 && instance.props.trigger.indexOf('click') >= 0 && ['mouseleave', 'mousemove'].indexOf(event.type) >= 0 && isVisibleFromClick) {
+      return;
+    }
+
+    var delay = getDelay(false);
+
+    if (delay) {
+      hideTimeout = setTimeout(function () {
+        if (instance.state.isVisible) {
+          instance.hide();
+        }
+      }, delay);
+    } else {
+      // Fixes a `transitionend` problem when it fires 1 frame too
+      // late sometimes, we don't want hide() to be called.
+      scheduleHideAnimationFrame = requestAnimationFrame(function () {
+        instance.hide();
+      });
+    }
+  } // ===========================================================================
+  // 🔑 Public methods
+  // ===========================================================================
+
+
+  function enable() {
+    instance.state.isEnabled = true;
+  }
+
+  function disable() {
+    // Disabling the instance should also hide it
+    // https://github.com/atomiks/tippy.js-react/issues/106
+    instance.hide();
+    instance.state.isEnabled = false;
+  }
+
+  function clearDelayTimeouts() {
+    clearTimeout(showTimeout);
+    clearTimeout(hideTimeout);
+    cancelAnimationFrame(scheduleHideAnimationFrame);
+  }
+
+  function setProps(partialProps) {
+    /* istanbul ignore else */
+    if (true) {
+      warnWhen(instance.state.isDestroyed, createMemoryLeakWarning('setProps'));
+    }
+
+    if (instance.state.isDestroyed) {
+      return;
+    }
+
+    invokeHook('onBeforeUpdate', [instance, partialProps]);
+    removeListeners();
+    var prevProps = instance.props;
+    var nextProps = evaluateProps(reference, Object.assign({}, prevProps, removeUndefinedProps(partialProps), {
+      ignoreAttributes: true
+    }));
+    instance.props = nextProps;
+    addListeners();
+
+    if (prevProps.interactiveDebounce !== nextProps.interactiveDebounce) {
+      cleanupInteractiveMouseListeners();
+      debouncedOnMouseMove = debounce(onMouseMove, nextProps.interactiveDebounce);
+    } // Ensure stale aria-expanded attributes are removed
+
+
+    if (prevProps.triggerTarget && !nextProps.triggerTarget) {
+      normalizeToArray(prevProps.triggerTarget).forEach(function (node) {
+        node.removeAttribute('aria-expanded');
+      });
+    } else if (nextProps.triggerTarget) {
+      reference.removeAttribute('aria-expanded');
+    }
+
+    handleAriaExpandedAttribute();
+    handleStyles();
+
+    if (onUpdate) {
+      onUpdate(prevProps, nextProps);
+    }
+
+    if (instance.popperInstance) {
+      createPopperInstance(); // Fixes an issue with nested tippies if they are all getting re-rendered,
+      // and the nested ones get re-rendered first.
+      // https://github.com/atomiks/tippyjs-react/issues/177
+      // TODO: find a cleaner / more efficient solution(!)
+
+      getNestedPopperTree().forEach(function (nestedPopper) {
+        // React (and other UI libs likely) requires a rAF wrapper as it flushes
+        // its work in one
+        requestAnimationFrame(nestedPopper._tippy.popperInstance.forceUpdate);
+      });
+    }
+
+    invokeHook('onAfterUpdate', [instance, partialProps]);
+  }
+
+  function setContent(content) {
+    instance.setProps({
+      content: content
+    });
+  }
+
+  function show() {
+    /* istanbul ignore else */
+    if (true) {
+      warnWhen(instance.state.isDestroyed, createMemoryLeakWarning('show'));
+    } // Early bail-out
+
+
+    var isAlreadyVisible = instance.state.isVisible;
+    var isDestroyed = instance.state.isDestroyed;
+    var isDisabled = !instance.state.isEnabled;
+    var isTouchAndTouchDisabled = currentInput.isTouch && !instance.props.touch;
+    var duration = getValueAtIndexOrReturn(instance.props.duration, 0, defaultProps.duration);
+
+    if (isAlreadyVisible || isDestroyed || isDisabled || isTouchAndTouchDisabled) {
+      return;
+    } // Normalize `disabled` behavior across browsers.
+    // Firefox allows events on disabled elements, but Chrome doesn't.
+    // Using a wrapper element (i.e. <span>) is recommended.
+
+
+    if (getCurrentTarget().hasAttribute('disabled')) {
+      return;
+    }
+
+    invokeHook('onShow', [instance], false);
+
+    if (instance.props.onShow(instance) === false) {
+      return;
+    }
+
+    instance.state.isVisible = true;
+
+    if (getIsDefaultRenderFn()) {
+      popper.style.visibility = 'visible';
+    }
+
+    handleStyles();
+    addDocumentPress();
+
+    if (!instance.state.isMounted) {
+      popper.style.transition = 'none';
+    } // If flipping to the opposite side after hiding at least once, the
+    // animation will use the wrong placement without resetting the duration
+
+
+    if (getIsDefaultRenderFn()) {
+      var _getDefaultTemplateCh2 = getDefaultTemplateChildren(),
+          box = _getDefaultTemplateCh2.box,
+          content = _getDefaultTemplateCh2.content;
+
+      setTransitionDuration([box, content], 0);
+    }
+
+    onFirstUpdate = function onFirstUpdate() {
+      var _instance$popperInsta2;
+
+      if (!instance.state.isVisible || ignoreOnFirstUpdate) {
+        return;
+      }
+
+      ignoreOnFirstUpdate = true; // reflow
+
+      void popper.offsetHeight;
+      popper.style.transition = instance.props.moveTransition;
+
+      if (getIsDefaultRenderFn() && instance.props.animation) {
+        var _getDefaultTemplateCh3 = getDefaultTemplateChildren(),
+            _box = _getDefaultTemplateCh3.box,
+            _content = _getDefaultTemplateCh3.content;
+
+        setTransitionDuration([_box, _content], duration);
+        setVisibilityState([_box, _content], 'visible');
+      }
+
+      handleAriaContentAttribute();
+      handleAriaExpandedAttribute();
+      pushIfUnique(mountedInstances, instance); // certain modifiers (e.g. `maxSize`) require a second update after the
+      // popper has been positioned for the first time
+
+      (_instance$popperInsta2 = instance.popperInstance) == null ? void 0 : _instance$popperInsta2.forceUpdate();
+      invokeHook('onMount', [instance]);
+
+      if (instance.props.animation && getIsDefaultRenderFn()) {
+        onTransitionedIn(duration, function () {
+          instance.state.isShown = true;
+          invokeHook('onShown', [instance]);
+        });
+      }
+    };
+
+    mount();
+  }
+
+  function hide() {
+    /* istanbul ignore else */
+    if (true) {
+      warnWhen(instance.state.isDestroyed, createMemoryLeakWarning('hide'));
+    } // Early bail-out
+
+
+    var isAlreadyHidden = !instance.state.isVisible;
+    var isDestroyed = instance.state.isDestroyed;
+    var isDisabled = !instance.state.isEnabled;
+    var duration = getValueAtIndexOrReturn(instance.props.duration, 1, defaultProps.duration);
+
+    if (isAlreadyHidden || isDestroyed || isDisabled) {
+      return;
+    }
+
+    invokeHook('onHide', [instance], false);
+
+    if (instance.props.onHide(instance) === false) {
+      return;
+    }
+
+    instance.state.isVisible = false;
+    instance.state.isShown = false;
+    ignoreOnFirstUpdate = false;
+    isVisibleFromClick = false;
+
+    if (getIsDefaultRenderFn()) {
+      popper.style.visibility = 'hidden';
+    }
+
+    cleanupInteractiveMouseListeners();
+    removeDocumentPress();
+    handleStyles(true);
+
+    if (getIsDefaultRenderFn()) {
+      var _getDefaultTemplateCh4 = getDefaultTemplateChildren(),
+          box = _getDefaultTemplateCh4.box,
+          content = _getDefaultTemplateCh4.content;
+
+      if (instance.props.animation) {
+        setTransitionDuration([box, content], duration);
+        setVisibilityState([box, content], 'hidden');
+      }
+    }
+
+    handleAriaContentAttribute();
+    handleAriaExpandedAttribute();
+
+    if (instance.props.animation) {
+      if (getIsDefaultRenderFn()) {
+        onTransitionedOut(duration, instance.unmount);
+      }
+    } else {
+      instance.unmount();
+    }
+  }
+
+  function hideWithInteractivity(event) {
+    /* istanbul ignore else */
+    if (true) {
+      warnWhen(instance.state.isDestroyed, createMemoryLeakWarning('hideWithInteractivity'));
+    }
+
+    getDocument().addEventListener('mousemove', debouncedOnMouseMove);
+    pushIfUnique(mouseMoveListeners, debouncedOnMouseMove);
+    debouncedOnMouseMove(event);
+  }
+
+  function unmount() {
+    /* istanbul ignore else */
+    if (true) {
+      warnWhen(instance.state.isDestroyed, createMemoryLeakWarning('unmount'));
+    }
+
+    if (instance.state.isVisible) {
+      instance.hide();
+    }
+
+    if (!instance.state.isMounted) {
+      return;
+    }
+
+    destroyPopperInstance(); // If a popper is not interactive, it will be appended outside the popper
+    // tree by default. This seems mainly for interactive tippies, but we should
+    // find a workaround if possible
+
+    getNestedPopperTree().forEach(function (nestedPopper) {
+      nestedPopper._tippy.unmount();
+    });
+
+    if (popper.parentNode) {
+      popper.parentNode.removeChild(popper);
+    }
+
+    mountedInstances = mountedInstances.filter(function (i) {
+      return i !== instance;
+    });
+    instance.state.isMounted = false;
+    invokeHook('onHidden', [instance]);
+  }
+
+  function destroy() {
+    /* istanbul ignore else */
+    if (true) {
+      warnWhen(instance.state.isDestroyed, createMemoryLeakWarning('destroy'));
+    }
+
+    if (instance.state.isDestroyed) {
+      return;
+    }
+
+    instance.clearDelayTimeouts();
+    instance.unmount();
+    removeListeners();
+    delete reference._tippy;
+    instance.state.isDestroyed = true;
+    invokeHook('onDestroy', [instance]);
+  }
+}
+
+function tippy(targets, optionalProps) {
+  if (optionalProps === void 0) {
+    optionalProps = {};
+  }
+
+  var plugins = defaultProps.plugins.concat(optionalProps.plugins || []);
+  /* istanbul ignore else */
+
+  if (true) {
+    validateTargets(targets);
+    validateProps(optionalProps, plugins);
+  }
+
+  bindGlobalEventListeners();
+  var passedProps = Object.assign({}, optionalProps, {
+    plugins: plugins
+  });
+  var elements = getArrayOfElements(targets);
+  /* istanbul ignore else */
+
+  if (true) {
+    var isSingleContentElement = isElement(passedProps.content);
+    var isMoreThanOneReferenceElement = elements.length > 1;
+    warnWhen(isSingleContentElement && isMoreThanOneReferenceElement, ['tippy() was passed an Element as the `content` prop, but more than', 'one tippy instance was created by this invocation. This means the', 'content element will only be appended to the last tippy instance.', '\n\n', 'Instead, pass the .innerHTML of the element, or use a function that', 'returns a cloned version of the element instead.', '\n\n', '1) content: element.innerHTML\n', '2) content: () => element.cloneNode(true)'].join(' '));
+  }
+
+  var instances = elements.reduce(function (acc, reference) {
+    var instance = reference && createTippy(reference, passedProps);
+
+    if (instance) {
+      acc.push(instance);
+    }
+
+    return acc;
+  }, []);
+  return isElement(targets) ? instances[0] : instances;
+}
+
+tippy.defaultProps = defaultProps;
+tippy.setDefaultProps = setDefaultProps;
+tippy.currentInput = currentInput;
+var hideAll = function hideAll(_temp) {
+  var _ref = _temp === void 0 ? {} : _temp,
+      excludedReferenceOrInstance = _ref.exclude,
+      duration = _ref.duration;
+
+  mountedInstances.forEach(function (instance) {
+    var isExcluded = false;
+
+    if (excludedReferenceOrInstance) {
+      isExcluded = isReferenceElement(excludedReferenceOrInstance) ? instance.reference === excludedReferenceOrInstance : instance.popper === excludedReferenceOrInstance.popper;
+    }
+
+    if (!isExcluded) {
+      var originalDuration = instance.props.duration;
+      instance.setProps({
+        duration: duration
+      });
+      instance.hide();
+
+      if (!instance.state.isDestroyed) {
+        instance.setProps({
+          duration: originalDuration
+        });
+      }
+    }
+  });
+};
+
+// every time the popper is destroyed (i.e. a new target), removing the styles
+// and causing transitions to break for singletons when the console is open, but
+// most notably for non-transform styles being used, `gpuAcceleration: false`.
+
+var applyStylesModifier = Object.assign({}, _popperjs_core__WEBPACK_IMPORTED_MODULE_1__["default"], {
+  effect: function effect(_ref) {
+    var state = _ref.state;
+    var initialStyles = {
+      popper: {
+        position: state.options.strategy,
+        left: '0',
+        top: '0',
+        margin: '0'
+      },
+      arrow: {
+        position: 'absolute'
+      },
+      reference: {}
+    };
+    Object.assign(state.elements.popper.style, initialStyles.popper);
+    state.styles = initialStyles;
+
+    if (state.elements.arrow) {
+      Object.assign(state.elements.arrow.style, initialStyles.arrow);
+    } // intentionally return no cleanup function
+    // return () => { ... }
+
+  }
+});
+
+var createSingleton = function createSingleton(tippyInstances, optionalProps) {
+  var _optionalProps$popper;
+
+  if (optionalProps === void 0) {
+    optionalProps = {};
+  }
+
+  /* istanbul ignore else */
+  if (true) {
+    errorWhen(!Array.isArray(tippyInstances), ['The first argument passed to createSingleton() must be an array of', 'tippy instances. The passed value was', String(tippyInstances)].join(' '));
+  }
+
+  var individualInstances = tippyInstances;
+  var references = [];
+  var triggerTargets = [];
+  var currentTarget;
+  var overrides = optionalProps.overrides;
+  var interceptSetPropsCleanups = [];
+  var shownOnCreate = false;
+
+  function setTriggerTargets() {
+    triggerTargets = individualInstances.map(function (instance) {
+      return normalizeToArray(instance.props.triggerTarget || instance.reference);
+    }).reduce(function (acc, item) {
+      return acc.concat(item);
+    }, []);
+  }
+
+  function setReferences() {
+    references = individualInstances.map(function (instance) {
+      return instance.reference;
+    });
+  }
+
+  function enableInstances(isEnabled) {
+    individualInstances.forEach(function (instance) {
+      if (isEnabled) {
+        instance.enable();
+      } else {
+        instance.disable();
+      }
+    });
+  }
+
+  function interceptSetProps(singleton) {
+    return individualInstances.map(function (instance) {
+      var originalSetProps = instance.setProps;
+
+      instance.setProps = function (props) {
+        originalSetProps(props);
+
+        if (instance.reference === currentTarget) {
+          singleton.setProps(props);
+        }
+      };
+
+      return function () {
+        instance.setProps = originalSetProps;
+      };
+    });
+  } // have to pass singleton, as it maybe undefined on first call
+
+
+  function prepareInstance(singleton, target) {
+    var index = triggerTargets.indexOf(target); // bail-out
+
+    if (target === currentTarget) {
+      return;
+    }
+
+    currentTarget = target;
+    var overrideProps = (overrides || []).concat('content').reduce(function (acc, prop) {
+      acc[prop] = individualInstances[index].props[prop];
+      return acc;
+    }, {});
+    singleton.setProps(Object.assign({}, overrideProps, {
+      getReferenceClientRect: typeof overrideProps.getReferenceClientRect === 'function' ? overrideProps.getReferenceClientRect : function () {
+        var _references$index;
+
+        return (_references$index = references[index]) == null ? void 0 : _references$index.getBoundingClientRect();
+      }
+    }));
+  }
+
+  enableInstances(false);
+  setReferences();
+  setTriggerTargets();
+  var plugin = {
+    fn: function fn() {
+      return {
+        onDestroy: function onDestroy() {
+          enableInstances(true);
+        },
+        onHidden: function onHidden() {
+          currentTarget = null;
+        },
+        onClickOutside: function onClickOutside(instance) {
+          if (instance.props.showOnCreate && !shownOnCreate) {
+            shownOnCreate = true;
+            currentTarget = null;
+          }
+        },
+        onShow: function onShow(instance) {
+          if (instance.props.showOnCreate && !shownOnCreate) {
+            shownOnCreate = true;
+            prepareInstance(instance, references[0]);
+          }
+        },
+        onTrigger: function onTrigger(instance, event) {
+          prepareInstance(instance, event.currentTarget);
+        }
+      };
+    }
+  };
+  var singleton = tippy(div(), Object.assign({}, removeProperties(optionalProps, ['overrides']), {
+    plugins: [plugin].concat(optionalProps.plugins || []),
+    triggerTarget: triggerTargets,
+    popperOptions: Object.assign({}, optionalProps.popperOptions, {
+      modifiers: [].concat(((_optionalProps$popper = optionalProps.popperOptions) == null ? void 0 : _optionalProps$popper.modifiers) || [], [applyStylesModifier])
+    })
+  }));
+  var originalShow = singleton.show;
+
+  singleton.show = function (target) {
+    originalShow(); // first time, showOnCreate or programmatic call with no params
+    // default to showing first instance
+
+    if (!currentTarget && target == null) {
+      return prepareInstance(singleton, references[0]);
+    } // triggered from event (do nothing as prepareInstance already called by onTrigger)
+    // programmatic call with no params when already visible (do nothing again)
+
+
+    if (currentTarget && target == null) {
+      return;
+    } // target is index of instance
+
+
+    if (typeof target === 'number') {
+      return references[target] && prepareInstance(singleton, references[target]);
+    } // target is a child tippy instance
+
+
+    if (individualInstances.indexOf(target) >= 0) {
+      var ref = target.reference;
+      return prepareInstance(singleton, ref);
+    } // target is a ReferenceElement
+
+
+    if (references.indexOf(target) >= 0) {
+      return prepareInstance(singleton, target);
+    }
+  };
+
+  singleton.showNext = function () {
+    var first = references[0];
+
+    if (!currentTarget) {
+      return singleton.show(0);
+    }
+
+    var index = references.indexOf(currentTarget);
+    singleton.show(references[index + 1] || first);
+  };
+
+  singleton.showPrevious = function () {
+    var last = references[references.length - 1];
+
+    if (!currentTarget) {
+      return singleton.show(last);
+    }
+
+    var index = references.indexOf(currentTarget);
+    var target = references[index - 1] || last;
+    singleton.show(target);
+  };
+
+  var originalSetProps = singleton.setProps;
+
+  singleton.setProps = function (props) {
+    overrides = props.overrides || overrides;
+    originalSetProps(props);
+  };
+
+  singleton.setInstances = function (nextInstances) {
+    enableInstances(true);
+    interceptSetPropsCleanups.forEach(function (fn) {
+      return fn();
+    });
+    individualInstances = nextInstances;
+    enableInstances(false);
+    setReferences();
+    setTriggerTargets();
+    interceptSetPropsCleanups = interceptSetProps(singleton);
+    singleton.setProps({
+      triggerTarget: triggerTargets
+    });
+  };
+
+  interceptSetPropsCleanups = interceptSetProps(singleton);
+  return singleton;
+};
+
+var BUBBLING_EVENTS_MAP = {
+  mouseover: 'mouseenter',
+  focusin: 'focus',
+  click: 'click'
+};
+/**
+ * Creates a delegate instance that controls the creation of tippy instances
+ * for child elements (`target` CSS selector).
+ */
+
+function delegate(targets, props) {
+  /* istanbul ignore else */
+  if (true) {
+    errorWhen(!(props && props.target), ['You must specity a `target` prop indicating a CSS selector string matching', 'the target elements that should receive a tippy.'].join(' '));
+  }
+
+  var listeners = [];
+  var childTippyInstances = [];
+  var disabled = false;
+  var target = props.target;
+  var nativeProps = removeProperties(props, ['target']);
+  var parentProps = Object.assign({}, nativeProps, {
+    trigger: 'manual',
+    touch: false
+  });
+  var childProps = Object.assign({
+    touch: defaultProps.touch
+  }, nativeProps, {
+    showOnCreate: true
+  });
+  var returnValue = tippy(targets, parentProps);
+  var normalizedReturnValue = normalizeToArray(returnValue);
+
+  function onTrigger(event) {
+    if (!event.target || disabled) {
+      return;
+    }
+
+    var targetNode = event.target.closest(target);
+
+    if (!targetNode) {
+      return;
+    } // Get relevant trigger with fallbacks:
+    // 1. Check `data-tippy-trigger` attribute on target node
+    // 2. Fallback to `trigger` passed to `delegate()`
+    // 3. Fallback to `defaultProps.trigger`
+
+
+    var trigger = targetNode.getAttribute('data-tippy-trigger') || props.trigger || defaultProps.trigger; // @ts-ignore
+
+    if (targetNode._tippy) {
+      return;
+    }
+
+    if (event.type === 'touchstart' && typeof childProps.touch === 'boolean') {
+      return;
+    }
+
+    if (event.type !== 'touchstart' && trigger.indexOf(BUBBLING_EVENTS_MAP[event.type]) < 0) {
+      return;
+    }
+
+    var instance = tippy(targetNode, childProps);
+
+    if (instance) {
+      childTippyInstances = childTippyInstances.concat(instance);
+    }
+  }
+
+  function on(node, eventType, handler, options) {
+    if (options === void 0) {
+      options = false;
+    }
+
+    node.addEventListener(eventType, handler, options);
+    listeners.push({
+      node: node,
+      eventType: eventType,
+      handler: handler,
+      options: options
+    });
+  }
+
+  function addEventListeners(instance) {
+    var reference = instance.reference;
+    on(reference, 'touchstart', onTrigger, TOUCH_OPTIONS);
+    on(reference, 'mouseover', onTrigger);
+    on(reference, 'focusin', onTrigger);
+    on(reference, 'click', onTrigger);
+  }
+
+  function removeEventListeners() {
+    listeners.forEach(function (_ref) {
+      var node = _ref.node,
+          eventType = _ref.eventType,
+          handler = _ref.handler,
+          options = _ref.options;
+      node.removeEventListener(eventType, handler, options);
+    });
+    listeners = [];
+  }
+
+  function applyMutations(instance) {
+    var originalDestroy = instance.destroy;
+    var originalEnable = instance.enable;
+    var originalDisable = instance.disable;
+
+    instance.destroy = function (shouldDestroyChildInstances) {
+      if (shouldDestroyChildInstances === void 0) {
+        shouldDestroyChildInstances = true;
+      }
+
+      if (shouldDestroyChildInstances) {
+        childTippyInstances.forEach(function (instance) {
+          instance.destroy();
+        });
+      }
+
+      childTippyInstances = [];
+      removeEventListeners();
+      originalDestroy();
+    };
+
+    instance.enable = function () {
+      originalEnable();
+      childTippyInstances.forEach(function (instance) {
+        return instance.enable();
+      });
+      disabled = false;
+    };
+
+    instance.disable = function () {
+      originalDisable();
+      childTippyInstances.forEach(function (instance) {
+        return instance.disable();
+      });
+      disabled = true;
+    };
+
+    addEventListeners(instance);
+  }
+
+  normalizedReturnValue.forEach(applyMutations);
+  return returnValue;
+}
+
+var animateFill = {
+  name: 'animateFill',
+  defaultValue: false,
+  fn: function fn(instance) {
+    var _instance$props$rende;
+
+    // @ts-ignore
+    if (!((_instance$props$rende = instance.props.render) != null && _instance$props$rende.$$tippy)) {
+      if (true) {
+        errorWhen(instance.props.animateFill, 'The `animateFill` plugin requires the default render function.');
+      }
+
+      return {};
+    }
+
+    var _getChildren = getChildren(instance.popper),
+        box = _getChildren.box,
+        content = _getChildren.content;
+
+    var backdrop = instance.props.animateFill ? createBackdropElement() : null;
+    return {
+      onCreate: function onCreate() {
+        if (backdrop) {
+          box.insertBefore(backdrop, box.firstElementChild);
+          box.setAttribute('data-animatefill', '');
+          box.style.overflow = 'hidden';
+          instance.setProps({
+            arrow: false,
+            animation: 'shift-away'
+          });
+        }
+      },
+      onMount: function onMount() {
+        if (backdrop) {
+          var transitionDuration = box.style.transitionDuration;
+          var duration = Number(transitionDuration.replace('ms', '')); // The content should fade in after the backdrop has mostly filled the
+          // tooltip element. `clip-path` is the other alternative but is not
+          // well-supported and is buggy on some devices.
+
+          content.style.transitionDelay = Math.round(duration / 10) + "ms";
+          backdrop.style.transitionDuration = transitionDuration;
+          setVisibilityState([backdrop], 'visible');
+        }
+      },
+      onShow: function onShow() {
+        if (backdrop) {
+          backdrop.style.transitionDuration = '0ms';
+        }
+      },
+      onHide: function onHide() {
+        if (backdrop) {
+          setVisibilityState([backdrop], 'hidden');
+        }
+      }
+    };
+  }
+};
+
+function createBackdropElement() {
+  var backdrop = div();
+  backdrop.className = BACKDROP_CLASS;
+  setVisibilityState([backdrop], 'hidden');
+  return backdrop;
+}
+
+var mouseCoords = {
+  clientX: 0,
+  clientY: 0
+};
+var activeInstances = [];
+
+function storeMouseCoords(_ref) {
+  var clientX = _ref.clientX,
+      clientY = _ref.clientY;
+  mouseCoords = {
+    clientX: clientX,
+    clientY: clientY
+  };
+}
+
+function addMouseCoordsListener(doc) {
+  doc.addEventListener('mousemove', storeMouseCoords);
+}
+
+function removeMouseCoordsListener(doc) {
+  doc.removeEventListener('mousemove', storeMouseCoords);
+}
+
+var followCursor = {
+  name: 'followCursor',
+  defaultValue: false,
+  fn: function fn(instance) {
+    var reference = instance.reference;
+    var doc = getOwnerDocument(instance.props.triggerTarget || reference);
+    var isInternalUpdate = false;
+    var wasFocusEvent = false;
+    var isUnmounted = true;
+    var prevProps = instance.props;
+
+    function getIsInitialBehavior() {
+      return instance.props.followCursor === 'initial' && instance.state.isVisible;
+    }
+
+    function addListener() {
+      doc.addEventListener('mousemove', onMouseMove);
+    }
+
+    function removeListener() {
+      doc.removeEventListener('mousemove', onMouseMove);
+    }
+
+    function unsetGetReferenceClientRect() {
+      isInternalUpdate = true;
+      instance.setProps({
+        getReferenceClientRect: null
+      });
+      isInternalUpdate = false;
+    }
+
+    function onMouseMove(event) {
+      // If the instance is interactive, avoid updating the position unless it's
+      // over the reference element
+      var isCursorOverReference = event.target ? reference.contains(event.target) : true;
+      var followCursor = instance.props.followCursor;
+      var clientX = event.clientX,
+          clientY = event.clientY;
+      var rect = reference.getBoundingClientRect();
+      var relativeX = clientX - rect.left;
+      var relativeY = clientY - rect.top;
+
+      if (isCursorOverReference || !instance.props.interactive) {
+        instance.setProps({
+          // @ts-ignore - unneeded DOMRect properties
+          getReferenceClientRect: function getReferenceClientRect() {
+            var rect = reference.getBoundingClientRect();
+            var x = clientX;
+            var y = clientY;
+
+            if (followCursor === 'initial') {
+              x = rect.left + relativeX;
+              y = rect.top + relativeY;
+            }
+
+            var top = followCursor === 'horizontal' ? rect.top : y;
+            var right = followCursor === 'vertical' ? rect.right : x;
+            var bottom = followCursor === 'horizontal' ? rect.bottom : y;
+            var left = followCursor === 'vertical' ? rect.left : x;
+            return {
+              width: right - left,
+              height: bottom - top,
+              top: top,
+              right: right,
+              bottom: bottom,
+              left: left
+            };
+          }
+        });
+      }
+    }
+
+    function create() {
+      if (instance.props.followCursor) {
+        activeInstances.push({
+          instance: instance,
+          doc: doc
+        });
+        addMouseCoordsListener(doc);
+      }
+    }
+
+    function destroy() {
+      activeInstances = activeInstances.filter(function (data) {
+        return data.instance !== instance;
+      });
+
+      if (activeInstances.filter(function (data) {
+        return data.doc === doc;
+      }).length === 0) {
+        removeMouseCoordsListener(doc);
+      }
+    }
+
+    return {
+      onCreate: create,
+      onDestroy: destroy,
+      onBeforeUpdate: function onBeforeUpdate() {
+        prevProps = instance.props;
+      },
+      onAfterUpdate: function onAfterUpdate(_, _ref2) {
+        var followCursor = _ref2.followCursor;
+
+        if (isInternalUpdate) {
+          return;
+        }
+
+        if (followCursor !== undefined && prevProps.followCursor !== followCursor) {
+          destroy();
+
+          if (followCursor) {
+            create();
+
+            if (instance.state.isMounted && !wasFocusEvent && !getIsInitialBehavior()) {
+              addListener();
+            }
+          } else {
+            removeListener();
+            unsetGetReferenceClientRect();
+          }
+        }
+      },
+      onMount: function onMount() {
+        if (instance.props.followCursor && !wasFocusEvent) {
+          if (isUnmounted) {
+            onMouseMove(mouseCoords);
+            isUnmounted = false;
+          }
+
+          if (!getIsInitialBehavior()) {
+            addListener();
+          }
+        }
+      },
+      onTrigger: function onTrigger(_, event) {
+        if (isMouseEvent(event)) {
+          mouseCoords = {
+            clientX: event.clientX,
+            clientY: event.clientY
+          };
+        }
+
+        wasFocusEvent = event.type === 'focus';
+      },
+      onHidden: function onHidden() {
+        if (instance.props.followCursor) {
+          unsetGetReferenceClientRect();
+          removeListener();
+          isUnmounted = true;
+        }
+      }
+    };
+  }
+};
+
+function getProps(props, modifier) {
+  var _props$popperOptions;
+
+  return {
+    popperOptions: Object.assign({}, props.popperOptions, {
+      modifiers: [].concat((((_props$popperOptions = props.popperOptions) == null ? void 0 : _props$popperOptions.modifiers) || []).filter(function (_ref) {
+        var name = _ref.name;
+        return name !== modifier.name;
+      }), [modifier])
+    })
+  };
+}
+
+var inlinePositioning = {
+  name: 'inlinePositioning',
+  defaultValue: false,
+  fn: function fn(instance) {
+    var reference = instance.reference;
+
+    function isEnabled() {
+      return !!instance.props.inlinePositioning;
+    }
+
+    var placement;
+    var cursorRectIndex = -1;
+    var isInternalUpdate = false;
+    var triedPlacements = [];
+    var modifier = {
+      name: 'tippyInlinePositioning',
+      enabled: true,
+      phase: 'afterWrite',
+      fn: function fn(_ref2) {
+        var state = _ref2.state;
+
+        if (isEnabled()) {
+          if (triedPlacements.indexOf(state.placement) !== -1) {
+            triedPlacements = [];
+          }
+
+          if (placement !== state.placement && triedPlacements.indexOf(state.placement) === -1) {
+            triedPlacements.push(state.placement);
+            instance.setProps({
+              // @ts-ignore - unneeded DOMRect properties
+              getReferenceClientRect: function getReferenceClientRect() {
+                return _getReferenceClientRect(state.placement);
+              }
+            });
+          }
+
+          placement = state.placement;
+        }
+      }
+    };
+
+    function _getReferenceClientRect(placement) {
+      return getInlineBoundingClientRect(getBasePlacement(placement), reference.getBoundingClientRect(), arrayFrom(reference.getClientRects()), cursorRectIndex);
+    }
+
+    function setInternalProps(partialProps) {
+      isInternalUpdate = true;
+      instance.setProps(partialProps);
+      isInternalUpdate = false;
+    }
+
+    function addModifier() {
+      if (!isInternalUpdate) {
+        setInternalProps(getProps(instance.props, modifier));
+      }
+    }
+
+    return {
+      onCreate: addModifier,
+      onAfterUpdate: addModifier,
+      onTrigger: function onTrigger(_, event) {
+        if (isMouseEvent(event)) {
+          var rects = arrayFrom(instance.reference.getClientRects());
+          var cursorRect = rects.find(function (rect) {
+            return rect.left - 2 <= event.clientX && rect.right + 2 >= event.clientX && rect.top - 2 <= event.clientY && rect.bottom + 2 >= event.clientY;
+          });
+          var index = rects.indexOf(cursorRect);
+          cursorRectIndex = index > -1 ? index : cursorRectIndex;
+        }
+      },
+      onHidden: function onHidden() {
+        cursorRectIndex = -1;
+      }
+    };
+  }
+};
+function getInlineBoundingClientRect(currentBasePlacement, boundingRect, clientRects, cursorRectIndex) {
+  // Not an inline element, or placement is not yet known
+  if (clientRects.length < 2 || currentBasePlacement === null) {
+    return boundingRect;
+  } // There are two rects and they are disjoined
+
+
+  if (clientRects.length === 2 && cursorRectIndex >= 0 && clientRects[0].left > clientRects[1].right) {
+    return clientRects[cursorRectIndex] || boundingRect;
+  }
+
+  switch (currentBasePlacement) {
+    case 'top':
+    case 'bottom':
+      {
+        var firstRect = clientRects[0];
+        var lastRect = clientRects[clientRects.length - 1];
+        var isTop = currentBasePlacement === 'top';
+        var top = firstRect.top;
+        var bottom = lastRect.bottom;
+        var left = isTop ? firstRect.left : lastRect.left;
+        var right = isTop ? firstRect.right : lastRect.right;
+        var width = right - left;
+        var height = bottom - top;
+        return {
+          top: top,
+          bottom: bottom,
+          left: left,
+          right: right,
+          width: width,
+          height: height
+        };
+      }
+
+    case 'left':
+    case 'right':
+      {
+        var minLeft = Math.min.apply(Math, clientRects.map(function (rects) {
+          return rects.left;
+        }));
+        var maxRight = Math.max.apply(Math, clientRects.map(function (rects) {
+          return rects.right;
+        }));
+        var measureRects = clientRects.filter(function (rect) {
+          return currentBasePlacement === 'left' ? rect.left === minLeft : rect.right === maxRight;
+        });
+        var _top = measureRects[0].top;
+        var _bottom = measureRects[measureRects.length - 1].bottom;
+        var _left = minLeft;
+        var _right = maxRight;
+
+        var _width = _right - _left;
+
+        var _height = _bottom - _top;
+
+        return {
+          top: _top,
+          bottom: _bottom,
+          left: _left,
+          right: _right,
+          width: _width,
+          height: _height
+        };
+      }
+
+    default:
+      {
+        return boundingRect;
+      }
+  }
+}
+
+var sticky = {
+  name: 'sticky',
+  defaultValue: false,
+  fn: function fn(instance) {
+    var reference = instance.reference,
+        popper = instance.popper;
+
+    function getReference() {
+      return instance.popperInstance ? instance.popperInstance.state.elements.reference : reference;
+    }
+
+    function shouldCheck(value) {
+      return instance.props.sticky === true || instance.props.sticky === value;
+    }
+
+    var prevRefRect = null;
+    var prevPopRect = null;
+
+    function updatePosition() {
+      var currentRefRect = shouldCheck('reference') ? getReference().getBoundingClientRect() : null;
+      var currentPopRect = shouldCheck('popper') ? popper.getBoundingClientRect() : null;
+
+      if (currentRefRect && areRectsDifferent(prevRefRect, currentRefRect) || currentPopRect && areRectsDifferent(prevPopRect, currentPopRect)) {
+        if (instance.popperInstance) {
+          instance.popperInstance.update();
+        }
+      }
+
+      prevRefRect = currentRefRect;
+      prevPopRect = currentPopRect;
+
+      if (instance.state.isMounted) {
+        requestAnimationFrame(updatePosition);
+      }
+    }
+
+    return {
+      onMount: function onMount() {
+        if (instance.props.sticky) {
+          updatePosition();
+        }
+      }
+    };
+  }
+};
+
+function areRectsDifferent(rectA, rectB) {
+  if (rectA && rectB) {
+    return rectA.top !== rectB.top || rectA.right !== rectB.right || rectA.bottom !== rectB.bottom || rectA.left !== rectB.left;
+  }
+
+  return true;
+}
+
+tippy.setDefaultProps({
+  render: render
+});
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (tippy);
+
+//# sourceMappingURL=tippy.esm.js.map
+
+
 /***/ })
 
 /******/ 	});
@@ -11509,7 +17184,11 @@ var __webpack_exports__ = {};
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js");
 /* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(jquery__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _scss_main_scss__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../scss/main.scss */ "./src/scss/main.scss");
+/* harmony import */ var tippy_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! tippy.js */ "./node_modules/tippy.js/dist/tippy.esm.js");
+/* harmony import */ var tippy_js_dist_tippy_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! tippy.js/dist/tippy.css */ "./node_modules/tippy.js/dist/tippy.css");
+/* harmony import */ var _scss_main_scss__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../scss/main.scss */ "./src/scss/main.scss");
+
+
 
 
 let mashiroConfig;
@@ -11518,11 +17197,33 @@ function saveConfig() {
     localStorage.setItem("mashiroCookie", JSON.stringify(mashiroConfig));
 }
 
+function colorFill() {
+    jquery__WEBPACK_IMPORTED_MODULE_0___default()("[character]").toggleClass("fill");
+    jquery__WEBPACK_IMPORTED_MODULE_0___default()("#dark-toggle").toggle();
+    jquery__WEBPACK_IMPORTED_MODULE_0___default()("#light-toggle").toggle();
+    mashiroConfig.darkColors = !mashiroConfig.darkColors;
+    saveConfig();
+}
+
+function sliderDrop() {
+    jquery__WEBPACK_IMPORTED_MODULE_0___default()(".toolbar-wrapper").toggleClass("showSlider");
+}
+
 function cardLightboxInitialize() {
     jquery__WEBPACK_IMPORTED_MODULE_0___default()("body").append(`<div class="lightbox__dim" style="display: none;">
         <div class="lightbox-content"></div>
     </div>`);
 }
+
+jquery__WEBPACK_IMPORTED_MODULE_0___default()("#colorFill").click(function () {
+    alert("Handler for .colorFill() called.");
+    colorFill();
+});
+
+jquery__WEBPACK_IMPORTED_MODULE_0___default()("#sliderDrop").click(function () {
+    alert("Handler for .sliderDrop() called.");
+    sliderDrop();
+});
 
 function minitalkInitialize() {
     jquery__WEBPACK_IMPORTED_MODULE_0___default()(".minitalk-option_header").click(function () {
@@ -11581,18 +17282,6 @@ function toolbarInitialize() {
 
     mashiroConfig = JSON.parse(mashiroCookie);
 
-    function colorFill() {
-        jquery__WEBPACK_IMPORTED_MODULE_0___default()("[character]").toggleClass("fill");
-        jquery__WEBPACK_IMPORTED_MODULE_0___default()("#dark-toggle").toggle();
-        jquery__WEBPACK_IMPORTED_MODULE_0___default()("#light-toggle").toggle();
-        mashiroConfig.darkColors = !mashiroConfig.darkColors;
-        saveConfig();
-    }
-
-    function sliderDrop() {
-        jquery__WEBPACK_IMPORTED_MODULE_0___default()(".toolbar-wrapper").toggleClass("showSlider");
-    }
-
     const handleSliderChange = (event) => {
         const fontSize = fontSizes[event.target.value - 1];
         jquery__WEBPACK_IMPORTED_MODULE_0___default()("[character]").removeClass(fontSizes.filter((size) => !!size));
@@ -11615,7 +17304,7 @@ function toolbarInitialize() {
 }
 
 function footnoteInitialize() {
-    tippy.setDefaultProps({
+    tippy_js__WEBPACK_IMPORTED_MODULE_3__["default"].setDefaultProps({
         maxWidth: 350,
         allowHTML: true,
         animation: "shift-away",
@@ -11624,7 +17313,7 @@ function footnoteInitialize() {
         moveTransition: "transform 0.2s ease",
         interactive: true,
     });
-    tippy("[data-tippy-content]");
+    (0,tippy_js__WEBPACK_IMPORTED_MODULE_3__["default"])("[data-tippy-content]");
 }
 
 jquery__WEBPACK_IMPORTED_MODULE_0___default()(document).ready(function () {

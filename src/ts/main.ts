@@ -1,4 +1,6 @@
 import $ from "jquery";
+import tippy, { createSingleton } from "tippy.js";
+import "tippy.js/dist/tippy.css";
 import "../scss/main.scss";
 let mashiroConfig;
 
@@ -6,11 +8,33 @@ function saveConfig() {
     localStorage.setItem("mashiroCookie", JSON.stringify(mashiroConfig));
 }
 
+function colorFill() {
+    $("[character]").toggleClass("fill");
+    $("#dark-toggle").toggle();
+    $("#light-toggle").toggle();
+    mashiroConfig.darkColors = !mashiroConfig.darkColors;
+    saveConfig();
+}
+
+function sliderDrop() {
+    $(".toolbar-wrapper").toggleClass("showSlider");
+}
+
 function cardLightboxInitialize() {
     $("body").append(`<div class="lightbox__dim" style="display: none;">
         <div class="lightbox-content"></div>
     </div>`);
 }
+
+$("#colorFill").click(function () {
+    alert("Handler for .colorFill() called.");
+    colorFill();
+});
+
+$("#sliderDrop").click(function () {
+    alert("Handler for .sliderDrop() called.");
+    sliderDrop();
+});
 
 function minitalkInitialize() {
     $(".minitalk-option_header").click(function () {
@@ -68,18 +92,6 @@ function toolbarInitialize() {
     }
 
     mashiroConfig = JSON.parse(mashiroCookie);
-
-    function colorFill() {
-        $("[character]").toggleClass("fill");
-        $("#dark-toggle").toggle();
-        $("#light-toggle").toggle();
-        mashiroConfig.darkColors = !mashiroConfig.darkColors;
-        saveConfig();
-    }
-
-    function sliderDrop() {
-        $(".toolbar-wrapper").toggleClass("showSlider");
-    }
 
     const handleSliderChange = (event) => {
         const fontSize = fontSizes[event.target.value - 1];
