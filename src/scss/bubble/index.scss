@@ -1,7 +1,5 @@
-@use "components/_variables";
-@use "components/enst";
+@use "components/core";
 
-@use "components/_main";
 @use "components/attributes";
 @use "components/extra";
 
@@ -9,4 +7,4 @@
 @use "components/fill";
 @use "components/sizes";
 
-@use "components/_media";
+@use "components/media";

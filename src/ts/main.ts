@@ -1,7 +1,8 @@
 import $ from "jquery";
-import tippy, { createSingleton } from "tippy.js";
+import tippy from "tippy.js";
 import "tippy.js/dist/tippy.css";
-import "../scss/main.scss";
+import "../scss/mashiro.scss";
+
 let mashiroConfig;
 
 function saveConfig() {
@@ -94,10 +95,9 @@ function toolbarInitialize() {
 
 function footnoteInitialize() {
     tippy.setDefaultProps({
-        maxWidth: 350,
+        theme: "translucent",
         allowHTML: true,
         animation: "shift-away",
-        delay: [50, 200],
         zIndex: 99,
         moveTransition: "transform 0.2s ease",
         interactive: true,
@@ -112,7 +112,6 @@ $(document).ready(function () {
     footnoteInitialize();
 
     $("#colorFill").click(function () {
-        alert("Handler for .colorFill() called.");
         $("[character]").toggleClass("fill");
         $("#dark-toggle").toggle();
         $("#light-toggle").toggle();
@@ -121,7 +120,6 @@ $(document).ready(function () {
     });
 
     $("#sliderDrop").click(function () {
-        alert("Handler for .sliderDrop() called.");
         $(".toolbar-wrapper").toggleClass("showSlider");
     });
 });

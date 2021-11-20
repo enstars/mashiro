@@ -6,7 +6,7 @@ module.exports = {
     devtool: "source-map",
     entry: "./src/ts/main.ts",
     output: {
-        filename: "main.js",
+        filename: "mashiro.js",
         path: path.resolve(__dirname, "dist"),
     },
     module: {

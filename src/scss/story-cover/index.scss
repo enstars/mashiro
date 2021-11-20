@@ -1,4 +1,5 @@
-@use "components/_main";
+@use "components/core";
+
 @use "components/story";
 @use "components/preview";
 @use "components/title";
@@ -9,4 +10,5 @@
 @use "components/cards";
 @use "components/lightbox";
 @use "components/reverse";
-@use "components/_media";
+
+@use "components/media";
