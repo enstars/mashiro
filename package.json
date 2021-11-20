@@ -2,9 +2,9 @@
     "name": "mashiro",
     "version": "1.3.2",
     "description": "CSS library for translation layouts",
-    "main": "Gruntfile.js",
+    "private": true,
     "scripts": {
-        "test": "grunt"
+        "test": "echo \"Error: no test specified\" && exit 1"
     },
     "repository": {
         "type": "git",
@@ -20,13 +20,97 @@
     },
     "homepage": "https://github.com/enstars/mashiro#readme",
     "devDependencies": {
-        "grunt": "^1.4.1",
-        "grunt-contrib-clean": "^2.0.0",
-        "grunt-contrib-concat": "^2.0.0",
-        "grunt-contrib-cssmin": "^4.0.0",
-        "grunt-contrib-sass": "^2.0.0",
-        "grunt-contrib-watch": "^1.1.0",
-        "grunt-terser": "^2.0.0",
-        "terser": "^5.9.0"
+        "eslint": "^8.2.0",
+        "prettier": "^2.4.1",
+        "autoprefixer": "^10.3.7",
+        "css-loader": "^6.4.0",
+        "postcss-loader": "^6.2.0",
+        "sass": "^1.43.4",
+        "sass-loader": "^12.3.0",
+        "style-loader": "^3.3.1",
+        "typescript": "^4.5.2",
+        "webpack": "^5.64.1",
+        "webpack-cli": "^4.9.1"
+    },
+    "dependencies": {
+        "jquery": "^3.6.0",
+        "tippy.js": "^6.3.7"
+    },
+    "eslintConfig": {
+        "extends": "airbnb",
+        "rules": {
+            "indent": [
+                "error",
+                4
+            ]
+        }
+    },
+    "prettier": {
+        "tabWidth": 4
+    },
+    "stylelint": {
+        "plugins": [
+            "stylelint-scss",
+            "stylelint-order"
+        ],
+        "rules": {
+            "indentation": 4,
+            "number-leading-zero": "always",
+            "max-empty-lines": 1,
+            "string-quotes": "double",
+            "selector-max-id": 0,
+            "selector-list-comma-newline-after": "always",
+            "rule-empty-line-before": [
+                "always",
+                {
+                    "ignore": [
+                        "after-comment",
+                        "first-nested"
+                    ]
+                }
+            ],
+            "comment-empty-line-before": [
+                "always",
+                {
+                    "except": [
+                        "first-nested"
+                    ]
+                }
+            ],
+            "block-opening-brace-space-before": "always",
+            "declaration-colon-space-after": "always",
+            "declaration-colon-space-before": "never",
+            "declaration-block-single-line-max-declarations": 1,
+            "declaration-property-value-blacklist": {
+                "/^border/": [
+                    "none"
+                ]
+            },
+            "at-rule-empty-line-before": [
+                "always",
+                {
+                    "ignore": [
+                        "after-comment"
+                    ],
+                    "except": [
+                        "after-same-name",
+                        "first-nested"
+                    ]
+                }
+            ],
+            "scss/dollar-variable-pattern": "^_?[a-z]+[\\w-]*$",
+            "scss/at-extend-no-missing-placeholder": true,
+            "order/order": [
+                "declarations",
+                {
+                    "type": "at-rule"
+                },
+                {
+                    "type": "at-rule",
+                    "hasBlock": true
+                },
+                "rules"
+            ]
+        }
     }
 }

@@ -1,0 +1,28 @@
+.story-wrapper,
+.preview-wrapper,
+.lightbox__dim,
+.three-wrapper,
+.two-wrapper {
+    width: 100%;
+    font-size: 0.92em;
+}
+
+.story-wrapper img,
+.lightbox__dim img,
+.preview-wrapper img,
+.three-wrapper img,
+.two-wrapper img {
+    margin-bottom: 0;
+    border-radius: 0;
+}
+
+.grid-wrapper {
+    display: grid;
+}
+
+.chapter-area ul,
+.lightbox ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}

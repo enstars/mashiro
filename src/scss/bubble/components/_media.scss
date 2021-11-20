@@ -1,0 +1,16 @@
+@media (min-width: 1200px) {
+    .spell {
+        font-size: 1.15em;
+    }
+}
+
+@media (max-width: 650px) {
+    .msr-unit {
+        margin-bottom: 0.85em;
+    }
+
+    .msr-icon__wrapper {
+        width: var(--msr-icon-size__small);
+        height: var(--msr-icon-size__small);
+    }
+}

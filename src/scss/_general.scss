@@ -1,0 +1,15 @@
+@use "mixins.scss";
+
+[character]:not([class*="tippy"]),
+.minitalk,
+.toolbar {
+    @include mixins.disableSelect;
+}
+
+.note {
+    &.location,
+    &.narration,
+    &.cw {
+        @include mixins.disableSelect;
+    }
+}

@@ -1,0 +1,31 @@
+[character].smallest {
+    .msr-line {
+        p {
+            font-size: 0.8em;
+        }
+    }
+}
+
+[character].smaller {
+    .msr-line {
+        p {
+            font-size: 0.9em;
+        }
+    }
+}
+
+[character].bigger {
+    .msr-line {
+        p {
+            font-size: 1.1em;
+        }
+    }
+}
+
+[character].biggest {
+    .msr-line {
+        p {
+            font-size: 1.2em;
+        }
+    }
+}
