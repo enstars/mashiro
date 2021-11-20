@@ -4,8 +4,10 @@
     gap: 10px;
     transition: 0.15s all ease;
 
-    [character] p:last-of-type {
-        margin-bottom: unset;
+    .msr-unit {
+        &:last-of-type {
+            margin-bottom: unset;
+        }
     }
 
     ul {

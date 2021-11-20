@@ -3,7 +3,7 @@ a.msr-fn {
     vertical-align: middle;
     margin: 0 2px;
     font-weight: 700;
-    font-size: 0.7em;
+    font-size: 0.55em;
     border-radius: 3px;
     border: solid 1px rgb(158 158 158 / 40%);
     padding: 0 3px;
@@ -29,6 +29,7 @@ a.msr-fn {
         > li {
             a.arrow {
                 color: var(--storyColor);
+                border: 0;
 
                 &:hover {
                     color: var(--storyColor-dark);

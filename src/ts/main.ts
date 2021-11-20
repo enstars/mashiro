@@ -101,6 +101,7 @@ function footnoteInitialize() {
         zIndex: 99999999,
         moveTransition: "transform 0.2s ease",
         interactive: true,
+        appendTo: () => document.body,
     });
     tippy("[data-tippy-content]");
 }
