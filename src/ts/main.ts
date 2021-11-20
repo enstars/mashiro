@@ -98,7 +98,7 @@ function footnoteInitialize() {
         theme: "translucent",
         allowHTML: true,
         animation: "shift-away",
-        zIndex: 99,
+        zIndex: 99999999,
         moveTransition: "transform 0.2s ease",
         interactive: true,
     });

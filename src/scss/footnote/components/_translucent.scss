@@ -1,5 +1,5 @@
 .tippy-box[data-theme~="translucent"] {
-    background-color: rgba(0, 0, 0, 0.7);
+    background-color: rgba(0, 0, 0, 0.85);
     font-size: 0.85em;
 
     > .tippy-arrow {
@@ -33,7 +33,7 @@
         }
 
         .tippy-svg-arrow {
-            fill: rgba(0, 0, 0, 0.7);
+            fill: rgba(0, 0, 0, 0.85);
         }
     }
 }
