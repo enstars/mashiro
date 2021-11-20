@@ -6,6 +6,14 @@
         var(--storyColor-dark-l)
     );
 
+    --storyColor-bright-l: calc(var(--storyColor-l) + 20%);
+    --storyColor-bright-s: calc(var(--storyColor-s) + 20%);
+    --storyColor-bright: hsl(
+        var(--storyColor-h),
+        var(--storyColor-bright-s),
+        var(--storyColor-bright-l)
+    );
+
     --msr-icon-border: 12px 4px;
     --msr-icon-size: 50px;
     --msr-icon-size__small: 45px;

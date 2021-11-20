@@ -1,4 +1,4 @@
-.msr-fn a {
+a.msr-fn {
     display: inline-block;
     vertical-align: middle;
     margin: 0 2px;
@@ -18,5 +18,22 @@
 
     &:hover {
         color: var(--storyColor-dark);
+    }
+}
+
+.msr-fn {
+    > ol {
+        padding-left: 0;
+        margin-left: 20px;
+
+        > li {
+            a.arrow {
+                color: var(--storyColor);
+
+                &:hover {
+                    color: var(--storyColor-dark);
+                }
+            }
+        }
     }
 }
