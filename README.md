@@ -11,4 +11,4 @@ Check out the [wiki](https://github.com/enstars/mashiro/wiki) for documentation.
 -   [ ] Library
 -   [x] Toolbar
 -   [ ] Documentation website
--   [ ] Refine bubble layout
+-   [x] Refine bubble layout

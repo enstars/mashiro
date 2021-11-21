@@ -1,16 +1,10 @@
 .msr-unit {
-    * {
-        &:not([class*="tippy"]) {
-            transition: all 0.2s ease;
-        }
-    }
-
     display: grid;
     grid-template-columns: auto 1fr;
     column-gap: 12px;
     row-gap: 1px;
-    margin-bottom: 1em;
-    font-size: 1em;
+    margin-bottom: var(--msr-unit-margin);
+    font-size: var(--msr-line-size);
 }
 
 .msr-icon {
@@ -39,7 +33,7 @@
 
 .msr-name {
     font-size: 0.85em;
-    line-height: 0.85;
+    line-height: 0.9;
     font-weight: 700;
     text-transform: var(--msr-name-case);
 
@@ -52,11 +46,10 @@
     display: flex;
     flex-direction: column;
     grid-column: 2;
-    row-gap: 3px;
+    row-gap: var(--msr-line-gap);
 
     p {
         align-self: flex-start;
-        font-size: var(--msr-line-size);
         background: var(--light-mode, #f1f1f1);
         color: #222;
         padding: 0.6em;
@@ -85,4 +78,11 @@
             }
         }
     }
+}
+
+.msr-unit p,
+.msr-line p:first-child::before,
+.msr-icon__wrapper,
+.msr-icon__base {
+    transition: all 0.2s ease;
 }

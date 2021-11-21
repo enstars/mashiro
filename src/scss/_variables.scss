@@ -14,14 +14,19 @@
         var(--storyColor-bright-l)
     );
 
+    --msr-unit-margin: 1.2em;
     --msr-icon-border: 12px 4px;
-    --msr-icon-size: 50px;
+    --msr-icon-size: 60px;
     --msr-icon-size__small: 45px;
     --msr-name-case: uppercase;
     /* --msr-line-filter: drop-shadow(0 1px 1.5px rgba(0, 0, 0, 0.05))
         drop-shadow(0 1px 1px rgba(0, 0, 0, 0.06)); */
     --msr-line-border: 8px;
     --msr-line-size: 1em;
+    --msr-line-gap: 2px;
+
+    --msr-tippy-bg: rgba(0, 0, 0, 0.8);
+    --msr-tippy-shadow: 3px 3px 6px rgba(0, 0, 0, 0.35);
 }
 
 [character] {

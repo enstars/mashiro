@@ -1,6 +1,7 @@
 .tippy-box[data-theme~="translucent"] {
-    background-color: rgba(0, 0, 0, 0.75);
-    font-size: 0.9em;
+    background-color: var(--msr-tippy-bg);
+    font-size: 0.93em;
+    box-shadow: var(--msr-tippy-shadow, 0);
 
     a {
         color: var(--storyColor-bright);
@@ -19,31 +20,31 @@
 
     &[data-placement^="top"] > .tippy-arrow:before {
         border-width: 7px 7px 0;
-        border-top-color: rgba(0, 0, 0, 0.75);
+        border-top-color: var(--msr-tippy-bg);
     }
 
     &[data-placement^="bottom"] > .tippy-arrow:before {
         border-width: 0 7px 7px;
-        border-bottom-color: rgba(0, 0, 0, 0.75);
+        border-bottom-color: var(--msr-tippy-bg);
     }
 
     &[data-placement^="left"] > .tippy-arrow:before {
         border-width: 7px 0 7px 7px;
-        border-left-color: rgba(0, 0, 0, 0.75);
+        border-left-color: var(--msr-tippy-bg);
     }
 
     &[data-placement^="right"] > .tippy-arrow:before {
         border-width: 7px 7px 7px 0;
-        border-right-color: rgba(0, 0, 0, 0.75);
+        border-right-color: var(--msr-tippy-bg);
     }
 
     > {
         .tippy-backdrop {
-            background-color: rgba(0, 0, 0, 0.75);
+            background-color: var(--msr-tippy-bg);
         }
 
         .tippy-svg-arrow {
-            fill: rgba(0, 0, 0, 0.75);
+            fill: var(--msr-tippy-bg);
         }
     }
 }
