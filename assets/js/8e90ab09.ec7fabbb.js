@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkmashiro_gh_pages=self.webpackChunkmashiro_gh_pages||[]).push([[241],{6090:function(a){a.exports=JSON.parse('{"allTagsPath":"/mashiro/blog/tags","slug":"/mashiro/blog/tags/facebook","name":"facebook","count":1,"permalink":"/mashiro/blog/tags/facebook"}')}}]);

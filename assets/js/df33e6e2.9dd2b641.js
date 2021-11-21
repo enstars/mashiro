@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkmashiro_gh_pages=self.webpackChunkmashiro_gh_pages||[]).push([[848],{5944:function(s){s.exports={blogPosts:[]}}}]);

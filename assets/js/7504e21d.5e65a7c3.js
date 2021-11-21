@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkmashiro_gh_pages=self.webpackChunkmashiro_gh_pages||[]).push([[680],{2955:function(e){e.exports=JSON.parse('{"permalink":"/mashiro/blog","page":1,"postsPerPage":10,"totalPages":1,"totalCount":4,"previousPage":null,"nextPage":null,"blogDescription":"Blog","blogTitle":"Blog"}')}}]);
