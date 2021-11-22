@@ -1,7 +1,9 @@
-@use "_mixins.scss";
+%slider-transition {
+    transition: transform 0.3s ease, max-height 0s 0.3s step-end;
+}
 
 .toolbar-wrapper.showSlider .slider-container {
-    @include mixins.sliderTransition;
+    @extend %slider-transition;
     transform: translateY(calc(100% + 5px));
 }
 
@@ -17,6 +19,7 @@
     transition: opacity 0.2s;
 
     &-container {
+        @extend %slider-transition;
         position: absolute;
         background: #fff;
         justify-content: center;
@@ -24,8 +27,6 @@
         width: auto;
         padding: 0 8px 5px;
         border-radius: 15px;
-        @include mixins.toolbarShadow;
-        @include mixins.sliderTransition;
     }
 
     &:hover {

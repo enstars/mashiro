@@ -98,12 +98,21 @@ function footnoteInitialize() {
         theme: "translucent",
         allowHTML: true,
         animation: "shift-away",
-        zIndex: 99999999,
+        zIndex: 99,
         moveTransition: "transform 0.2s ease",
+    });
+
+    tippy("[data-tippy-content]");
+
+    tippy($("body").find(".msr-fn-inline").toArray(), {
         interactive: true,
         appendTo: () => document.body,
     });
-    tippy("[data-tippy-content]");
+
+    tippy($("body").find(".msr-fn-toolbar").toArray(), {
+        hideOnClick: false,
+        trigger: "mouseenter",
+    });
 }
 
 $(document).ready(function () {
