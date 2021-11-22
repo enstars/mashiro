@@ -1,6 +1,6 @@
 @use "mixins.scss";
 
-[character]:not([class*="tippy"]),
+[character],
 .minitalk,
 .toolbar {
     @include mixins.disableSelect;

@@ -1,22 +1,24 @@
-.dark .minitalk-option_header {
-    color: #eee;
-    background: var(--dark-mode, #0e0e0e);
-}
+.dark {
+    &.minitalk {
+        ul {
+            border-color: var(--dark-mode, #0e0e0e);
+        }
 
-.dark.minitalk {
-    ul {
-        border-color: var(--dark-mode, #0e0e0e);
-    }
+        li {
+            border-color: var(--dark-mode, #0e0e0e);
 
-    li {
-        border-color: var(--dark-mode, #0e0e0e);
+            &.active {
+                background: var(--dark-mode, #0e0e0e);
 
-        &.active {
-            background: var(--dark-mode, #0e0e0e);
-
-            > a {
-                color: #eee;
+                > a {
+                    color: #eee;
+                }
             }
         }
+    }
+
+    .minitalk-option_header {
+        color: #eee;
+        background: var(--dark-mode, #0e0e0e);
     }
 }

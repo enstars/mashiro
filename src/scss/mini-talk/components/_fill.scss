@@ -1,22 +1,24 @@
-.fill .minitalk-option_header {
-    color: #fff;
-    background: var(--fill-mode, #737373);
-}
+.fill {
+    &.minitalk {
+        ul {
+            border-color: var(--fill-mode, #737373);
+        }
 
-.fill.minitalk {
-    ul {
-        border-color: var(--fill-mode, #737373);
-    }
+        li {
+            border-color: var(--fill-mode, #737373);
 
-    li {
-        border-color: var(--fill-mode, #737373);
+            &.active {
+                background: var(--fill-mode, #737373);
 
-        &.active {
-            background: var(--fill-mode, #737373);
-
-            > a {
-                color: #fff;
+                > a {
+                    color: #fff;
+                }
             }
         }
+    }
+
+    .minitalk-option_header {
+        color: #fff;
+        background: var(--fill-mode, #737373);
     }
 }

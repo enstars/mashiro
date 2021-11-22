@@ -1,7 +1,7 @@
 .minitalk {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 8px;
     transition: 0.15s all ease;
 
     .msr-unit {
@@ -47,50 +47,45 @@
             font-weight: 700;
         }
     }
-}
 
-.minitalk-option_header {
-    background: var(--light-mode, #f1f1f1);
-    border-radius: 5px;
-    cursor: pointer;
-    padding: 8px;
-    display: grid;
-    grid-template-columns: 40px 1fr 40px;
-    text-align: center;
-    align-items: center;
-    gap: 10px;
-    color: #222;
-    transition: 0.15s all ease;
+    &-option {
+        &_header {
+            background: var(--light-mode, #f1f1f1);
+            border-radius: 5px;
+            cursor: pointer;
+            padding: 8px;
+            display: grid;
+            grid-template-columns: 40px 1fr 40px;
+            text-align: center;
+            align-items: center;
+            gap: 10px;
+            color: #222;
+            transition: 0.15s all ease;
 
-    &::after {
-        content: "\e5cf";
-        display: inline-block;
-        font-family: "Material Icons Round";
-        font-size: 1.5em;
-        font-weight: 700;
-        line-height: 1;
-        transition: transform 0.4s ease;
-        justify-self: end;
-        align-self: center;
-    }
+            &::after {
+                content: "\e5cf";
+                display: inline-block;
+                font-family: "Material Icons Round";
+                font-size: 1.5em;
+                font-weight: 700;
+                line-height: 1;
+                transition: transform 0.4s ease;
+                justify-self: end;
+                align-self: center;
+            }
 
-    &::before {
-        content: "";
-        background: var(--charahead) 0 (0 / cover);
-        height: 40px;
-        width: 40px;
-        display: inline-block;
-    }
-}
+            &::before {
+                content: "";
+                background: var(--charahead) 0 (0 / cover);
+                height: 40px;
+                width: 40px;
+                display: inline-block;
+            }
+        }
 
-.minitalk-option_content {
-    display: none;
-    padding: 15px 0 5px;
-}
-
-.minitalk[character] {
-    &::before,
-    &::after {
-        content: none;
+        &_content {
+            display: none;
+            padding: 15px 0 5px;
+        }
     }
 }

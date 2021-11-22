@@ -59,10 +59,6 @@
         }
     }
 
-    .quotes__wrapper {
-        display: none;
-    }
-
     .quotes {
         display: grid;
         grid-template-rows: var(--quote-height) var(--quote-height);
@@ -74,6 +70,10 @@
             align-items: center;
             text-align: center;
             line-height: 1.2;
+        }
+
+        &__wrapper {
+            display: none;
         }
     }
 }

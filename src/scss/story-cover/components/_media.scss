@@ -1,13 +1,15 @@
 @media only screen and (max-width: 812px) {
-    .story-box {
-        grid-template-columns: auto [col-start] 1fr [last];
-        grid-template-rows: auto;
-        margin: -245px 15px 0;
-    }
+    .story {
+        &-box {
+            grid-template-columns: auto [col-start] 1fr [last];
+            grid-template-rows: auto;
+            margin: -245px 15px 0;
+        }
 
-    .story-cover {
-        grid-column: 1/2;
-        grid-row: 1/2;
+        &-cover {
+            grid-column: 1/2;
+            grid-row: 1/2;
+        }
     }
 
     .title-area {
@@ -20,12 +22,14 @@
     }
 
     .mobile-reverse {
-        .story-box {
-            grid-template-columns: 1fr [col-start] auto [last];
-        }
+        .story {
+            &-box {
+                grid-template-columns: 1fr [col-start] auto [last];
+            }
 
-        .story-cover {
-            grid-column: 2/2;
+            &-cover {
+                grid-column: 2/2;
+            }
         }
 
         .title-area {
@@ -49,29 +53,33 @@
         margin-bottom: -3px;
     }
 
-    .lightbox__dim {
-        font-size: 0.9em;
+    .lightbox {
+        &__dim {
+            font-size: 0.9em;
+
+            .skills li {
+                grid-template-columns: 50px 1fr;
+            }
+        }
+
+        &-content {
+            padding: 15px;
+            gap: 15px;
+        }
     }
 
-    .lightbox-content {
-        padding: 15px;
-        gap: 15px;
-    }
+    .card {
+        &__name {
+            font-size: 1em;
+        }
 
-    .lightbox__dim .skills li {
-        grid-template-columns: 50px 1fr;
-    }
-
-    .card__name {
-        font-size: 1em;
-    }
-
-    .card__jp {
-        font-size: 0.9em;
+        &__jp {
+            font-size: 0.9em;
+        }
     }
 
     .skills {
-        li:before {
+        li::before {
             font-size: 0.7em;
         }
 
@@ -87,19 +95,21 @@
 }
 
 @media only screen and (max-width: 567px) {
-    .preview-background {
-        display: none;
-    }
+    .preview {
+        &-background {
+            display: none;
+        }
 
-    .preview-wrapper .grid-wrapper {
-        grid-template-columns: unset;
-    }
+        &-wrapper .grid-wrapper {
+            grid-template-columns: unset;
+        }
 
-    .preview-box {
-        padding: 0;
-        margin: 0;
-        background: none;
-        box-shadow: none;
+        &-box {
+            padding: 0;
+            margin: 0;
+            background: none;
+            box-shadow: none;
+        }
     }
 
     .characters > .value a {

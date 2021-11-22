@@ -6,11 +6,11 @@
 
 @media (max-width: 650px) {
     .msr-unit {
-        margin-bottom: 0.85em;
+        margin-bottom: var(--msr-unit-marginSmall);
     }
 
     .msr-icon__wrapper {
-        width: var(--msr-icon-size__small);
-        height: var(--msr-icon-size__small);
+        width: var(--msr-icon-sizeSmall);
+        height: var(--msr-icon-sizeSmall);
     }
 }

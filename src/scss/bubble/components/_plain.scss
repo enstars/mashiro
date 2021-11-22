@@ -1,0 +1,36 @@
+.plain {
+    .msr-unit {
+        grid-template-columns: 115px 1fr;
+        column-gap: 5px;
+    }
+
+    .msr-icon {
+        display: none;
+    }
+
+    .msr-name {
+        font-size: var(--msr-line-size);
+        line-height: unset;
+        text-transform: capitalize;
+
+        &::after {
+            content: ":";
+        }
+    }
+
+    .msr-line {
+        row-gap: 0.5em;
+
+        p {
+            background: 0;
+            padding: initial;
+            color: initial;
+
+            &:first-child {
+                &::before {
+                    display: none;
+                }
+            }
+        }
+    }
+}
