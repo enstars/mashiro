@@ -108,7 +108,7 @@ function footnoteInitialize() {
     });
 
     tippy($("body").find(".msr-fn-toolbar").toArray(), {
-        hideOnClick: false,
+        arrow: false,
         trigger: "mouseenter",
     });
 }
