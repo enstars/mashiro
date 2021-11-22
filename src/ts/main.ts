@@ -102,8 +102,6 @@ function footnoteInitialize() {
         moveTransition: "transform 0.2s ease",
     });
 
-    tippy("[data-tippy-content]");
-
     tippy($("body").find(".msr-fn-inline").toArray(), {
         interactive: true,
         appendTo: () => document.body,
