@@ -100,6 +100,7 @@ function footnoteInitialize() {
         animation: "shift-away",
         zIndex: 99,
         moveTransition: "transform 0.2s ease",
+        offset: [0, 5],
     });
 
     tippy($("body").find(".msr-fn-inline").toArray(), {
@@ -110,6 +111,11 @@ function footnoteInitialize() {
     tippy($("body").find(".msr-fn-toolbar").toArray(), {
         arrow: false,
         trigger: "mouseenter",
+    });
+
+    tippy($("body").find(".msr-tippy").toArray(), {
+        interactive: true,
+        appendTo: () => document.body,
     });
 }
 
