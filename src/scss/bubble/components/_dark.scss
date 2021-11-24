@@ -1,24 +1,22 @@
 .dark {
-    &[character] {
+    .msr-line {
+        p {
+            background: var(--dark-mode, #0e0e0e);
+            color: #eee;
+
+            &:first-child::before {
+                box-shadow: 20px 0 0 0 var(--dark-mode, #0e0e0e);
+            }
+        }
+    }
+
+    &[unknown] {
         .msr-line {
             p {
-                background: var(--dark-mode, #0e0e0e);
-                color: #eee;
+                background: #0e0e0e;
 
-                &:first-child {
-                    &::before {
-                        box-shadow: 20px 0 0 0 var(--dark-mode, #0e0e0e);
-                    }
-                }
-            }
-            &[unknown] {
-                p {
-                    background: #0e0e0e;
-                }
-                &:first-child {
-                    &::before {
-                        box-shadow: 20px 0 0 0 #0e0e0e;
-                    }
+                &:first-child::before {
+                    box-shadow: 20px 0 0 0 #0e0e0e;
                 }
             }
         }

@@ -26,10 +26,8 @@
             padding: initial;
             color: initial;
 
-            &:first-child {
-                &::before {
-                    display: none;
-                }
+            &:first-child::before {
+                display: none;
             }
         }
     }

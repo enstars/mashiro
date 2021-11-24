@@ -26,10 +26,8 @@
             background: #b3b3b3;
         }
 
-        &__wrapper {
-            &::after {
-                @extend %icon-silhouette;
-            }
+        &__wrapper::after {
+            @extend %icon-silhouette;
         }
     }
 

@@ -1,24 +1,22 @@
 .fill {
-    &[character] {
+    .msr-line {
+        p {
+            background: var(--fill-mode, #737373);
+            color: #fff;
+
+            &:first-child::before {
+                box-shadow: 20px 0 0 0 var(--fill-mode, #737373);
+            }
+        }
+    }
+
+    &[unknown] {
         .msr-line {
             p {
-                background: var(--fill-mode, #737373);
-                color: #fff;
+                background: #737373;
 
-                &:first-child {
-                    &::before {
-                        box-shadow: 20px 0 0 0 var(--fill-mode, #737373);
-                    }
-                }
-            }
-            &[unknown] {
-                p {
-                    background: #737373;
-                }
-                &:first-child {
-                    &::before {
-                        box-shadow: 20px 0 0 0 #737373;
-                    }
+                &:first-child::before {
+                    box-shadow: 20px 0 0 0 #737373;
                 }
             }
         }

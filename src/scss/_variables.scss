@@ -1,10 +1,14 @@
-:root {
+%story-dark {
     --storyColor-dark-l: calc(var(--storyColor-l) - 20%);
     --storyColor-dark: hsl(
         var(--storyColor-h),
         var(--storyColor-s),
         var(--storyColor-dark-l)
     );
+}
+
+:root {
+    @extend %story-dark;
 
     --storyColor-bright-l: calc(var(--storyColor-l) + 20%);
     --storyColor-bright-s: calc(var(--storyColor-s) + 20%);
@@ -33,4 +37,9 @@
     --light-mode: hsl(var(--hue), 54%, 93%);
     --dark-mode: hsl(var(--hue), 12%, 25%);
     --fill-mode: hsl(var(--hue), 25%, 42%);
+}
+
+.preview-wrapper,
+.info-area {
+    @extend %story-dark;
 }

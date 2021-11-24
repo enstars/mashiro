@@ -5,13 +5,6 @@
 
 .preview {
     &-wrapper {
-        --storyColor-dark-l: calc(var(--storyColor-l) - 20%);
-        --storyColor-dark: hsl(
-            var(--storyColor-h),
-            var(--storyColor-s),
-            var(--storyColor-dark-l)
-        );
-
         .grid-wrapper {
             width: 100%;
             grid-template-columns: 22% 10% 2fr 1fr;
