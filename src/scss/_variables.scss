@@ -30,7 +30,6 @@
     --msr-line-gap: 2.5px;
 
     --msr-tippy-bg: rgba(0, 0, 0, 0.75);
-    // --msr-tippy-shadow: 3px 3px 6px rgba(0, 0, 0, 0.35);
 }
 
 [character] {
@@ -40,6 +39,7 @@
 }
 
 .preview-wrapper,
-.info-area {
+.info-area,
+a.msr-fn-inline {
     @extend %story-dark;
 }

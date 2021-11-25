@@ -5,7 +5,7 @@
             color: #fff;
 
             &:first-child::before {
-                box-shadow: 20px 0 0 0 var(--fill-mode, #737373);
+                background: var(--fill-mode, #737373);
             }
         }
     }
@@ -16,7 +16,7 @@
                 background: #737373;
 
                 &:first-child::before {
-                    box-shadow: 20px 0 0 0 #737373;
+                    background: #737373;
                 }
             }
         }

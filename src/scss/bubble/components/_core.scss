@@ -66,15 +66,18 @@
             border-top-left-radius: 0;
 
             &::before {
-                background: transparent;
                 content: "";
+                display: block;
+                background: var(--light-mode, #f1f1f1);
+                width: 8px;
+                height: 12px;
                 position: absolute;
-                left: -30px;
-                top: 0px;
-                height: 10px;
-                width: 30px;
-                border-top-right-radius: 25px;
-                box-shadow: 23px 0 0 0 var(--light-mode, #f1f1f1);
+                top: 0;
+                left: -6px;
+                -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 12.5'%3E%3Cpath d='M6,12H9V0H.6C.4,0,0,.12,0,.7V1c0,.4.2.6.6.91C4.1,4.6,6,7.6,6,12Z'/%3E%3C/svg%3E")
+                    no-repeat 100% 100%;
+                mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 12.5'%3E%3Cpath d='M6,12H9V0H.6C.4,0,0,.12,0,.7V1c0,.4.2.6.6.91C4.1,4.6,6,7.6,6,12Z'/%3E%3C/svg%3E")
+                    no-repeat 100% 100%;
             }
         }
     }

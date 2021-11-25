@@ -10,12 +10,6 @@ a.msr-fn-inline {
     padding: 0 3px;
     background: rgb(255 255 255 / 50%);
     color: var(--storyColor);
-    --storyColor-dark-l: calc(var(--storyColor-l) - 20%);
-    --storyColor-dark: hsl(
-        var(--storyColor-h),
-        var(--storyColor-s),
-        var(--storyColor-dark-l)
-    );
 
     &:hover {
         color: var(--storyColor-dark);
