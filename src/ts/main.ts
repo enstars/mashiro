@@ -2,6 +2,8 @@ import $ from "jquery";
 import tippy from "tippy.js";
 import "tippy.js/dist/tippy.css";
 import "../scss/mashiro.scss";
+import "@fontsource/material-icons-rounded";
+import "@fontsource/almendra/400-italic.css";
 
 let mashiroConfig;
 
@@ -33,7 +35,7 @@ function minitalkInitialize() {
 
 function storyCoverInitialize() {
     cardLightboxInitialize();
-    $(".tab-header,.mt-header").click(function () {
+    $(".tab-header, .mt-header").click(function () {
         $(this).next().slideToggle();
         $(this).toggleClass("tab-header__open");
     });
@@ -64,6 +66,7 @@ function toolbarInitialize() {
             darkColors: false,
             // Slider range is 1-5, but font size array indices are 0-4
             fontSize: fontSizes.indexOf("") + 1,
+            fuckOkay: false,
         };
         mashiroConfig = defaultMashiroConfig;
         saveConfig();
@@ -103,7 +106,7 @@ function footnoteInitialize() {
         offset: [0, 8],
     });
 
-    tippy($("body").find(".msr-fn-inline").toArray(), {
+    tippy($("body").find(".msr-fn-inline, .msr-tippy").toArray(), {
         interactive: true,
         appendTo: () => document.body,
     });
@@ -111,11 +114,6 @@ function footnoteInitialize() {
     tippy($("body").find(".msr-fn-toolbar").toArray(), {
         arrow: false,
         trigger: "mouseenter",
-    });
-
-    tippy($("body").find(".msr-tippy").toArray(), {
-        interactive: true,
-        appendTo: () => document.body,
     });
 }
 
@@ -135,5 +133,11 @@ $(document).ready(function () {
 
     $("#sliderDrop").click(function () {
         $(".toolbar-wrapper").toggleClass("showSlider");
+    });
+
+    $(".fuckSwitch").click(function () {
+        $(".noFuck, .yesFuck").toggle();
+        mashiroConfig.fuckOkay = !mashiroConfig.fuckOkay;
+        saveConfig();
     });
 });

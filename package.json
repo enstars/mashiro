@@ -20,11 +20,11 @@
     },
     "homepage": "https://github.com/enstars/mashiro#readme",
     "devDependencies": {
-        "eslint": "^8.2.0",
-        "prettier": "^2.4.1",
         "autoprefixer": "^10.3.7",
         "css-loader": "^6.4.0",
+        "eslint": "^8.2.0",
         "postcss-loader": "^6.2.0",
+        "prettier": "^2.4.1",
         "sass": "^1.43.4",
         "sass-loader": "^12.3.0",
         "style-loader": "^3.3.1",
@@ -33,6 +33,8 @@
         "webpack-cli": "^4.9.1"
     },
     "dependencies": {
+        "@fontsource/almendra": "^4.5.0",
+        "@fontsource/material-icons-rounded": "^4.5.0",
         "jquery": "^3.6.0",
         "tippy.js": "^6.3.7"
     },
