@@ -65,7 +65,7 @@
             &::after {
                 content: "\e5cf";
                 display: inline-block;
-                font-family: "Material Icons Round";
+                font-family: "Material Icons Rounded";
                 font-size: 1.5em;
                 font-weight: 700;
                 line-height: 1;
@@ -85,7 +85,7 @@
 
         &_content {
             display: none;
-            padding: 10px 0 2px;
+            padding: 8px 0 0;
         }
     }
 }

@@ -1,0 +1,22 @@
+.msr-season {
+    &.winter {
+        background: #dce2ed;
+        border-color: #9dabc9;
+    }
+
+    &.spring {
+        border-color: #ffbbd1;
+        background: #ffe8f0;
+    }
+
+    &.summer {
+        border-color: #a1d1ff;
+        background: #e5f2ff;
+    }
+
+    &.fall,
+    &.autumn {
+        border-color: #ffd6b0;
+        background: #fff2e6;
+    }
+}

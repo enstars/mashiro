@@ -88,6 +88,8 @@ function toolbarInitialize() {
     $("[character]").toggleClass("fill", mashiroConfig.darkColors);
     $("#dark-toggle").toggle(mashiroConfig.darkColors);
     $("#light-toggle").toggle(!mashiroConfig.darkColors);
+    $(".yesFuck").toggle(mashiroConfig.fuckOkay);
+    $(".noFuck").toggle(!mashiroConfig.fuckOkay);
 
     if (mashiroConfig.fontSize) {
         $("input.slider").val(mashiroConfig.fontSize);
