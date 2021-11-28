@@ -90,7 +90,7 @@ function toolbarInitialize() {
     $("#light-toggle").toggle(!mashiroConfig.darkColors);
 
     $(".yesFuck").toggle(mashiroConfig.fuckOkay);
-    $("#fuckToggle").toggleClass("fuckOK", mashiroConfig.fuckOkay); // Colors link red
+    $("#fuckToggle").toggleClass("fuckON", mashiroConfig.fuckOkay); // Colors link red
     $(".noFuck").toggle(!mashiroConfig.fuckOkay);
 
     if (mashiroConfig.fontSize) {
@@ -141,7 +141,7 @@ $(document).ready(function () {
 
     $("#fuckToggle").click(function () {
         $(".noFuck, .yesFuck").toggle();
-        $("#fuckToggle").toggleClass("fuckOK");
+        $("#fuckToggle").toggleClass("fuckON");
         mashiroConfig.fuckOkay = !mashiroConfig.fuckOkay;
         saveConfig();
     });
