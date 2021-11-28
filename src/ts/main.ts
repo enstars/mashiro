@@ -85,17 +85,17 @@ function toolbarInitialize() {
     // Initialize fill mode based on config value
 
     if (mashiroConfig.darkColors) {
-        $("[character]").toggleClass("fill", mashiroConfig.darkColors);
-        $("#dark-toggle").toggle(mashiroConfig.darkColors);
+        $("[character]").toggleClass();
+        $("#dark-toggle").toggle();
     } else {
-        $("#light-toggle").toggle(!mashiroConfig.darkColors);
+        $("#light-toggle").toggle();
     }
 
     if (mashiroConfig.fuckOkay) {
-        $(".yesFuck").toggle(mashiroConfig.fuckOkay);
-        $("#fuckToggle").toggleClass("fuckON", mashiroConfig.fuckOkay);
+        $(".yesFuck").toggle();
+        $(".fuckSection").toggleClass("fuckON");
     } else {
-        $(".noFuck").toggle(!mashiroConfig.fuckOkay);
+        $(".noFuck").toggle();
     }
 
     if (mashiroConfig.fontSize) {
