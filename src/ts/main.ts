@@ -141,6 +141,7 @@ $(document).ready(function () {
 
     $("#fuckToggle").click(function () {
         $(".noFuck, .yesFuck").toggle();
+        $("#fuckToggle").toggleClass("fuckOK");
         mashiroConfig.fuckOkay = !mashiroConfig.fuckOkay;
         saveConfig();
     });

@@ -39,6 +39,7 @@
     @extend %grid-center;
     grid-template: 1fr / 1fr auto 1fr;
     gap: 5px;
+    margin: 0.9em 0;
 
     p {
         margin: 0;
@@ -53,7 +54,7 @@
     }
 
     span {
-        padding-left: 2px;
+        padding-right: 2px;
     }
 
     &::before,
@@ -66,7 +67,7 @@
     @extend %grid-center;
     grid-template: 1fr / var(--msr-icon-size) 1fr;
     gap: 10px;
-    margin-bottom: 1em;
+    margin-bottom: var(--msr-unit-margin);
 
     p {
         margin: 0;
@@ -84,7 +85,7 @@
     color: #fff;
     border-radius: 5px;
     padding: 12px;
-    margin: 1em 0;
+    margin: var(--msr-unit-margin) 0;
     grid-template: 1fr 1fr / 28px 1fr;
     column-gap: 12px;
 
