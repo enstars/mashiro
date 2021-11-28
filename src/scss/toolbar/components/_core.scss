@@ -35,17 +35,14 @@
             background-color: #e0e0e0;
         }
 
-        &#fuckToggle:hover {
+        &#fuckToggle:hover,
+        .fuckON {
             color: #9f0606;
         }
     }
 
     &__section {
         display: flex;
-
-        &.fuckSection.fuckON a {
-            color: #9f0606;
-        }
     }
 
     span {
