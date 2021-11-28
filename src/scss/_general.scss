@@ -1,15 +1,14 @@
-@use "mixins.scss";
-
 [character],
 .minitalk,
-.toolbar {
-    @include mixins.disableSelect;
-}
-
-.note {
-    &.location,
-    &.narration,
-    &.cw {
-        @include mixins.disableSelect;
-    }
+.toolbar,
+.msr-season,
+.msr-location,
+.msr-narration,
+.msr-cw {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }

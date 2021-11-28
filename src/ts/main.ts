@@ -2,8 +2,6 @@ import $ from "jquery";
 import tippy from "tippy.js";
 import "tippy.js/dist/tippy.css";
 import "../scss/mashiro.scss";
-import "@fontsource/material-icons-rounded";
-import "@fontsource/almendra/400-italic.css";
 
 let mashiroConfig;
 

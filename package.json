@@ -1,6 +1,6 @@
 {
     "name": "mashiro",
-    "version": "2.1.11",
+    "version": "2.1.2",
     "description": "CSS library for translation layouts",
     "private": true,
     "scripts": {
