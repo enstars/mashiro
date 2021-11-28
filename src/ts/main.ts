@@ -89,6 +89,7 @@ function toolbarInitialize() {
 
     $(".yesFuck").toggle(mashiroConfig.fuckOkay);
     $(".fuckSection").toggleClass("fuckON", mashiroConfig.fuckOkay);
+    $(".noFuck").toggle(!mashiroConfig.fuckOkay);
 
     if (mashiroConfig.fontSize) {
         $("input.slider").val(mashiroConfig.fontSize);
