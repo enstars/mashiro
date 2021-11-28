@@ -115,7 +115,7 @@ function footnoteInitialize() {
 
     tippy($("body").find(".msr-fn-toolbar").toArray(), {
         arrow: false,
-        trigger: "mouseenter",
+        appendTo: () => document.body,
     });
 }
 
