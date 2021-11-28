@@ -83,20 +83,12 @@ function toolbarInitialize() {
     $("input.slider").on("change", handleSliderChange);
 
     // Initialize fill mode based on config value
+    $("[character]").toggleClass("fill", mashiroConfig.darkColors);
+    $("#dark-toggle").toggle(mashiroConfig.darkColors);
+    $("#light-toggle").toggle(!mashiroConfig.darkColors);
 
-    if (mashiroConfig.darkColors) {
-        $("[character]").toggleClass();
-        $("#dark-toggle").toggle();
-    } else {
-        $("#light-toggle").toggle();
-    }
-
-    if (mashiroConfig.fuckOkay) {
-        $(".yesFuck").toggle();
-        $(".fuckSection").toggleClass("fuckON");
-    } else {
-        $(".noFuck").toggle();
-    }
+    $(".yesFuck").toggle(mashiroConfig.fuckOkay);
+    $(".fuckSection").toggleClass("fuckON", mashiroConfig.fuckOkay);
 
     if (mashiroConfig.fontSize) {
         $("input.slider").val(mashiroConfig.fontSize);
@@ -145,9 +137,8 @@ $(document).ready(function () {
     });
 
     $("#fuckToggle").click(function () {
+        $(".noFuck, .yesFuck").toggle();
         $(".fuckSection").toggleClass("fuckON");
-        $(".noFuck").toggle();
-        $(".yesFuck").toggle();
         mashiroConfig.fuckOkay = !mashiroConfig.fuckOkay;
         saveConfig();
     });
