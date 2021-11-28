@@ -83,13 +83,20 @@ function toolbarInitialize() {
     $("input.slider").on("change", handleSliderChange);
 
     // Initialize fill mode based on config value
-    $("[character]").toggleClass("fill", mashiroConfig.darkColors);
-    $("#dark-toggle").toggle(mashiroConfig.darkColors);
-    $("#light-toggle").toggle(!mashiroConfig.darkColors);
 
-    $(".yesFuck").toggle(mashiroConfig.fuckOkay);
-    $("#fuckToggle").toggleClass("fuckON", mashiroConfig.fuckOkay); // Colors link red
-    $(".noFuck").toggle(!mashiroConfig.fuckOkay);
+    if (mashiroConfig.darkColors) {
+        $("[character]").toggleClass("fill", mashiroConfig.darkColors);
+        $("#dark-toggle").toggle(mashiroConfig.darkColors);
+    } else {
+        $("#light-toggle").toggle(!mashiroConfig.darkColors);
+    }
+
+    if (mashiroConfig.fuckOkay) {
+        $(".yesFuck").toggle(mashiroConfig.fuckOkay);
+        $("#fuckToggle").toggleClass("fuckON", mashiroConfig.fuckOkay);
+    } else {
+        $(".noFuck").toggle(!mashiroConfig.fuckOkay);
+    }
 
     if (mashiroConfig.fontSize) {
         $("input.slider").val(mashiroConfig.fontSize);
@@ -138,8 +145,9 @@ $(document).ready(function () {
     });
 
     $("#fuckToggle").click(function () {
-        $(".noFuck, .yesFuck").toggle();
-        $("#fuckToggle").toggleClass("fuckON");
+        $(".fuckSection").toggleClass("fuckON");
+        $(".noFuck").toggle();
+        $(".yesFuck").toggle();
         mashiroConfig.fuckOkay = !mashiroConfig.fuckOkay;
         saveConfig();
     });
