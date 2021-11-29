@@ -1,5 +1,6 @@
 @media (max-width: 650px) {
     .msr-narration {
+        grid-template: 1fr / var(--msr-icon-sizeSmall) 1fr;
         margin-bottom: var(--msr-unit-marginSmall);
     }
 
