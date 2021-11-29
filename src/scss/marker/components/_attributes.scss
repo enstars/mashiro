@@ -1,22 +1,22 @@
 .msr-season {
     &.winter {
-        border-color: hsl(221, 27%, 77%);
+        border-color: hsl(221, 27%, 80%);
         background: hsl(221, 27%, 92%);
     }
 
     &.spring {
-        border-color: hsl(341, 100%, 80%);
+        border-color: hsl(341, 100%, 83%);
         background: hsl(341, 100%, 95%);
     }
 
     &.summer {
-        border-color: hsl(210, 100%, 80%);
+        border-color: hsl(210, 100%, 83%);
         background: hsl(210, 100%, 95%);
     }
 
     &.fall,
     &.autumn {
-        border-color: hsl(29, 100%, 80%);
+        border-color: hsl(29, 100%, 83%);
         background: hsl(29, 100%, 95%);
     }
 }

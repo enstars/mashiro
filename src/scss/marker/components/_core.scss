@@ -39,7 +39,7 @@
     @extend %grid-center;
     grid-template: 1fr / 1fr auto 1fr;
     gap: 5px;
-    margin: 0.9em 0;
+    margin: 0.8em 0;
 
     p {
         margin: 0;
@@ -71,6 +71,11 @@
 
     p {
         margin: 0;
+        transition: all 0.2s ease;
+
+        &:hover {
+            transform: translate(2px, 0px);
+        }
     }
 
     &::before {
