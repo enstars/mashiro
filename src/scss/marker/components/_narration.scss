@@ -1,0 +1,22 @@
+@use "core";
+
+.msr-narration {
+    @include core.grid-center;
+    grid-template: 1fr / var(--msr-icon-size) 1fr;
+    gap: 10px;
+    margin-bottom: var(--msr-unit-margin);
+
+    p {
+        margin: 0;
+        transition: all 0.2s ease;
+
+        &:hover {
+            transform: translate(2px, 0px);
+        }
+    }
+
+    &::before {
+        @include core.marker-line;
+        transition: all 0.2s ease;
+    }
+}

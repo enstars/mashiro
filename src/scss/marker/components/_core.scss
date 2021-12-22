@@ -1,119 +1,17 @@
-%grid-center {
+@mixin grid-center {
     display: grid;
     align-items: center;
 }
 
-%marker-icon {
+@mixin marker-icon {
     font-family: "Material Icons Rounded";
-    font-size: 18px;
     justify-self: center;
 }
 
-%marker-line {
+@mixin marker-line {
     content: "";
     height: 0.1em;
     width: 100%;
     display: block;
     border-bottom: solid var(--msr-marker-lineColor, #555) 1px;
-}
-
-.msr-season {
-    @extend %grid-center;
-    grid-template: 1fr / 24px 1fr;
-    border-radius: 5px;
-    padding: 8px;
-    border: solid 1px;
-    margin: 0.8em 0;
-
-    p {
-        margin: 0;
-    }
-
-    &::before {
-        content: "\f076";
-        @extend %marker-icon;
-    }
-}
-
-.msr-location {
-    @extend %grid-center;
-    grid-template: 1fr / 1fr auto 1fr;
-    gap: 5px;
-    margin: 0.8em 0;
-
-    p {
-        margin: 0;
-        display: flex;
-        align-items: center;
-        gap: 5px;
-
-        &::before {
-            content: "\e55f";
-            @extend %marker-icon;
-        }
-    }
-
-    span {
-        padding-right: 2px;
-    }
-
-    &::before,
-    &::after {
-        @extend %marker-line;
-    }
-}
-
-.msr-narration {
-    @extend %grid-center;
-    grid-template: 1fr / var(--msr-icon-size) 1fr;
-    gap: 10px;
-    margin-bottom: var(--msr-unit-margin);
-
-    p {
-        margin: 0;
-        transition: all 0.2s ease;
-
-        &:hover {
-            transform: translate(2px, 0px);
-        }
-    }
-
-    &::before {
-        @extend %marker-line;
-        transition: all 0.2s ease;
-    }
-}
-
-.msr-cw {
-    @extend %grid-center;
-    background: #cb0f0f;
-    border: solid 1px #9f0606;
-    color: #fff;
-    border-radius: 5px;
-    padding: 12px;
-    margin: var(--msr-unit-margin) 0;
-    grid-template: 1fr 1fr / 28px 1fr;
-    column-gap: 12px;
-
-    p {
-        margin: 0;
-        grid-column: 2/3;
-    }
-
-    .cw-header {
-        font-weight: 700;
-        font-size: 1.1em;
-        grid-column: 2/3;
-        grid-row: 1/2;
-    }
-
-    &::before {
-        content: "\e002";
-        font-family: "Material Icons Rounded";
-        font-size: 28px;
-        font-weight: normal;
-        justify-self: center;
-        grid-row: 1/3;
-        line-height: 1;
-    }
 }

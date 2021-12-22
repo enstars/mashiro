@@ -1,0 +1,20 @@
+@use "core";
+
+.msr-season {
+    @include core.grid-center;
+    grid-template: 1fr / 24px 1fr;
+    border-radius: 5px;
+    padding: 8px;
+    border: solid 1px;
+    margin: 0.8em 0;
+
+    p {
+        margin: 0;
+    }
+
+    &::before {
+        content: "\f076";
+        @include core.marker-icon;
+        font-size: 18px;
+    }
+}

@@ -1,0 +1,34 @@
+@use "core";
+
+.msr-cw {
+    @include core.grid-center;
+    background: #cb0f0f;
+    border: solid 1px #9f0606;
+    color: #fff;
+    border-radius: 5px;
+    padding: 12px;
+    margin: var(--msr-unit-margin) 0;
+    grid-template: 1fr 1fr / 28px 1fr;
+    column-gap: 12px;
+
+    p {
+        margin: 0;
+        grid-column: 2/3;
+    }
+
+    .cw-header {
+        font-weight: 700;
+        font-size: 1.1em;
+        grid-column: 2/3;
+        grid-row: 1/2;
+    }
+
+    &::before {
+        content: "\e002";
+        @include core.marker-icon;
+        font-size: 28px;
+        font-weight: normal;
+        grid-row: 1/3;
+        line-height: 1;
+    }
+}
