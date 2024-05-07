@@ -87,10 +87,6 @@ function toolbarInitialize() {
     $("#dark-toggle").toggle(mashiroConfig.darkColors);
     $("#light-toggle").toggle(!mashiroConfig.darkColors);
 
-    $(".yesFuck").toggle(mashiroConfig.fuckOkay);
-    $("#fuckToggle").toggleClass("fuckON", mashiroConfig.fuckOkay);
-    $(".noFuck").toggle(!mashiroConfig.fuckOkay);
-
     if (mashiroConfig.fontSize) {
         $("input.slider").val(mashiroConfig.fontSize);
         // Need to manually invoke event listener
@@ -135,12 +131,5 @@ $(document).ready(function () {
 
     $("#sliderDrop").click(function () {
         $(".toolbar-wrapper").toggleClass("showSlider");
-    });
-
-    $("#fuckToggle").click(function () {
-        $(".noFuck, .yesFuck").toggle();
-        $("#fuckToggle").toggleClass("fuckON");
-        mashiroConfig.fuckOkay = !mashiroConfig.fuckOkay;
-        saveConfig();
     });
 });
