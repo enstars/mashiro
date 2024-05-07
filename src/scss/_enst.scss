@@ -110,6 +110,24 @@
     --charahead: url("https://cdn.jsdelivr.net/gh/enstars/img/charahead/hinata.png");
 }
 
+[character="Hitsugi"],
+[character="NEGI"] {
+    --icon: url("https://cdn.jsdelivr.net/gh/enstars/img/icon/hitsugi.png");
+    --charahead: url("https://cdn.jsdelivr.net/gh/enstars/img/charahead/hitsugi.png");
+}
+
+[character="Hitsugi"] {
+    --name: "Hitsugi";
+    --color: #00c6ff;
+    --hue: #{color.hue(#00c6ff)};
+}
+
+[character="NEGI"] {
+    --name: "NEGI";
+    --color: #eac254;
+    --hue: #{color.hue(#eac254)};
+}
+
 [character="Hiyori"] {
     --color: #b8d200;
     --hue: #{color.hue(#b8d200)};
@@ -362,8 +380,8 @@
 }
 
 [character="Seiya"] {
-    --color: #07467f;
-    --hue: #{color.hue(#07467f)};
+    --color: #043c78;
+    --hue: #{color.hue(#043c78)};
     --name: "Seiya";
     --icon: url("https://cdn.jsdelivr.net/gh/enstars/img/icon/seiya.png");
     --charahead: url("https://cdn.jsdelivr.net/gh/enstars/img/charahead/seiya.png");
