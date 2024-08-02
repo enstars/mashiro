@@ -12,3 +12,7 @@ Check out the [wiki](https://github.com/enstars/mashiro/wiki) for documentation.
 -   [x] Toolbar
 -   [ ] Documentation website
 -   [x] Refine bubble layout
+
+## Compiling
+
+Run `npx webpack`.
