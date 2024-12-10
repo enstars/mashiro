@@ -486,6 +486,14 @@
     --charahead: url("https://cdn.jsdelivr.net/gh/enstars/img/charahead/wataru.png");
 }
 
+[character="Yume"] {
+    --color: #ccadd9;
+    --hue: #{color.hue(#ccadd9)};
+    --name: "Yume";
+    --icon: url("https://cdn.jsdelivr.net/gh/enstars/img/icon/fuyume.png");
+    --charahead: url("https://cdn.jsdelivr.net/gh/enstars/img/charahead/fuyume.png");
+}
+
 [character="Yuta"] {
     --color: #00a1e9;
     --hue: #{color.hue(#00a1e9)};
