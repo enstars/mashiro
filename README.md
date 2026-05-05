@@ -15,4 +15,4 @@ Check out the [wiki](https://github.com/enstars/mashiro/wiki) for documentation.
 
 ## Compiling
 
-Run `npx webpack`.
+Run `npx webpack` or `pnpx webpack`.

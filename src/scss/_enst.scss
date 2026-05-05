@@ -46,6 +46,14 @@
     --charahead: url("https://cdn.jsdelivr.net/gh/enstars/img/charahead/chiaki.png");
 }
 
+[character="Chitose"] {
+    --color: #304780;
+    --hue: #{color.hue(#304780)};
+    --name: "Chitose";
+    --icon: url("https://cdn.jsdelivr.net/gh/enstars/img/icon/chitose.png");
+    --charahead: url("https://cdn.jsdelivr.net/gh/enstars/img/charahead/chitose.png");
+}
+
 [character="Eichi"] {
     --color: #fff3b8;
     --hue: #{color.hue(#fff3b8)};
@@ -176,6 +184,14 @@
     --charahead: url("https://cdn.jsdelivr.net/gh/enstars/img/charahead/jin.png");
 }
 
+[character="Juis"] {
+    --color: #52CC53;
+    --hue: #{color.hue(#52CC53)};
+    --name: "Juis";
+    --icon: url("https://cdn.jsdelivr.net/gh/enstars/img/icon/juis.png");
+    --charahead: url("https://cdn.jsdelivr.net/gh/enstars/img/charahead/juis.png");
+}
+
 [character="Jun"] {
     --color: #192f60;
     --hue: #{color.hue(#192f60)};
@@ -273,6 +289,22 @@
     --name: "Mao";
     --icon: url("https://cdn.jsdelivr.net/gh/enstars/img/icon/mao.png");
     --charahead: url("https://cdn.jsdelivr.net/gh/enstars/img/charahead/mao.png");
+}
+
+[character="Mashu"] {
+    --color: #F37A89;
+    --hue: #{color.hue(#F37A89)};
+    --name: "Mashu";
+    --icon: url("https://cdn.jsdelivr.net/gh/enstars/img/icon/mashu.png");
+    --charahead: url("https://cdn.jsdelivr.net/gh/enstars/img/charahead/mashu.png");
+}
+
+[character="Madoka"] {
+    --color: #981558;
+    --hue: #{color.hue(#981558)};
+    --name: "Mashu";
+    --icon: url("https://cdn.jsdelivr.net/gh/enstars/img/icon/madoka.png");
+    --charahead: url("https://cdn.jsdelivr.net/gh/enstars/img/charahead/madoka.png");
 }
 
 [character="Mayoi"] {
