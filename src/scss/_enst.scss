@@ -299,14 +299,6 @@
     --charahead: url("https://cdn.jsdelivr.net/gh/enstars/img/charahead/mashu.png");
 }
 
-[character="Madoka"] {
-    --color: #981558;
-    --hue: #{color.hue(#981558)};
-    --name: "Mashu";
-    --icon: url("https://cdn.jsdelivr.net/gh/enstars/img/icon/madoka.png");
-    --charahead: url("https://cdn.jsdelivr.net/gh/enstars/img/charahead/madoka.png");
-}
-
 [character="Mayoi"] {
     --color: #522f60;
     --hue: #{color.hue(#522f60)};
@@ -377,6 +369,14 @@
     --name: "Niki";
     --icon: url("https://cdn.jsdelivr.net/gh/enstars/img/icon/niki.png");
     --charahead: url("https://cdn.jsdelivr.net/gh/enstars/img/charahead/niki.png");
+}
+
+[character="Nozomi"] {
+    --color: #981558;
+    --hue: #{color.hue(#981558)};
+    --name: "Nozomi";
+    --icon: url("https://cdn.jsdelivr.net/gh/enstars/img/icon/nozomi.png");
+    --charahead: url("https://cdn.jsdelivr.net/gh/enstars/img/charahead/nozomi.png");
 }
 
 [character="Raika"] {
